@@ -42,12 +42,6 @@ export type ContactInfo = {
     }[];
 };
 
-export type Subscribe = {
-    title?: string;
-    text?: string;
-    formUrl: string;
-};
-
 export type SiteConfig = {
     website: string;
     logo?: Image;
@@ -60,7 +54,6 @@ export type SiteConfig = {
     hero?: Hero;
     about?: About;
     contactInfo?: ContactInfo;
-    subscribe?: Subscribe;
     blog?: Blog;
     postsPerPage?: number;
     recentPostLimit: number;
@@ -69,11 +62,11 @@ export type SiteConfig = {
 
 const siteConfig: SiteConfig = {
     website: 'https://example.com',
-    title: 'Space Ahead',
-    description: 'A minimal space-inspired personal blog template built with Astro.js and Tailwind CSS, by Siddhesh Thadeshwar',
+    title: 'Caring Hearts',
+    description: 'Care for children who think differently',
     image: {
-        src: '/space-ahead-preview.jpeg',
-        alt: 'Space Ahead ✨ - A minimal space-inspired personal blog template, created by Siddhesh Thadeshwar.'
+        src: '/caring-hearts-preview.jpeg',
+        alt: 'Caring Hearts - Care for children who think differently'
     },
     headerNavLinks: [
         {
@@ -81,20 +74,20 @@ const siteConfig: SiteConfig = {
             href: withBase('/')
         },
         {
-            text: 'Blog',
-            href: withBase('/blog')
+            text: 'About Us',
+            href: withBase('/about-us/')
         },
         {
-            text: 'Tags',
-            href: withBase('/tags')
+            text: 'Fun Stuff',
+            href: withBase('/fun-stuff/')
         },
         {
-            text: 'About',
-            href: withBase('/about')
+            text: 'Positive Message',
+            href: withBase('/positive-message/')
         },
         {
-            text: 'Contact',
-            href: withBase('/contact')
+            text: 'Help',
+            href: withBase('/help/')
         }
     ],
     footerNavLinks: [
@@ -130,27 +123,27 @@ const siteConfig: SiteConfig = {
         }
     ],
     hero: {
-        eyebrowText: 'Galaxy of Adventures',
-        title: 'Space Ahead ✨',
-        text: "Written by Astro-naut Sid, a space explorer at Beyond Earth.",
+        eyebrowText: 'Support & Resources',
+        title: 'Caring Hearts',
+        text: 'Supporting families and children who think differently',
         image: {
             src: '/assets/images/pixeltrue-space-discovery.svg',
             alt: 'A person sitting at a desk in front of a computer'
         },
         actions: [
             {
-                text: 'Read Now',
-                href: withBase('/blog')
+                text: 'Get Help',
+                href: withBase('/help/')
             },
             {
-                text: 'Subscribe',
-                href: '#subscribe'
+                text: 'Learn More',
+                href: withBase('/about-us/')
             }
         ]
     },
     about: {
         title: 'About',
-        text: 'Space Ahead is a blog about space exploration and travel. It is written by Astro-naut Sid, a space explorer at Beyond Earth. Sid is known for his love of adventure and his insatiable curiosity about the universe. He has explored countless planets, discovered new life forms, and made friends with aliens along the way. 🚀',
+        text: 'Caring Hearts is dedicated to supporting families and children with autism and neurodivergence. We provide accessible resources, practical guidance, and community connection to help children thrive.',
     },
     contactInfo: {
         title: 'Contact',
@@ -174,11 +167,6 @@ const siteConfig: SiteConfig = {
                 href: "https://github.com/"
             }
         ]
-    },
-    subscribe: {
-        title: 'Subscribe to Space Ahead',
-        text: 'One update per week. All the latest stories in your inbox.',
-        formUrl: '#'
     },
     blog: {
         description: "Read about my space adventures, explorations and the aliens I've met on my journeys."

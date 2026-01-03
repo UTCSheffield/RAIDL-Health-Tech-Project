@@ -1,72 +1,111 @@
 ---
 import siteConfig, { type Link } from "../site.config";
 import Hamburger from "./Hamburger.astro";
-import ThemeSwitcher from "./ThemeSwitcher.astro";
 import SiteIdentity from "./SiteIdentity.astro";
 import NavLinks from "./NavLinks.astro";
 import { withBase } from "../utils/helpers";
 const { activePage } = Astro.props;
 ---
 
-<header>
-  <nav class="font-light w-full">
-    <a href={withBase("/")}><SiteIdentity /></a>
-    <div class="hidden sm:flex sm:gap-8">
-      {(<NavLinks activePage={activePage} links={siteConfig.headerNavLinks} />)}
+<header id="site-header" class="sticky top-0 z-50 bg-white/80 backdrop-blur-sm transition-transform duration-300">
+  <nav class="flex items-center justify-between w-full px-6 py-4">
+    <div class="flex items-center gap-6">
+      <a href={withBase("/")} aria-label="Home"><SiteIdentity /></a>
     </div>
-    <ThemeSwitcher />
-    <Hamburger />
+
+    <!-- Desktop Links -->
+    <div class="hidden sm:flex sm:items-center sm:gap-8">
+      <NavLinks activePage={activePage} links={siteConfig.headerNavLinks} />
+    </div>
+
+    <!-- Actions -->
+    <div class="flex items-center gap-4">
+      <a href={withBase("/help/")} class="hidden sm:inline-flex items-center px-5 py-2 rounded-lg text-white font-bold caveat-brush-regular get-help-btn" style="background: linear-gradient(90deg, #fb8a56 0%, #8d3db8 100%); color: white !important;">Get Help</a>
+      <button id="hamburger-menu" aria-controls="mobile-links" aria-expanded="false" class="sm:hidden inline-block" title="Menu">🍔</button>
+    </div>
   </nav>
-  <div
-    id="mobile-links"
-    class="font-light animated h-0 m-0 opacity-0 top-0 w-full"
-  >
-    <span class="close-menu">❌</span>
-    <NavLinks
-      activePage={activePage}
-      links={siteConfig.headerNavLinks}
-      isMobileLink={true}
-    />
+
+  <!-- Mobile menu (hidden by default) -->
+  <div id="mobile-links" class="fixed inset-0 z-40 hidden bg-black/60 backdrop-blur-sm p-6">
+    <div class="bg-white dark:bg-black rounded-lg max-w-md w-full mx-auto p-6">
+      <div class="flex items-center justify-between mb-4">
+        <SiteIdentity />
+        <button id="mobile-close" aria-label="Close menu">❌</button>
+      </div>
+      <nav class="flex flex-col gap-2">
+        <NavLinks activePage={activePage} links={siteConfig.headerNavLinks} isMobileLink={true} />
+        <a href={withBase("/help/")} class="mt-4 inline-flex items-center px-4 py-2 rounded-lg text-white font-bold caveat-brush-regular get-help-btn" style="background: linear-gradient(90deg, #fb8a56 0%, #8d3db8 100%); color: white !important;">Get Help</a>
+      </nav>
+    </div>
   </div>
 </header>
+
 <script is:inline>
-  document.querySelector("#hamburger-menu").addEventListener("click", () => {
-    console.log("clicked...");
-    document.querySelector("#mobile-links").classList.remove("slideOutUp");
-    document.querySelector("#mobile-links").classList.add("expanded");
-    document.querySelector("#mobile-links").classList.add("slideInDown");
-  });
+  const hamburger = document.querySelector("#hamburger-menu");
+  const mobile = document.querySelector("#mobile-links");
+  const closeBtn = document.querySelector("#mobile-close");
 
-  document.querySelector(".close-menu").addEventListener("click", () => {
-    console.log("clicked...");
-    document.querySelector("#mobile-links").classList.add("slideOutUp");
-    document.querySelector("#mobile-links").classList.add("expanded");
-    document.querySelector("#mobile-links").classList.remove("slideInDown");
-  });
-</script>
-
-<style>
-  @media (orientation: portrait) {
-    #mobile-links.expanded {
-      align-items: end;
-      background-color: #0000007a;
-      backdrop-filter: blur(72px);
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-      justify-content: end;
-      position: absolute;
-      z-index: 10;
-      opacity: 1;
-      padding: 1rem 2rem;
-      width: 100vw;
-      top: 0;
-      min-height: fit-content;
-      border-bottom-left-radius: 0.5rem;
-      border-bottom-right-radius: 0.5rem;
-    }
-    html.light #mobile-links.expanded {
-      background-color: #ffffff6a;
-    }
+  function openMobile() {
+    if (!mobile) return;
+    mobile.classList.remove("hidden");
+    mobile.setAttribute("aria-hidden", "false");
+    hamburger?.setAttribute("aria-expanded", "true");
+    // move focus to first link for accessibility
+    const firstLink = mobile.querySelector("a, button");
+    firstLink?.focus();
+    document.documentElement.style.overflow = "hidden";
   }
-</style>
+
+  function closeMobile() {
+    if (!mobile) return;
+    mobile.classList.add("hidden");
+    mobile.setAttribute("aria-hidden", "true");
+    hamburger?.setAttribute("aria-expanded", "false");
+    hamburger?.focus();
+    document.documentElement.style.overflow = "auto";
+  }
+
+  hamburger?.addEventListener("click", openMobile);
+  closeBtn?.addEventListener("click", closeMobile);
+  mobile?.addEventListener("click", (e) => {
+    if (e.target === mobile) closeMobile();
+  });
+
+  // close with Escape key
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeMobile();
+  });
+
+  // Hide/show header on scroll: hide when scrolling down, show when scrolling up
+  (function () {
+    const header = document.getElementById("site-header");
+    if (!header) return;
+    let lastScroll = window.scrollY || document.documentElement.scrollTop;
+    let ticking = false;
+
+    function onScroll() {
+      const current = window.scrollY || document.documentElement.scrollTop;
+      const delta = current - lastScroll;
+
+      if (Math.abs(delta) < 10) return; // ignore small changes
+
+      if (delta > 0 && current > 80) {
+        // scrolled down
+        header.classList.add('header-hidden');
+      } else {
+        // scrolled up
+        header.classList.remove('header-hidden');
+      }
+
+      lastScroll = current <= 0 ? 0 : current;
+      ticking = false;
+    }
+
+    window.addEventListener('scroll', () => {
+      if (!ticking) {
+        window.requestAnimationFrame(onScroll);
+        ticking = true;
+      }
+    }, { passive: true });
+  })();
+</script>

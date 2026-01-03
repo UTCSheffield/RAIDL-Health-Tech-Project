@@ -1,5 +1,6 @@
 @import url("animate.css");
 @import url("fonts.css");
+@import url('https://fonts.googleapis.com/css2?family=Caveat+Brush&family=Roboto+Slab:wght@100..900&display=swap');
 @import "tailwindcss";
 
 /* 0. color variables & fonts */
@@ -8,10 +9,11 @@
 
 /* 0. color variables & fonts */
 :root {
-  --space-red: #90393a;
-  --space-yellow: #ffff85;
-  --space-sand: #e2d1c3;
-  --space-stone: #434343;
+  --tan-hide: #fb8a56;
+  --violet-red: #f33974;
+  --studio: #8d3db8;
+  --falcon: #78596b;
+  --thunder: #422940;
 }
 
 /* Required to ensure dark: modifiers work when manually toggling mode */
@@ -20,10 +22,11 @@
 
 @theme {
   --font-sans: "Kanit", "sans-serif";
-  --color-space-red: var(--space-red);
-  --color-space-yellow: var(--space-yellow);
-  --color-space-sand: var(--space-sand);
-  --color-space-stone: var(--space-stone);
+  --color-tan-hide: var(--tan-hide);
+  --color-violet-red: var(--violet-red);
+  --color-studio: var(--studio);
+  --color-falcon: var(--falcon);
+  --color-thunder: var(--thunder);
   --color-whitesmoke: whitesmoke;
 }
 
@@ -37,7 +40,7 @@ body {
 html.dark body {
   background-image: linear-gradient(
     to bottom,
-    var(--color-space-stone) 0%,
+    var(--color-thunder) 0%,
     black 100%
   );
   @apply bg-black bg-cover bg-no-repeat text-whitesmoke;
@@ -45,24 +48,17 @@ html.dark body {
 
 html.light body {
   /* background-image: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); */
-  background-image: linear-gradient(180deg, #fdfcfb 0%, #e2d1c3 100%);
-  @apply bg-space-sand bg-cover bg-no-repeat text-black;
+  background-image: linear-gradient(180deg, #fdfcfb 0%, #f3e5f5 100%);
+  @apply bg-cover bg-no-repeat text-black;
 }
 
 /* semantic elements */
 header {
-  @apply sticky top-4 z-20 mr-auto ml-auto flex w-full max-w-3xl flex-col items-center justify-center px-0 py-0 text-base;
+  @apply sticky top-0 z-20 w-full flex flex-col items-center justify-center px-0 py-0 text-base;
 }
 
 header > nav {
-  @apply flex flex-row items-center justify-between gap-2 rounded-4xl px-5 py-2 text-xs backdrop-blur-3xl sm:gap-8 sm:py-3 sm:text-base;
-  /* inner glow 👇 */
-  box-shadow:
-    inset 0 0 0.5px 1px hsla(0, 0%, 100%, 0.075),
-    /* shadow ring 👇 */ 0 0 0 1px hsla(0, 0%, 0%, 0.05),
-    /* multiple soft shadows 👇 */ 0 0.3px 0.4px hsla(0, 0%, 0%, 0.02),
-    0 0.9px 1.5px hsla(0, 0%, 0%, 0.045),
-    0 3.5px 6px hsla(0, 0%, 0%, 0.09);
+  @apply flex flex-row items-center justify-between gap-4 w-full px-6 py-4 text-base;
 }
 
 main {
@@ -92,15 +88,15 @@ img {
 /* links */
 a.button-link:not(:disabled),
 button.button-link:not(:disabled) {
-  @apply inline-flex cursor-pointer items-center justify-center rounded-full border px-6 py-2 leading-tight transition hover:border-space-red hover:text-space-red sm:px-8 hover:dark:border-space-yellow hover:dark:text-space-yellow;
+  @apply inline-flex cursor-pointer items-center justify-center rounded-full border px-6 py-2 leading-tight transition hover:border-violet-red hover:text-violet-red sm:px-8 hover:dark:border-tan-hide hover:dark:text-tan-hide;
 }
 a.button-link.space-btn-filled:not(:disabled),
 button.button-link.space-btn-filled:not(:disabled) {
-  @apply bg-black text-whitesmoke hover:border-space-red hover:bg-space-red dark:bg-whitesmoke dark:text-black dark:hover:border-space-yellow dark:hover:bg-space-yellow;
+  @apply bg-black text-whitesmoke hover:border-violet-red hover:bg-violet-red dark:bg-whitesmoke dark:text-black dark:hover:border-tan-hide dark:hover:bg-tan-hide;
 }
 a.button-link.space-btn-outlined:not(:disabled),
 button.button-link.space-btn-outlined:not(:disabled) {
-  @apply border border-black bg-transparent text-black hover:border-space-red hover:text-space-red dark:border-whitesmoke dark:bg-transparent dark:text-whitesmoke dark:hover:border-space-yellow dark:hover:text-space-yellow;
+  @apply border border-black bg-transparent text-black hover:border-violet-red hover:text-violet-red dark:border-whitesmoke dark:bg-transparent dark:text-whitesmoke dark:hover:border-tan-hide dark:hover:text-tan-hide;
 }
 
 html.dark a:not(.button-link) {
@@ -112,15 +108,15 @@ html.light a:not(.button-link) {
 }
 
 html.light a:not(.button-link):hover {
-  @apply text-space-red;
+  @apply text-violet-red;
 }
 
 html.dark a:not(.button-link):hover {
-  @apply text-space-yellow;
+  @apply text-tan-hide;
 }
 
 .page-content {
-  @apply my-12 w-full px-4 text-center;
+  @apply my-12 w-full px-6 text-left max-w-screen-2xl mx-auto;
 }
 
 @keyframes cursor-blink {
@@ -144,3 +140,72 @@ html.dark a:not(.button-link):hover {
     gap: 3rem;
   }
 }
+
+/* Header hide/show behaviour */
+#site-header {
+  transition: transform 240ms ease, box-shadow 240ms ease;
+  will-change: transform;
+}
+
+.header-hidden {
+  transform: translateY(-110%);
+}
+
+/* Nav tweaks (converted to Tailwind where possible) */
+
+.nav-logo a {
+  font-size: 1.2rem;
+  font-weight: 700;
+  text-decoration: none;
+  font-family: "Rubik", sans-serif;
+  background: linear-gradient(135deg, #ff6b6b 17%, #f18e0b 33%, #ff8633 66%, #ffc857 100%);
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+/* Mobile panel fallback styling if Tailwind utilities don't apply */
+#mobile-links > div {
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+/* simple highlight fallback */
+.highlight { color: #f12711; }
+
+/* Header scroll behavior */
+#site-header {
+  transform: translateY(0);
+}
+
+#site-header.header-hidden {
+  transform: translateY(-100%);
+}
+
+
+.get-help-btn {
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 2px 10px rgba(243, 57, 116, 0.2);
+}
+
+.get-help-btn:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 5px 15px rgba(243, 57, 116, 0.35);
+}
+
+.text-border {
+            text-align: center;
+            padding: 150px 20px;
+            font-size: 72px;
+            font-weight: 900;
+            color: #ffffff;
+            text-shadow:
+                -2px -2px 0 #000,
+                2px -2px 0 #000,
+                -2px 2px 0 #000,
+                2px 2px 0 #000,
+                -3px 0px 0 #000,
+                3px 0px 0 #000,
+                0px -3px 0 #000,
+                0px 3px 0 #000;
+        }

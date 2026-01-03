@@ -12,16 +12,16 @@ const {
 
 {
   links?.map((link) => {
-    const classNames = [
-      isMobileLink ? "close-menu" : "",
-      activePage === link.text.toLowerCase()
-        ? "text-space-red! dark:text-space-yellow!"
-        : "",
-    ]
-      .join(" ")
-      .trim();
+    const isActive = activePage === link.text.toLowerCase();
+    const base = isMobileLink
+      ? "block w-full text-left px-4 py-3 text-base"
+      : "inline-block px-4 py-2 text-base";
+    const theme = isActive
+      ? "text-violet-red dark:text-tan-hide font-semibold"
+      : "text-gray-800 dark:text-whitesmoke hover:opacity-80";
+
     return (
-      <a class={classNames} href={link.href}>
+      <a class={`${base} ${theme} rounded-md transition`} href={link.href}>
         {link.text}
       </a>
     );

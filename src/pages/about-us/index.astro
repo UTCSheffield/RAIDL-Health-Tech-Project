@@ -1,0 +1,17 @@
+---
+import MainLayout from "../../layouts/MainLayout.astro";
+import siteConfig from "../../site.config";
+---
+
+<MainLayout activePage="about us" pageTitle={`${siteConfig.title} — About Us`}>
+  <div class="page-content max-w-2xl mx-auto text-left">
+    <div class="rounded-lg p-6 bg-white/70 dark:bg-black/60 shadow-sm">
+      <h1 class="sigmar-ff text-2xl">About Us</h1>
+      <p class="kanit-regular mt-3">We’re dedicated to providing supportive, accessible information about autism — peer-reviewed resources, personal experiences, and practical tips. Replace this with your organisation’s mission and team details.</p>
+      <section class="mt-6">
+        <h2 class="sigmar-ff text-xl">Our mission</h2>
+        <p class="kanit-regular">Create safe spaces, raise awareness, and connect people to meaningful support.</p>
+      </section>
+    </div>
+  </div>
+</MainLayout>
