@@ -7,8 +7,8 @@ import tailwindcss from "@tailwindcss/vite";
 
 // https://astro.build/config
 export default defineConfig({
-  site: "https://djsiddz.github.io",
-  base: "/space-ahead",
+  site: "https://utcsheffield.github.io",
+  base: "/RAIDL---Health-Tech-Project",
   integrations: [
     swup({
       theme: ["overlay", { direction: "to-top" }],
