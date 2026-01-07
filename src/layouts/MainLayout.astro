@@ -36,7 +36,7 @@ const {
       title={siteConfig.title + " - RSS Feed"}
       href={new URL(withBase("/rss.xml"), Astro.site)}
     />
-    <title>{pageTitle}</title>
+    <title>{siteConfig.title}</title>
   </head>
   <body>
     <script is:inline>document.documentElement.classList.remove('dark');document.documentElement.classList.add('light');localStorage?.setItem('theme','light');</script>

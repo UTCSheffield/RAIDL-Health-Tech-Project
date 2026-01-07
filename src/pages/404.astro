@@ -13,20 +13,16 @@ import siteConfig from "../site.config";
 >
   <div class="flex flex-col items-center justify-center page-content">
     <h1>404</h1>
-    <Image
-      class="cover-img"
-      src={heroImage}
-      alt={"Astronaut in space"}
-      width={400}
-      height={300}
-    />
-    <p>🧑‍🚀: Houston, we have a problem.</p>
-    <p>
-      We couldn't find that link. Verify the address or <a
+    <p class="mt-4 text-center max-w-md">
+      The page you're looking for doesn't exist.
+      <br /></p>
+      
+   
+      <a
         class="font-medium underline"
         href={withBase("/")}>Go Back Home</a
       >
-    </p>
+    
     <SpaceKeyboard />
   </div>
 </MainLayout>

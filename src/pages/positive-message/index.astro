@@ -14,41 +14,43 @@ import siteConfig from "../../site.config";
 </MainLayout>
 
 <script is:inline>
-  document.addEventListener('DOMContentLoaded', () => {
-    const messages = [
-      "You are not broken — your way of experiencing the world is valid.",
-      "It’s okay to move at your own pace. There is no deadline for being yourself.",
-      "Your needs matter, even when they’re hard to explain.",
-      "You’re allowed to rest without earning it.",
-      "Being autistic is not a flaw — it’s part of who you are.",
-      "You don’t have to go through this alone. Support exists, and you deserve it.",
-      "Small steps still count. Progress looks different for everyone.",
-      "Your experiences and feelings are real and worthy of respect.",
-      "It’s okay if today is overwhelming. Tomorrow can be different.",
-      "You are allowed to set boundaries that protect your wellbeing.",
-      "There is strength in asking for help and sharing your story.",
-      "You belong, exactly as you are.",
-      "Your voice matters in this community.",
-      "It’s okay to take breaks from the world when you need to.",
-      "Understanding grows through compassion — including compassion for yourself."
-    ];
+  (function initPositiveMessage() {
+    const run = () => {
+      const messages = [
+        "You are not broken — your way of experiencing the world is valid.",
+        "It’s okay to move at your own pace. There is no deadline for being yourself.",
+        "Your needs matter, even when they’re hard to explain.",
+        "You’re allowed to rest without earning it.",
+        "Being autistic is not a flaw — it’s part of who you are.",
+        "You don’t have to go through this alone. Support exists, and you deserve it.",
+        "Small steps still count. Progress looks different for everyone.",
+        "Your experiences and feelings are real and worthy of respect.",
+        "It’s okay if today is overwhelming. Tomorrow can be different.",
+        "You are allowed to set boundaries that protect your wellbeing.",
+        "There is strength in asking for help and sharing your story.",
+        "You belong, exactly as you are.",
+        "Your voice matters in this community.",
+        "It’s okay to take breaks from the world when you need to.",
+        "Understanding grows through compassion — including compassion for yourself."
+      ];
 
-    function getEl(id) { return document.getElementById(id); }
+      const getEl = (id) => document.getElementById(id);
+      const button = getEl('generateBtn');
+      const box = getEl('messageBox');
+      if (!button || !box) return;
 
-    const button = getEl('generateBtn');
-    const box = getEl('messageBox');
-    if (!button || !box) return;
+      button.addEventListener('click', () => {
+        button.classList.add('scale-95');
+        setTimeout(() => button.classList.remove('scale-95'), 200);
+        const randomIndex = Math.floor(Math.random() * messages.length);
+        box.textContent = messages[randomIndex];
+      });
+    };
 
-    button.addEventListener('click', () => {
-      button.classList.add('scale-95');
-      setTimeout(() => {
-        button.classList.remove('scale-95');
-      }, 200);
-
-      const randomIndex = Math.floor(Math.random() * messages.length);
-      box.textContent = messages[randomIndex];
-    });
-
-
-  });
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', run);
+    } else {
+      run();
+    }
+  })();
 </script>

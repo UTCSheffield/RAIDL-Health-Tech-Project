@@ -33,6 +33,7 @@
 /* 1. html elements */
 html,
 body {
+  zoom: 105%;
   @apply mx-0 my-auto min-h-screen p-0 text-base;
   overscroll-behavior: none;
 }
@@ -54,7 +55,6 @@ html.dark body {
 }
 
 html.light {
-  /* background-image: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); */
   background-image: linear-gradient(180deg, #fdfcfb 0%, #f3e5f5 100%);
   background-attachment: fixed;
   background-size: cover;

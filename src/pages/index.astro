@@ -67,25 +67,17 @@ import { withBase } from "../utils/helpers";
 
       <div class="flex flex-wrap justify-center gap-8 lg:gap-12">
         <div class="flex-1 min-w-80 max-w-md bg-gradient-to-br from-blue-100 to-indigo-200 dark:from-blue-900 dark:to-indigo-800 p-10 rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
-          <div class="w-20 h-20 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg">
-            <span class="text-white text-3xl">📚</span>
-          </div>
+
           <h3 class="text-2xl font-bold text-gray-800 dark:text-white mb-4">Accessible Resources</h3>
           <p class="text-gray-700 dark:text-gray-200 leading-relaxed">Easy-to-understand guides and information tailored for families and children.</p>
         </div>
         
         <div class="flex-1 min-w-80 max-w-md bg-gradient-to-br from-green-100 to-emerald-200 dark:from-green-900 dark:to-emerald-800 p-10 rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
-          <div class="w-20 h-20 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg">
-            <span class="text-white text-3xl">🤝</span>
-          </div>
           <h3 class="text-2xl font-bold text-gray-800 dark:text-white mb-4">Community Support</h3>
           <p class="text-gray-700 dark:text-gray-200 leading-relaxed">Connect with others who understand your experiences and challenges.</p>
         </div>
         
         <div class="flex-1 min-w-80 max-w-md bg-gradient-to-br from-purple-100 to-violet-200 dark:from-purple-900 dark:to-violet-800 p-10 rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
-          <div class="w-20 h-20 bg-gradient-to-br from-purple-500 to-violet-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg">
-            <span class="text-white text-3xl">💡</span>
-          </div>
           <h3 class="text-2xl font-bold text-gray-800 dark:text-white mb-4">Practical Guidance</h3>
           <p class="text-gray-700 dark:text-gray-200 leading-relaxed">Real-world tips and strategies from lived experiences and experts.</p>
         </div>
@@ -95,20 +87,17 @@ import { withBase } from "../utils/helpers";
 
   <!-- Organic Call to Action -->
   <section class="relative py-32 px-4 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white overflow-hidden">
-    <div class="absolute inset-0 bg-gradient-to-br from-indigo-700/20 via-purple-700/20 to-pink-700/20"></div>
+    <div class="absolute inset-0 bg-gradient-to-br from-indigo-700/20 via-purple-700/20 to-pink-700/20" style="border-radius: 20%;"></div>
     <div class="relative max-w-screen-xl mx-auto text-center">
-      <h2 class="text-5xl lg:text-6xl font-bold mb-8 leading-tight">
+      <h2 class="text-5xl lg:text-6xl font-bold mb-8 leading-tight" style="color: black;">
         Ready to Get Started?
       </h2>
-      <p class="text-2xl lg:text-3xl mb-12 opacity-90 max-w-3xl mx-auto leading-relaxed">
+      <p class="text-2xl lg:text-3xl mb-12 opacity-90 max-w-3xl mx-auto leading-relaxed" style="color: black;">
         Join our community of supportive families and discover resources that make a difference.
       </p>
       <div class="flex flex-col sm:flex-row gap-8 justify-center">
         <a href={withBase("/positive-message/")} class="bg-white text-indigo-600 px-12 py-6 rounded-full font-bold text-xl hover:bg-gray-100 transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:-translate-y-1">
           Try Positive Messages
-        </a>
-        <a href={withBase("/contact/")} class="bg-transparent border-3 border-white text-white px-12 py-6 rounded-full font-bold text-xl hover:bg-white hover:text-indigo-600 transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:-translate-y-1">
-          Contact Us
         </a>
       </div>
     </div>
