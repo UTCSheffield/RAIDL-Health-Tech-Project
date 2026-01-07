@@ -9,6 +9,9 @@ import tailwindcss from "@tailwindcss/vite";
 export default defineConfig({
   site: "https://utcsheffield.github.io",
   base: "/RAIDL---Health-Tech-Project",
+  server: {
+    open: '/RAIDL---Health-Tech-Project'
+  },
   integrations: [
     swup({
       theme: ["overlay", { direction: "to-top" }],
