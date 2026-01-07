@@ -8,26 +8,163 @@
 /* 2. utilities */
 
 /* 0. color variables & fonts */
-:root {
-  --tan-hide: #fb8a56;
-  --violet-red: #f33974;
-  --studio: #8d3db8;
-  --falcon: #78596b;
-  --thunder: #422940;
+:root{
+  /* PRIMARY: now orange (calm) */
+  --brand-primary: #F4A261;      /* Calm Apricot (primary CTA, focus states) */
+  --brand-primary-rgb: 244,162,97; /* rgb for shadows/alpha use */
+
+  /* Secondary (keeps purple identity but less saturated) */
+  --brand-secondary: #7A5EA8;    /* Soft Lavender (decorative accents) */
+
+  /* Warm supporting tone (kept available) */
+  --brand-warm: #FB8A56;         /* Tan Hide (support / stronger warm accents) */
+
+  /* Dark background / headings */
+  --brand-dark: #2B2F3A;         /* Soft Charcoal / Navy (backgrounds, headings) */
+
+  /* Muted support */
+  --brand-muted: #78596B;        /* Falcon (subheads, borders) */
+
+  /* Light neutral for text-on-dark */
+  --brand-light: #F5F5F5;
+
+  /* Page light background */
+  --page-light: #FDFBD4;
+
+  /* Inline emphasis */
+  --brand-highlight: #FF8A65;
+
+  /* Logo / hero gradient stops (calm) */
+  --logo-stop-1: #F4A261;        /* use primary in gradient start */
+  --logo-stop-2: #F4A261;        /* middle — you can tune */
+  --logo-stop-3: #FFC857;        /* end */
 }
 
-/* Required to ensure dark: modifiers work when manually toggling mode */
-/* REF: https://tailwindcss.com/docs/dark-mode#toggling-dark-mode-manually */
-@custom-variant dark (&:where(.dark, .dark *));
+/* VIVID mode: higher-saturation / original palette (orange primary) */
+html[data-mode="vivid"], :root[data-mode="vivid"] {
+  --brand-primary: #FB8A56;      /* Tan Hide (vivid primary) */
+  --brand-primary-rgb: 251,138,86;
+  --brand-secondary: #8D3DB8;    /* Studio (vivid) */
+  --brand-warm: #FF8633;         /* stronger warm accent for vivid */
+  --brand-dark: #422940;         /* Thunder (vivid) */
+  --brand-muted: #78596B;
+  --brand-light: #F5F5F5;
+  --brand-highlight: #F12711;
+  --logo-stop-1: #FB8A56;        /* vivid gradient start */
+  --logo-stop-2: #F18E0B;
+  --logo-stop-3: #FFC857;
+}
 
+
+#site-header {
+  background: transparent !important;
+  /* keep existing sticky behaviour; padding removed so nav controls spacing */
+  padding: 0;
+}
+
+/* Primary nav container — centered content with soft rounded bottom corners */
+.site-nav {
+  /* Limit width and center so the rounded corners are visible and consistent */
+  width: min(1200px, calc(100% - 32px));
+  margin: 8px auto 0;               /* small top gap for breathing room */
+  padding: 12px 20px;               /* comfortable hit area */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  /* Visuals: soft frosted surface that adapts to your colours */
+  background: linear-gradient(180deg, rgba(255,255,255,0.86), rgba(255,255,255,0.72));
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+
+  /* rounded bottom only — keeps sharp top edge aligned to viewport top */
+  border-radius: 0 0 15px 15px;
+
+  /* soft shadow for separation but low contrast to avoid harsh edges */
+  box-shadow: 0 6px 22px rgba(11,15,20,0.06);
+  -webkit-font-smoothing:antialiased;
+}
+
+/* Dark mode variant: preserve shape but use themed dark surface */
+html.dark .site-nav {
+  background: linear-gradient(180deg, rgba(43,47,58,0.9), rgba(34,36,42,0.85));
+  color: var(--brand-light);
+}
+
+/* Mobile: reduce side margins so nav fits comfortably on small screens */
+@media (max-width: 640px) {
+  .site-nav {
+    width: calc(100% - 24px);
+    margin: 8px 12px 0;
+    padding: 10px 14px;
+    border-radius: 0 0 12px 12px;
+  }
+}
+
+/* If you prefer the nav to be edge-to-edge (full-bleed) with rounded bottom corners,
+   replace the .site-nav width/margin rules with width:100% and remove the margin.
+   I chose the centered approach because it avoids white-corner artefacts across devices. */
+
+/* Small polish: ensure the hamburger and mobile overlay still sit above nav */
+#hamburger-menu, #mosbile-links {
+  z-index: 60;
+}
+/* Toggle button visuals (small, accessible) */
+.mode-toggle {
+  --size: 40px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.125rem;
+  border-radius: 999px;
+  background: transparent;
+  border: 1px solid rgba(0,0,0,0.06);
+  font-weight: 600;
+  font-size: 0.875rem;
+  line-height: 1;
+  cursor: pointer;
+  user-select: none;
+}
+
+.mode-toggle .knob {
+  width: calc(var(--size) * 0.6);
+  height: calc(var(--size) * 0.6);
+  border-radius: 999px;
+  background: var(--brand-light);
+  box-shadow: 0 2px 6px rgba(11,15,20,0.08);
+  transition: transform 220ms cubic-bezier(.2,.9,.3,1), background 220ms ease;
+  display: inline-block;
+  transform: translateX(0);
+}
+
+/* pressed = vivid */
+.mode-toggle[aria-pressed="true"] {
+  border-color: color-mix(in srgb, var(--brand-primary) 40%, black 10%);
+  background: linear-gradient(90deg, var(--brand-primary), var(--brand-secondary));
+  color: var(--brand-light);
+}
+
+.mode-toggle[aria-pressed="true"] .knob {
+  background: var(--brand-light);
+  transform: translateX(12px);
+}
+
+/* compact icon-only variant for mobile if desired */
+.mode-toggle.icon-only {
+  padding: 6px;
+  width: 44px;
+  justify-content: center;
+}
+
+/* Ensure theme tokens map for any systems expecting @theme */
 @theme {
   --font-sans: "Kanit", "sans-serif";
-  --color-tan-hide: var(--tan-hide);
-  --color-violet-red: var(--violet-red);
-  --color-studio: var(--studio);
-  --color-falcon: var(--falcon);
-  --color-thunder: var(--thunder);
-  --color-whitesmoke: whitesmoke;
+  --color-primary: var(--brand-primary);
+  --color-secondary: var(--brand-secondary);
+  --color-warm: var(--brand-warm);
+  --color-muted: var(--brand-muted);
+  --color-dark: var(--brand-dark);
+  --color-whitesmoke: var(--brand-light);
 }
 
 /* 1. html elements */
@@ -38,11 +175,12 @@ body {
   overscroll-behavior: none;
 }
 
+/* Dark mode uses the themed dark colour for depth */
 html.dark {
   background-image: linear-gradient(
     to bottom,
-    var(--color-thunder) 0%,
-    black 100%
+    var(--brand-dark) 0%,
+    #000000 100%
   );
   background-attachment: fixed;
   background-size: cover;
@@ -51,11 +189,12 @@ html.dark {
 
 html.dark body {
   background: transparent;
-  @apply text-whitesmoke;
+  color: var(--brand-light);
+
 }
 
 html.light {
-  background-color: #FDFBD4;
+  background-color: var(--page-light);
   background-attachment: fixed;
   background-size: cover;
   @apply bg-no-repeat;
@@ -63,7 +202,8 @@ html.light {
 
 html.light body {
   background: transparent;
-  @apply text-black;
+  color: var(--brand-dark);
+
 }
 
 /* semantic elements */
@@ -99,34 +239,105 @@ img {
   @apply h-auto max-w-full rounded-xl;
 }
 
-/* links */
+/* links & interactive elements
+   - replaced hard-coded colour utilities with theme variable rules
+   - kept Tailwind @apply for layout/shape utilities
+*/
 a.button-link:not(:disabled),
 button.button-link:not(:disabled) {
-  @apply inline-flex cursor-pointer items-center justify-center rounded-full border px-6 py-2 leading-tight transition hover:border-violet-red hover:text-violet-red sm:px-8 hover:dark:border-tan-hide hover:dark:text-tan-hide;
-}
-a.button-link.space-btn-filled:not(:disabled),
-button.button-link.space-btn-filled:not(:disabled) {
-  @apply bg-black text-whitesmoke hover:border-violet-red hover:bg-violet-red dark:bg-whitesmoke dark:text-black dark:hover:border-tan-hide dark:hover:bg-tan-hide;
-}
-a.button-link.space-btn-outlined:not(:disabled),
-button.button-link.space-btn-outlined:not(:disabled) {
-  @apply border border-black bg-transparent text-black hover:border-violet-red hover:text-violet-red dark:border-whitesmoke dark:bg-transparent dark:text-whitesmoke dark:hover:border-tan-hide dark:hover:text-tan-hide;
+  @apply inline-flex cursor-pointer items-center justify-center rounded-full border px-6 py-2 leading-tight transition sm:px-8;
+  border-color: transparent;
+  color: inherit;
+  /* subtle default border using muted colour */
+  box-shadow: none;
 }
 
+/* hover (light mode) and hover in dark mode */
+a.button-link:not(:disabled):hover,
+button.button-link:not(:disabled):hover {
+  border-color: var(--brand-primary);
+  color: var(--brand-primary);
+}
+
+/* dark-mode hover override */
+html.dark a.button-link:not(:disabled):hover,
+html.dark button.button-link:not(:disabled):hover {
+  border-color: var(--brand-warm);
+  color: var(--brand-warm);
+}
+
+/* Filled primary-style button (replaces bg-black / whitesmoke usage) */
+a.button-link.space-btn-filled:not(:disabled),
+button.button-link.space-btn-filled:not(:disabled) {
+  background: var(--brand-dark);
+  color: var(--brand-light);
+  border-color: rgba(0,0,0,0.06); /* subtle border */
+}
+
+/* Filled hover — use brand primary for emphasis */
+a.button-link.space-btn-filled:not(:disabled):hover,
+button.button-link.space-btn-filled:not(:disabled):hover {
+  border-color: var(--brand-primary);
+  background: linear-gradient(90deg, var(--brand-primary), var(--brand-secondary));
+  color: var(--brand-light);
+}
+
+/* Dark-mode inversion for filled button */
+html.dark a.button-link.space-btn-filled:not(:disabled),
+html.dark button.button-link.space-btn-filled:not(:disabled) {
+  background: var(--brand-light);
+  color: var(--brand-dark);
+}
+
+html.dark a.button-link.space-btn-filled:not(:disabled):hover,
+html.dark button.button-link.space-btn-filled:not(:disabled):hover {
+  border-color: var(--brand-warm);
+  background: var(--brand-warm);
+  color: var(--brand-dark);
+}
+
+/* Outlined button (light + dark) */
+a.button-link.space-btn-outlined:not(:disabled),
+button.button-link.space-btn-outlined:not(:disabled) {
+  border: 1px solid var(--brand-dark);
+  background: transparent;
+  color: var(--brand-dark);
+}
+
+a.button-link.space-btn-outlined:not(:disabled):hover,
+button.button-link.space-btn-outlined:not(:disabled):hover {
+  border-color: var(--brand-primary);
+  color: var(--brand-primary);
+}
+
+html.dark a.button-link.space-btn-outlined:not(:disabled),
+html.dark button.button-link.space-btn-outlined:not(:disabled) {
+  border: 1px solid var(--brand-light);
+  background: transparent;
+  color: var(--brand-light);
+}
+
+html.dark a.button-link.space-btn-outlined:not(:disabled):hover,
+html.dark button.button-link.space-btn-outlined:not(:disabled):hover {
+  border-color: var(--brand-warm);
+  color: var(--brand-warm);
+}
+
+/* Anchor colour defaults */
 html.dark a:not(.button-link) {
-  @apply text-whitesmoke;
+  color: var(--brand-light);
 }
 
 html.light a:not(.button-link) {
-  @apply text-black;
+  color: var(--brand-dark);
 }
 
 html.light a:not(.button-link):hover {
-  @apply text-violet-red;
+  color: var(--brand-primary);
 }
 
 html.dark a:not(.button-link):hover {
-  @apply text-tan-hide;
+  color: var(--brand-warm);
 }
 
 .page-content {
@@ -177,7 +388,11 @@ main, .page-content, section, article {
   font-weight: 700;
   text-decoration: none;
   font-family: "Rubik", sans-serif;
-  background: linear-gradient(135deg, #ff6b6b 17%, #f18e0b 33%, #ff8633 66%, #ffc857 100%);
+  /* use themed gradient stops */
+  background: linear-gradient(135deg,
+    var(--logo-stop-1) 17%,
+    var(--logo-stop-2) 33%,
+    var(--logo-stop-3) 100%);
   color: transparent;
   -webkit-background-clip: text;
   background-clip: text;
@@ -189,8 +404,9 @@ main, .page-content, section, article {
   overflow-y: auto;
 }
 
-/* simple highlight fallback */
-.highlight { color: #f12711; }
+/* simple highlight fallback uses the theme highlight */
+.highlight { color: var(--brand-highlight); }
+
 
 /* Header scroll behavior */
 #site-header {
@@ -201,33 +417,37 @@ main, .page-content, section, article {
   transform: translateY(-100%);
 }
 
-
+/* Get-help CTA shadows use a soft tint of the primary colour */
+/* Get-help CTA shadows use a soft tint of the primary colour */
 .get-help-btn {
   transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-  box-shadow: 0 2px 10px rgba(243, 57, 116, 0.2);
+  /* use brand-primary-rgb for consistent coloured shadows */
+  box-shadow: 0 2px 10px rgba(var(--brand-primary-rgb), 0.12);
 }
 
 .get-help-btn:hover {
   transform: translateY(-2px) scale(1.02);
-  box-shadow: 0 5px 15px rgba(243, 57, 116, 0.35);
+  box-shadow: 0 5px 15px rgba(var(--brand-primary-rgb), 0.22);
 }
 
+
+/* Text-border uses theme for text + shadow (keeps high emphasis but themed) */
 .text-border {
-            text-align: center;
-            padding: 150px 20px;
-            font-size: 72px;
-            font-weight: 900;
-            color: #ffffff;
-            text-shadow:
-                -2px -2px 0 #000,
-                2px -2px 0 #000,
-                -2px 2px 0 #000,
-                2px 2px 0 #000,
-                -3px 0px 0 #000,
-                3px 0px 0 #000,
-                0px -3px 0 #000,
-                0px 3px 0 #000;
-        }
+  text-align: center;
+  padding: 150px 20px;
+  font-size: 72px;
+  font-weight: 900;
+  color: var(--brand-light);
+  text-shadow:
+    -2px -2px 0 var(--brand-dark),
+    2px -2px 0 var(--brand-dark),
+    -2px 2px 0 var(--brand-dark),
+    2px 2px 0 var(--brand-dark),
+    -3px 0px 0 var(--brand-dark),
+    3px 0px 0 var(--brand-dark),
+    0px -3px 0 var(--brand-dark),
+    0px 3px 0 var(--brand-dark);
+}
 
 /* Custom animations for organic flow */
 @keyframes float {
@@ -241,4 +461,43 @@ main, .page-content, section, article {
 
 .animate-float {
   animation: float 6s ease-in-out infinite;
+}
+
+/* Ensure action group and CTA align consistently */
+.site-nav .flex.items-center.gap-4,
+.site-nav > .flex.items-center.gap-4 {
+  align-items: center; /* explicit vertical centring */
+}
+
+/* Standardise Get Help button size so all controls line up */
+.get-help-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;          /* consistent control height */
+  padding: 0 14px;       /* horizontal padding */
+  line-height: 1;
+  font-size: 0.95rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(var(--brand-primary-rgb, 244,162,97), 0.12);
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+
+/* Slightly larger hit area on larger screens (optional) */
+@media (min-width: 640px) {
+  .get-help-btn { height: 44px; padding: 0 18px; }
+}
+
+/* Mobile variant inside the mobile menu: remove any extra margin top */
+#mobile-links .get-help-btn {
+  margin-top: 0 !important;
+}
+
+/* If the mode toggle or other inline controls look off, ensure they inherit the same height baseline */
+.mode-toggle, .mode-toggle.icon-only {
+  height: 40px;
+  min-width: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }

@@ -8,7 +8,7 @@ const { activePage } = Astro.props;
 ---
 
 <header id="site-header" class="sticky top-0 z-50 bg-white/80 backdrop-blur-sm transition-transform duration-300">
-  <nav class="flex items-center justify-between w-full px-6 py-4" style="background-color: rgba(251,236,93, 0.4); border-radius: 0 0 15px 15px; ">
+<nav class="site-nav flex items-center justify-between w-full px-6 py-4">
     <div class="flex items-center gap-6">
       <a href={withBase("/")} aria-label="Home"><SiteIdentity /></a>
     </div>
@@ -19,10 +19,25 @@ const { activePage } = Astro.props;
     </div>
 
     <!-- Actions -->
-    <div class="flex items-center gap-4">
-      <a href={withBase("/help/")} class="hidden sm:inline-flex items-center px-5 py-2 rounded-lg text-white font-bold caveat-brush-regular get-help-btn" style="background: linear-gradient(90deg, #fb8a56 0%, #8d3db8 100%); color: white !important;">Get Help</a>
-      <button id="hamburger-menu" aria-controls="mobile-links" aria-expanded="false" class="sm:hidden inline-block" title="Menu">🍔</button>
-    </div>
+<div class="flex items-center gap-4">
+  <!-- desktop CTA: no mt-4 so it vertically centers with the row -->
+  <a
+    href={withBase("/help/")}
+    class="inline-flex items-center px-4 py-2 rounded-lg text-white font-bold caveat-brush-regular get-help-btn"
+    style="background: linear-gradient(90deg, var(--brand-warm) 0%, var(--brand-secondary) 100%); color: white !important;"
+  >
+    Get Help
+  </a>
+
+  <!-- Mode toggle (accessible) -->
+  <button id="mode-toggle" class="mode-toggle hidden sm:inline-flex" aria-pressed="false" aria-label="Toggle colour mode: Calm or Vivid" title="Calm / Vivid">
+    <span class="knob" aria-hidden="true"></span>
+    <span class="sr-only">Toggle colour mode</span>
+    <span class="mode-label" aria-hidden="true">Calm</span>
+  </button>
+
+  <button id="hamburger-menu" aria-controls="mobile-links" aria-expanded="false" class="sm:hidden inline-block" title="Menu">🍔</button>
+</div>
   </nav>
 
   <!-- Mobile menu (hidden by default) -->
@@ -32,6 +47,13 @@ const { activePage } = Astro.props;
         <SiteIdentity />
         <button id="mobile-close" aria-label="Close menu">❌</button>
       </div>
+      <div class="mt-4 flex items-center justify-between">
+  <a href={withBase("/help/")} class="inline-flex items-center px-4 py-2 rounded-lg text-white font-bold caveat-brush-regular get-help-btn" style="background: linear-gradient(90deg, var(--brand-warm) 0%, var(--brand-secondary) 100%); color: white !important;">Get Help</a>
+
+  <button id="mobile-mode-toggle" class="mode-toggle icon-only" aria-pressed="false" aria-label="Toggle colour mode: Calm or Vivid" title="Calm / Vivid">
+    <span class="knob" aria-hidden="true"></span>
+  </button>
+</div>
       <nav class="flex flex-col gap-2">
         <NavLinks activePage={activePage} links={siteConfig.headerNavLinks} isMobileLink={true} />
         <a href={withBase("/help/")} class="mt-4 inline-flex items-center px-4 py-2 rounded-lg text-white font-bold caveat-brush-regular get-help-btn" style="background: linear-gradient(90deg, #fb8a56 0%, #8d3db8 100%); color: white !important;">Get Help</a>
@@ -41,71 +63,88 @@ const { activePage } = Astro.props;
 </header>
 
 <script is:inline>
-  const hamburger = document.querySelector("#hamburger-menu");
-  const mobile = document.querySelector("#mobile-links");
-  const closeBtn = document.querySelector("#mobile-close");
+  const MODE_KEY = 'site:mode';
+  const VALID_MODES = ['calm', 'vivid'];
 
-  function openMobile() {
-    if (!mobile) return;
-    mobile.classList.remove("hidden");
-    mobile.setAttribute("aria-hidden", "false");
-    hamburger?.setAttribute("aria-expanded", "true");
-    // move focus to first link for accessibility
-    const firstLink = mobile.querySelector("a, button");
-    firstLink?.focus();
-    document.documentElement.style.overflow = "hidden";
+  const VAR_MAP = {
+    '--brand-primary': ['#2AA6B7', '#F33974'],
+    '--brand-secondary': ['#7A5EA8', '#8D3DB8'],
+    '--brand-warm': ['#F4A261', '#FB8A56'],
+    '--brand-dark': ['#2B2F3A', '#422940'],
+    '--brand-muted': ['#78596B', '#78596B'],
+    '--brand-light': ['#F5F5F5', '#F5F5F5'],
+    '--brand-highlight': ['#FF8A65', '#F12711'],
+    '--logo-stop-1': ['#2AA6B7', '#FF6B6B'],
+    '--logo-stop-2': ['#F4A261', '#F18E0B'],
+    '--logo-stop-3': ['#FFC857', '#FFC857']
+  };
+
+  function setMode(mode, { persist = true } = {}) {
+    if (!VALID_MODES.includes(mode)) mode = 'calm';
+
+    document.documentElement.setAttribute('data-mode', mode);
+
+    const isVivid = mode === 'vivid';
+    Object.entries(VAR_MAP).forEach(([key, [calm, vivid]]) => {
+      document.documentElement.style.setProperty(key, isVivid ? vivid : calm);
+    });
+
+    if (persist) localStorage.setItem(MODE_KEY, mode);
+    updateToggleUI(mode);
   }
 
-  function closeMobile() {
-    if (!mobile) return;
-    mobile.classList.add("hidden");
-    mobile.setAttribute("aria-hidden", "true");
-    hamburger?.setAttribute("aria-expanded", "false");
-    hamburger?.focus();
-    document.documentElement.style.overflow = "auto";
+  function getStoredMode() {
+    const stored = localStorage.getItem(MODE_KEY);
+    return VALID_MODES.includes(stored) ? stored : 'calm';
   }
 
-  hamburger?.addEventListener("click", openMobile);
-  closeBtn?.addEventListener("click", closeMobile);
-  mobile?.addEventListener("click", (e) => {
-    if (e.target === mobile) closeMobile();
+  function toggleMode() {
+    const current = document.documentElement.getAttribute('data-mode') || getStoredMode();
+    const next = current === 'calm' ? 'vivid' : 'calm';
+    setMode(next);
+  }
+
+  function updateToggleUI(mode) {
+    const pressed = mode === 'vivid';
+    document.querySelectorAll('#mode-toggle, #mobile-mode-toggle').forEach(btn => {
+      if (!btn) return;
+      btn.setAttribute('aria-pressed', String(pressed));
+      const label = btn.querySelector('.mode-label');
+      if (label) label.textContent = pressed ? 'Vivid' : 'Calm';
+    });
+  }
+
+  function bindToggleHandlers() {
+    document.querySelectorAll('#mode-toggle, #mobile-mode-toggle').forEach(btn => {
+      if (!btn || btn.dataset.bound) return;
+
+      btn.dataset.bound = 'true';
+      btn.addEventListener('click', toggleMode);
+      btn.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          toggleMode();
+        }
+      });
+    });
+  }
+
+  function initMode() {
+    const mode = getStoredMode();
+    setMode(mode, { persist: false });
+    bindToggleHandlers();
+  }
+
+  // initial load
+  initMode();
+
+  // re-run after Astro client-side navigation
+  document.addEventListener('astro:page-load', () => {
+    initMode();
   });
 
-  // close with Escape key
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") closeMobile();
-  });
-
-  // Hide/show header on scroll: hide when scrolling down, show when scrolling up
-  (function () {
-    const header = document.getElementById("site-header");
-    if (!header) return;
-    let lastScroll = window.scrollY || document.documentElement.scrollTop;
-    let ticking = false;
-
-    function onScroll() {
-      const current = window.scrollY || document.documentElement.scrollTop;
-      const delta = current - lastScroll;
-
-      if (Math.abs(delta) < 10) return; // ignore small changes
-
-      if (delta > 0 && current > 80) {
-        // scrolled down
-        header.classList.add('header-hidden');
-      } else {
-        // scrolled up
-        header.classList.remove('header-hidden');
-      }
-
-      lastScroll = current <= 0 ? 0 : current;
-      ticking = false;
-    }
-
-    window.addEventListener('scroll', () => {
-      if (!ticking) {
-        window.requestAnimationFrame(onScroll);
-        ticking = true;
-      }
-    }, { passive: true });
-  })();
+  // expose if needed
+  window.setSiteMode = setMode;
 </script>
+
+
