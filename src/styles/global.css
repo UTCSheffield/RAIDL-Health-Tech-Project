@@ -37,19 +37,33 @@ body {
   overscroll-behavior: none;
 }
 
-html.dark body {
+html.dark {
   background-image: linear-gradient(
     to bottom,
     var(--color-thunder) 0%,
     black 100%
   );
-  @apply bg-black bg-cover bg-no-repeat text-whitesmoke;
+  background-attachment: fixed;
+  background-size: cover;
+  @apply bg-black bg-no-repeat;
+}
+
+html.dark body {
+  background: transparent;
+  @apply text-whitesmoke;
+}
+
+html.light {
+  /* background-image: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); */
+  background-image: linear-gradient(180deg, #fdfcfb 0%, #f3e5f5 100%);
+  background-attachment: fixed;
+  background-size: cover;
+  @apply bg-no-repeat;
 }
 
 html.light body {
-  /* background-image: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); */
-  background-image: linear-gradient(180deg, #fdfcfb 0%, #f3e5f5 100%);
-  @apply bg-cover bg-no-repeat text-black;
+  background: transparent;
+  @apply text-black;
 }
 
 /* semantic elements */
@@ -117,6 +131,11 @@ html.dark a:not(.button-link):hover {
 
 .page-content {
   @apply my-12 w-full px-6 text-left max-w-screen-2xl mx-auto;
+}
+
+/* Ensure individual page containers don't introduce separate backgrounds */
+main, .page-content, section, article {
+  background: transparent !important;
 }
 
 @keyframes cursor-blink {
