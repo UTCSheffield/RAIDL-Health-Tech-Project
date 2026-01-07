@@ -55,7 +55,7 @@ html.dark body {
 }
 
 html.light {
-  background-image: linear-gradient(180deg, #fdfcfb 0%, #f3e5f5 100%);
+  background-color: #FDFBD4;
   background-attachment: fixed;
   background-size: cover;
   @apply bg-no-repeat;
