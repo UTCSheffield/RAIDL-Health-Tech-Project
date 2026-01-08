@@ -39,7 +39,24 @@ const {
     <title>{siteConfig.title}</title>
   </head>
   <body>
-    
+      <div class="page-decor" aria-hidden="true">
+    <div
+      class="decor-circle decor-medium decor-float decor-themed"
+      style="top:-28px; left:-28px; --size:96px; --c1:rgba(244,162,97,0.85); --c2:rgba(255,200,87,0.45); --blur:10px; --op:0.9;">
+    </div>
+
+    <div
+      class="decor-circle decor-small decor-float"
+      style="bottom:-18px; right:-18px; --size:64px; --c1:rgba(255,183,197,0.7); --c2:rgba(255,140,170,0.22); --blur:8px; --op:0.6;">
+    </div>
+
+    <div
+      class="decor-circle decor-large"
+      style="top:25%; left:18%; --size:160px; --c1:rgba(107,168,167,0.18); --c2:rgba(167,199,197,0.06); --blur:28px; --op:0.32;">
+    </div>
+  </div>
+
+
     <script is:inline>document.documentElement.classList.remove('dark');document.documentElement.classList.add('light');localStorage?.setItem('theme','light');</script>
     <main class="w-full min-h-screen pt-6 sm:pt-8 px-4">
       <Nav activePage={activePage} />

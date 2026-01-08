@@ -27,34 +27,44 @@ import { withBase } from "../utils/helpers";
         </div>
       </div>
 
-      <!-- Image -->
       <div class="flex-1 relative z-10 hero-image">
-        <div class="relative">
-          <img src="https://picsum.photos/700/500?random=1"
-               alt="Inclusive and supportive community illustration"
-               class="rounded-3xl shadow-2xl w-full transform hover:scale-105 transition-transform duration-500" />
-        </div>
-      </div>
-    </div>
+<figure
+  id="image-rotator"
+  data-base-url={withBase('/')}
+  class="rounded-3xl shadow-2xl w-full aspect-[16/10] overflow-hidden relative"
+>
+   <img
+  id="rotating-image"
+  src={withBase('/images/autism-1.webp')}
+  alt="Young person and support worker talking in a quiet room"
+  class="w-full h-full object-cover transform transition-transform duration-500"
+  loading="lazy"
+  decoding="async"
+/>
+    <figcaption id="rotator-caption" class="text-sm text-gray-600 mt-2 sr-only">Photo credit</figcaption>
 
-    <!-- Decorative blobs (kept inside hero so layout stays valid) -->
-    <div
-      class="decor-circle decor-medium decor-float decor-themed"
-      aria-hidden="true"
-      style="top: -28px; left: -28px; --size:96px; --c1: rgba(244,162,97,0.85); --c2: rgba(255,200,87,0.45); --blur:10px; --op:0.9;"
-    ></div>
+<div
+  id="rotator-controls"
+  class="absolute left-4 bottom-4 z-20 flex gap-2"
+  hidden
+>
+  <button id="rot-prev" type="button"
+    class="px-3 py-1 rounded bg-white/80 hover:bg-white text-sm">
+    Prev
+  </button>
+  <button id="rot-toggle" type="button"
+    class="px-3 py-1 rounded bg-white/80 hover:bg-white text-sm">
+    Pause
+  </button>
+  <button id="rot-next" type="button"
+    class="px-3 py-1 rounded bg-white/80 hover:bg-white text-sm">
+    Next
+  </button>
+</div>
+  </figure>
+</div>
+    
 
-    <div
-      class="decor-circle decor-small decor-float"
-      aria-hidden="true"
-      style="bottom: -18px; right: -18px; --size:64px; --c1: rgba(255,183,197,0.7); --c2: rgba(255,140,170,0.22); --blur:8px; --op:0.6;"
-    ></div>
-
-    <div
-      class="decor-circle decor-large"
-      aria-hidden="true"
-      style="top: 25%; left: 18%; --size:160px; --c1: rgba(107,168,167,0.18); --c2: rgba(167,199,197,0.06); --blur:28px; --op:0.32;"
-    ></div>
 
   </section>
 
@@ -67,11 +77,11 @@ import { withBase } from "../utils/helpers";
           Our Mission
         </h2>
         <p class="text-xl lg:text-2xl text-gray-600 dark:text-gray-300 leading-relaxed max-w-4xl mx-auto">
-          At Caring Hearts, we believe every child deserves to feel understood and supported...
+          At Raidl we want to help young people stay in the know about Autism and how to help yourself or others who could be struggling with this condition.
         </p>
       </div>
 
-      <div class="flex flex-wrap justify-center gap-8 lg:gap-12">
+      <!-- <div class="flex flex-wrap justify-center gap-8 lg:gap-12">
         <div class="flex-1 min-w-80 max-w-md bg-gradient-to-br from-blue-100 to-indigo-200 dark:from-blue-900 dark:to-indigo-800 p-10 rounded-3xl shadow-xl">
           <h3 class="text-2xl font-bold text-gray-800 dark:text-white mb-4">Accessible Resources</h3>
           <p class="text-gray-700 dark:text-gray-200 leading-relaxed">Easy-to-understand guides and information tailored for families and children.</p>
@@ -86,7 +96,7 @@ import { withBase } from "../utils/helpers";
           <h3 class="text-2xl font-bold text-gray-800 dark:text-white mb-4">Practical Guidance</h3>
           <p class="text-gray-700 dark:text-gray-200 leading-relaxed">Real-world tips and strategies from lived experiences and experts.</p>
         </div>
-      </div>
+      </div> -->
     </div>
   </section>
 
@@ -111,7 +121,19 @@ import { withBase } from "../utils/helpers";
       </div>
     </div>
   </section>
+<script is:inline>
+  document.addEventListener('DOMContentLoaded', () => {
+    const controls = document.getElementById('rotator-controls');
+    if (!controls) return;
 
+    const mode = document.documentElement.dataset.mode;
+
+    if (mode === 'calm') {
+      controls.hidden = false;
+      controls.style.display = 'flex';
+    }
+  });
+</script>
   <script is:inline>
     function initPositiveMessages() {
       const messages = [
@@ -151,4 +173,104 @@ import { withBase } from "../utils/helpers";
     document.addEventListener('DOMContentLoaded', initPositiveMessages);
     document.addEventListener('astro:page-load', initPositiveMessages);
   </script>
+
+<script is:inline>
+  (function () {
+    document.addEventListener('DOMContentLoaded', () => {
+      // Local image filenames (no leading slash). If you prefer full URLs, put them here.
+      const images = [
+        { src: 'images/autism-1.webp', alt: 'Child listening on his headphones' },
+        { src: 'images/autism-2.webp', alt: 'Child playing with bricks'},
+        { src: 'images/autism-3.webp', alt: 'Child playing with building blocks'}
+      ];
+
+      const imgEl = document.getElementById('rotating-image');
+      const captionEl = document.getElementById('rotator-caption');
+      const prevBtn = document.getElementById('rot-prev');
+      const nextBtn = document.getElementById('rot-next');
+      const toggleBtn = document.getElementById('rot-toggle');
+      const rotator = document.getElementById('image-rotator');
+
+      if (!imgEl || !rotator) {
+        console.warn('Image rotator: required elements not found.');
+        return;
+      }
+
+      // base url injected by Astro via data attribute (e.g. "/RAIDL---Health-Tech-Project/")
+      const baseUrl = rotator.dataset.baseUrl || '/';
+
+      // helper: build a usable src
+      function makeSrc(path) {
+        if (!path) return path;
+        // absolute external URL? leave as-is
+        if (/^https?:\/\//i.test(path)) return path;
+        // starts with slash -> treat as absolute (but keep it, since it may already include base)
+        if (path.startsWith('/')) return path;
+        // otherwise prefix baseUrl (ensure exactly one slash)
+        return baseUrl.replace(/\/$/, '') + '/' + path.replace(/^\//, '');
+      }
+
+      // Preload
+      images.forEach(i => { const p = new Image(); p.src = makeSrc(i.src); });
+
+      let idx = 0;
+      const delayMs = 5000;
+      let timer = null;
+     
+      let playing = true;
+      const controls = document.getElementById('rotator-controls');
+
+      function show(i) {
+        const item = images[i];
+        if (!item) return;
+        imgEl.src = makeSrc(item.src);
+        imgEl.alt = item.alt || '';
+        if (captionEl) captionEl.textContent = item.credit || '';
+      }
+
+      function next() { idx = (idx + 1) % images.length; show(idx); }
+      function prev() { idx = (idx - 1 + images.length) % images.length; show(idx); }
+
+      function start() {
+        if (timer) clearInterval(timer);
+        if (!playing) return;
+        timer = setInterval(next, delayMs);
+        if (toggleBtn) { toggleBtn.textContent = 'Pause'; toggleBtn.setAttribute('aria-label', 'Pause slideshow'); }
+      }
+      function stop() {
+        if (timer) { clearInterval(timer); timer = null; }
+        if (toggleBtn) { toggleBtn.textContent = 'Play'; toggleBtn.setAttribute('aria-label', 'Play slideshow'); }
+      }
+
+      // initial
+      show(idx);
+      if (playing) start(); else if (toggleBtn) toggleBtn.textContent = 'Play';
+
+      if (prevBtn) prevBtn.addEventListener('click', () => { prev(); if (playing) start(); });
+      if (nextBtn) nextBtn.addEventListener('click', () => { next(); if (playing) start(); });
+      if (toggleBtn) toggleBtn.addEventListener('click', () => { playing = !playing; if (playing) start(); else stop(); });
+
+      rotator.addEventListener('mouseenter', () => { if (timer) clearInterval(timer); });
+      rotator.addEventListener('mouseleave', () => { if (playing) start(); });
+      rotator.addEventListener('focusin', () => { if (timer) clearInterval(timer); });
+      rotator.addEventListener('focusout', () => { if (playing) start(); });
+
+      rotator.addEventListener('keydown', (ev) => {
+        if (ev.key === 'ArrowLeft') { prev(); if (playing) start(); }
+        if (ev.key === 'ArrowRight') { next(); if (playing) start(); }
+        if (ev.key === ' ' || ev.key === 'Spacebar') { ev.preventDefault(); playing = !playing; if (playing) start(); else stop(); }
+      });
+
+      if (!rotator.hasAttribute('tabindex')) rotator.tabIndex = 0;
+      if (mode === 'calm') {
+  playing = false; // stop auto-rotation
+  stop();
+}
+    });
+  })();
+  
+</script>
+
+
 </MainLayout>
+

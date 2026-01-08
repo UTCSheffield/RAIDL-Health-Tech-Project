@@ -187,7 +187,7 @@ html[data-mode="calm"].light {
 html[data-mode="calm"] .site-nav {
   /* Slightly lower contrast glass & shadow */
   background: linear-gradient(180deg, rgba(255,255,255,0.82), rgba(255,255,255,0.68));
-  box-shadow: 0 4px 16px rgba(11,15,20,0.05);
+
 }
 
 /* Buttons & links — calmer hover (underline + subtle color shift) */
@@ -288,7 +288,7 @@ html[data-mode="calm"] .get-help-btn:hover {
   border-radius: 0 0 15px 15px;
 
   /* soft shadow for separation but low contrast to avoid harsh edges */
-  box-shadow: 0 6px 22px rgba(11,15,20,0.06);
+border-bottom: 1px solid rgba(0,0,0,0.05);
   -webkit-font-smoothing:antialiased;
 }
 
@@ -928,7 +928,7 @@ html[data-mode="calm"]::view-transition-new(root) {
   height: var(--size, 96px);
   border-radius: 9999px;
   background: radial-gradient(circle at 30% 30%, var(--c1), var(--c2));
-  filter: blur(var(--blur, 20px));
+  filter: blur(var(--blur, 1px));
   opacity: var(--op, 0.5);
   pointer-events: none;
   z-index: 0;
@@ -955,4 +955,134 @@ html[data-mode="calm"]::view-transition-new(root) {
   inset: 0;
   z-index: 0;
   pointer-events: none;
+}
+
+html[data-mode="calm"] {
+  --calm-motion-scale: 0.25;   /* 25% of vivid movement */
+  --calm-motion-speed: 2.2;    /* slower = larger number */
+}
+
+/* Slow down all non-essential animations */
+html[data-mode="calm"] .animate__animated,
+html[data-mode="calm"] .animate-float,
+html[data-mode="calm"] .decor-float {
+  animation-duration: calc(var(--animate-duration, 1s) * var(--calm-motion-speed)) !important;
+  animation-timing-function: ease-in-out !important;
+}
+
+/* Reduce translation amplitude for float effects */
+html[data-mode="calm"] .animate-float,
+html[data-mode="calm"] .decor-float {
+  --float-distance: 12px;
+  animation-name: calm-float;
+}
+
+@keyframes calm-float {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(calc(var(--float-distance) * var(--calm-motion-scale))); }
+}
+
+/* Remove attention-grabbing effects */
+html[data-mode="calm"] .blinking {
+  animation: none !important;
+}
+
+/* Remove bouncy / elastic easings in calm */
+html[data-mode="calm"] * {
+  transition-timing-function: ease !important;
+}
+
+/* Prevent sudden view transitions in calm */
+html[data-mode="calm"]::view-transition-old(root),
+html[data-mode="calm"]::view-transition-new(root) {
+  animation-duration: 1ms;
+}
+
+/* =====================================================
+   CALM MODE — PERCEPTUAL SIMPLIFICATION
+   ===================================================== */
+
+html[data-mode="calm"] {
+
+  /* Flatten spatial depth */
+  --calm-elevation: 0px;
+  --calm-shadow: none;
+
+  /* Reduce visual contrast */
+  --calm-opacity-soft: 0.88;
+
+  /* Neutralise gradients */
+  --calm-flat-bg: var(--page-light);
+}
+
+/* Kill decorative motion entirely */
+html[data-mode="calm"] .animate__animated,
+html[data-mode="calm"] .animate-float,
+html[data-mode="calm"] .decor-float {
+  animation: none !important;
+}
+
+/* Flatten depth everywhere */
+html[data-mode="calm"] * {
+  box-shadow: none !important;
+  filter: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  text-shadow: none !important;
+}
+
+/* Remove glass and blur */
+
+html[data-mode="calm"] .bg-white\/80,
+html[data-mode="calm"] .bg-black\/60 {
+  background: var(--calm-flat-bg) !important;
+}
+
+/* Flatten buttons */
+html[data-mode="calm"] .get-help-btn,
+html[data-mode="calm"] .button-link,
+html[data-mode="calm"] .mode-toggle {
+  box-shadow: none !important;
+  transform: none !important;
+  background-image: none !important;
+}
+
+/* Remove hover motion */
+html[data-mode="calm"] *:hover {
+  transform: none !important;
+}
+
+
+
+
+/* Soften opacity slightly to reduce visual salience */
+
+html[data-mode="calm"] header,
+html[data-mode="calm"] main,
+html[data-mode="calm"] footer {
+  opacity: var(--calm-opacity-soft);
+}
+
+/* Hide purely decorative elements */
+html[data-mode="calm"] .page-decor,
+html[data-mode="calm"] .decor-circle {
+  display: none !important;
+}
+
+/* Prevent view transition flicker */
+html[data-mode="calm"]::view-transition-old(root),
+html[data-mode="calm"]::view-transition-new(root) {
+  animation: none;
+}
+
+html[data-mode="calm"] .allow-border {
+  text-shadow:
+    -2px -2px 0 var(--brand-dark),
+    2px -2px 0 var(--brand-dark),
+    -2px 2px 0 var(--brand-dark),
+    2px 2px 0 var(--brand-dark),
+    -3px 0px 0 var(--brand-dark),
+    3px 0px 0 var(--brand-dark),
+    0px -3px 0 var(--brand-dark),
+    0px 3px 0 var(--brand-dark) !important;
 }

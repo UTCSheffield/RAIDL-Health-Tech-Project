@@ -9,9 +9,9 @@ const { activePage } = Astro.props;
 
 <header
   id="site-header"
-  class="sticky top-0 z-50 bg-white/80 backdrop-blur-sm transition-transform duration-300 h-16"
+  class="sticky top-0 z-50 transition-transform duration-300 h-16 overflow-hidden"
 >
-<nav class="site-nav flex items-center justify-between w-full h-full px-6">
+<nav class="site-nav flex items-center justify-between w-full h-full px-6 bg-white/80 backdrop-blur-sm">
     <div class="flex items-center gap-6">
       <a href={withBase("/")} aria-label="Home"><SiteIdentity /></a>
     </div>
