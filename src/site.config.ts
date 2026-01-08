@@ -82,10 +82,6 @@ const siteConfig: SiteConfig = {
             href: withBase('/fun-stuff/')
         },
         {
-            text: 'Positive Message',
-            href: withBase('/positive-message/')
-        },
-        {
             text: 'Help',
             href: withBase('/help/')
         }

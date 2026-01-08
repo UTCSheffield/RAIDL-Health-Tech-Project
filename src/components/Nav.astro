@@ -7,8 +7,11 @@ import { withBase } from "../utils/helpers";
 const { activePage } = Astro.props;
 ---
 
-<header id="site-header" class="sticky top-0 z-50 bg-white/80 backdrop-blur-sm transition-transform duration-300">
-<nav class="site-nav flex items-center justify-between w-full px-6 py-4">
+<header
+  id="site-header"
+  class="sticky top-0 z-50 bg-white/80 backdrop-blur-sm transition-transform duration-300 h-16"
+>
+<nav class="site-nav flex items-center justify-between w-full h-full px-6">
     <div class="flex items-center gap-6">
       <a href={withBase("/")} aria-label="Home"><SiteIdentity /></a>
     </div>
@@ -21,20 +24,29 @@ const { activePage } = Astro.props;
     <!-- Actions -->
 <div class="flex items-center gap-4">
   <!-- desktop CTA: no mt-4 so it vertically centers with the row -->
-  <a
-    href={withBase("/help/")}
-    class="inline-flex items-center px-4 py-2 rounded-lg text-white font-bold caveat-brush-regular get-help-btn"
-    style="background: linear-gradient(90deg, var(--brand-warm) 0%, var(--brand-secondary) 100%); color: white !important;"
-  >
+<a
+  href={withBase("/help/")}
+  class="inline-flex items-center h-10 px-4 rounded-lg font-bold caveat-brush-regular get-help-btn"
+>
     Get Help
   </a>
 
-  <!-- Mode toggle (accessible) -->
-  <button id="mode-toggle" class="mode-toggle hidden sm:inline-flex" aria-pressed="false" aria-label="Toggle colour mode: Calm or Vivid" title="Calm / Vivid">
-    <span class="knob" aria-hidden="true"></span>
-    <span class="sr-only">Toggle colour mode</span>
-    <span class="mode-label" aria-hidden="true">Calm</span>
-  </button>
+ <!-- Mode toggle (accessible) -->
+<button
+  id="mode-toggle"
+  class="mode-toggle hidden sm:inline-flex"
+  aria-pressed="false"
+  aria-label="Toggle colour mode: Calm or Vivid"
+  title="Calm / Vivid"
+>
+  <span class="labels" aria-hidden="true">
+    <span class="label-calm">Calm</span>
+    <span class="label-vivid">Vivid</span>
+  </span>
+
+  <span class="knob" aria-hidden="true"></span>
+  <span class="sr-only">Toggle colour mode</span>
+</button>
 
   <button id="hamburger-menu" aria-controls="mobile-links" aria-expanded="false" class="sm:hidden inline-block" title="Menu">🍔</button>
 </div>

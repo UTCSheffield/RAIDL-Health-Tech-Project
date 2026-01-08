@@ -41,19 +41,226 @@
 }
 
 /* VIVID mode: higher-saturation / original palette (orange primary) */
-html[data-mode="vivid"], :root[data-mode="vivid"] {
-  --brand-primary: #FB8A56;      /* Tan Hide (vivid primary) */
-  --brand-primary-rgb: 251,138,86;
-  --brand-secondary: #8D3DB8;    /* Studio (vivid) */
-  --brand-warm: #FF8633;         /* stronger warm accent for vivid */
-  --brand-dark: #422940;         /* Thunder (vivid) */
-  --brand-muted: #78596B;
+
+html[data-mode="calm"], :root[data-mode="calm"] {
+  /* Muted cool primary (soft teal) & secondary (slate-blue) */
+  --brand-primary: #6FA8A6;           /* Soft Teal (calming accent) */
+  --brand-primary-rgb: 111,168,166;
+  --brand-secondary: #6C73A3;         /* Muted Slate Blue */
+
+  /* Warm accent dialed down */
+  --brand-warm: #D5A86C;              /* Soft Sand (gentle warm) */
+
+  /* Keep dark/light as-is for readability */
+  --brand-dark: #2B2F3A;
   --brand-light: #F5F5F5;
-  --brand-highlight: #F12711;
-  --logo-stop-1: #FB8A56;        /* vivid gradient start */
-  --logo-stop-2: #F18E0B;
-  --logo-stop-3: #FFC857;
+
+  /* Muted support & highlight tuned softer */
+  --brand-muted: #6A6E73;             /* Graphite */
+  --brand-highlight: #7AA8A4;         /* Teal highlight (low chroma) */
+
+  /* Page background: warm cream to reduce glare vs pure white */
+  --page-light: #F6F2E8;              /* Warm Cream */
+  --logo-stop-1: #6FA8A6;
+  --logo-stop-2: #7AA8A4;
+  --logo-stop-3: #A7C7C5;
 }
+
+:root {
+  --text-primary: color-mix(in srgb, var(--brand-dark) 92%, black 8%);
+  --text-secondary: color-mix(in srgb, var(--brand-dark) 72%, var(--brand-muted) 28%);
+  --text-muted: var(--brand-muted);
+  --text-inverse: var(--brand-light);
+}
+
+/* Calm ↔ Vivid segmented control (autism.org.uk style) */
+.mode-toggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  height: 36px;
+  min-width: 92px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(11,15,20,0.06);
+  background: var(--page-light);
+  color: var(--brand-dark);
+  font-weight: 700;
+  font-size: 0.875rem;
+  line-height: 1;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: background .22s ease, color .22s ease, box-shadow .18s ease;
+}
+
+/* labels container (two labels side-by-side) */
+.mode-toggle .labels {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 0 10px; /* leave space for knob */
+  pointer-events: none; /* text itself shouldn't capture clicks */
+  color: inherit;
+  align-items: center;
+}
+
+/* knob (slides left/right) */
+.mode-toggle .knob {
+  position: absolute;
+  left: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--brand-light);
+  box-shadow: 0 4px 12px rgba(11,15,20,0.12);
+  transition: left .22s cubic-bezier(.23,.9,.32,1), background .22s ease, box-shadow .18s ease;
+  pointer-events: none;
+}
+
+/* calm state (default) - subtle contrast */
+.mode-toggle[aria-pressed="false"] .label-calm { opacity: 1; color: var(--brand-dark); }
+.mode-toggle[aria-pressed="false"] .label-vivid { opacity: 0.55; color: var(--brand-muted); }
+
+/* vivid state - pill background becomes brand gradient, labels invert */
+.mode-toggle[aria-pressed="true"] {
+  background: linear-gradient(90deg, var(--brand-primary), var(--brand-secondary));
+  border-color: color-mix(in srgb, var(--brand-primary) 40%, black 10%);
+  color: var(--brand-light);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+}
+.mode-toggle[aria-pressed="true"] .label-calm { opacity: 0.6; color: rgba(255,255,255,0.9); }
+.mode-toggle[aria-pressed="true"] .label-vivid { opacity: 1; color: var(--brand-light); }
+
+/* knob position when vivid (slide to right) */
+.mode-toggle[aria-pressed="true"] .knob {
+  left: calc(100% - 6px - 26px);
+}
+
+/* keyboard & focus visuals */
+.mode-toggle:focus {
+  outline: none;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--brand-primary) 18%, transparent);
+  z-index: 70;
+}
+
+/* small, icon-only variant for mobile (keeps previous behaviour) */
+.mode-toggle.icon-only {
+  padding: 6px;
+  width: 44px;
+  min-width: 44px;
+  justify-content: center;
+}
+.mode-toggle.icon-only .labels { display: none; }
+.mode-toggle.icon-only .knob { left: 8px; }
+
+/* ensure consistent baseline with other controls */
+.mode-toggle, .mode-toggle.icon-only {
+  height: 36px;
+}
+
+/* responsive tweak: ensure enough hit area on small screens */
+@media (max-width: 640px) {
+  .mode-toggle { min-width: 78px; height: 34px; }
+  .mode-toggle .knob { width: 24px; height: 24px; }
+}
+
+
+html.dark {
+  --text-primary: color-mix(in srgb, var(--brand-light) 92%, white 8%);
+  --text-secondary: color-mix(in srgb, var(--brand-light) 72%, var(--brand-muted) 28%);
+  --text-muted: color-mix(in srgb, var(--brand-light) 55%, var(--brand-muted) 45%);
+  --text-inverse: var(--brand-dark);
+}
+
+/* Calm mode background behavior (keeps your dark/light architecture) */
+html[data-mode="calm"].light {
+  background-color: var(--page-light);
+}
+
+html[data-mode="calm"] .site-nav {
+  /* Slightly lower contrast glass & shadow */
+  background: linear-gradient(180deg, rgba(255,255,255,0.82), rgba(255,255,255,0.68));
+  box-shadow: 0 4px 16px rgba(11,15,20,0.05);
+}
+
+/* Buttons & links — calmer hover (underline + subtle color shift) */
+html[data-mode="calm"] a.button-link:not(:disabled):hover,
+html[data-mode="calm"] button.button-link:not(:disabled):hover {
+  border-color: color-mix(in srgb, var(--brand-primary) 40%, var(--brand-dark) 10%);
+  color: var(--brand-primary);
+  text-decoration: underline;
+}
+
+/* Filled button hover: reduce gradient intensity */
+html[data-mode="calm"] a.button-link.space-btn-filled:not(:disabled):hover,
+html[data-mode="calm"] button.button-link.space-btn-filled:not(:disabled):hover {
+  background: color-mix(in srgb, var(--brand-primary) 55%, var(--brand-dark) 45%);
+  border-color: var(--brand-primary);
+  color: var(--brand-light);
+}
+
+/* Outlined button hover: softer */
+html[data-mode="calm"] a.button-link.space-btn-outlined:not(:disabled):hover,
+html[data-mode="calm"] button.button-link.space-btn-outlined:not(:disabled):hover {
+  border-color: var(--brand-primary);
+  color: var(--brand-primary);
+  text-decoration: underline;
+}
+
+/* Reduce non-essential motion in calm mode */
+/* Animate.css adds .animate__animated — disable in calm */
+html[data-mode="calm"] .animate__animated,
+html[data-mode="calm"] .animate-float,
+html[data-mode="calm"] .blinking {
+  animation: none !important;
+}
+
+/* Also respect OS setting (WCAG technique C39) */
+@media (prefers-reduced-motion: reduce) {
+  .animate__animated,
+  .animate-float,
+  .blinking {
+    animation: none !important;
+  }
+  /* Soften global transitions for motion-sensitive users */
+  * {
+    transition: none !important;
+  }
+}
+
+/* Focus visibility (kept strong but low-chroma) */
+:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--brand-secondary) 55%, white 45%);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* Text-border: calmer shadow stack in calm mode */
+html[data-mode="calm"] .text-border {
+  text-shadow:
+    -1px -1px 0 color-mix(in srgb, var(--brand-dark) 80%, white 20%),
+    1px -1px 0 color-mix(in srgb, var(--brand-dark) 80%, white 20%),
+    -1px 1px 0 color-mix(in srgb, var(--brand-dark) 80%, white 20%),
+    1px 1px 0 color-mix(in srgb, var(--brand-dark) 80%, white 20%);
+}
+
+/* Get-help CTA: slightly gentler lift & shadow in calm mode */
+html[data-mode="calm"] .get-help-btn {
+  color: var(--brand-dark);
+  box-shadow: 0 2px 8px rgba(var(--brand-primary-rgb), 0.1);
+}
+html[data-mode="calm"] .get-help-btn:hover {
+  transform: translateY(-1px) scale(1.01);
+  box-shadow: 0 4px 12px rgba(var(--brand-primary-rgb), 0.18);
+}
+
 
 
 #site-header {
@@ -422,7 +629,7 @@ main, .page-content, section, article {
 .get-help-btn {
   transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   /* use brand-primary-rgb for consistent coloured shadows */
-  box-shadow: 0 2px 10px rgba(var(--brand-primary-rgb), 0.12);
+  box-shadow: 0 2px 10px rgba(var(--brand-primary-rgb), 0.32);
 }
 
 .get-help-btn:hover {
@@ -500,4 +707,252 @@ main, .page-content, section, article {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+}
+
+
+/* =====================================================
+   GLOBAL TEXT COLOUR NORMALISATION
+   Ensures Tailwind text utilities respect theme tokens
+   ===================================================== */
+
+/* Base text */
+body {
+  color: var(--brand-dark);
+}
+
+/* Light / dark mode base */
+html.dark body {
+  color: var(--brand-light);
+}
+
+/* Remap Tailwind grayscale text utilities */
+.text-black {
+  color: var(--brand-dark) !important;
+}
+
+.text-white {
+  color: var(--brand-light) !important;
+}
+
+/* Common gray shades → theme-muted */
+.text-gray-500,
+.text-gray-600,
+.text-gray-700,
+.text-gray-800 {
+  color: color-mix(in srgb, var(--brand-dark) 82%, var(--brand-muted) 18%) !important;
+}
+
+/* Subtle text */
+.text-gray-400 {
+  color: var(--brand-muted) !important;
+}
+
+/* Dark mode overrides */
+html.dark .text-gray-400,
+html.dark .text-gray-500,
+html.dark .text-gray-600,
+html.dark .text-gray-700,
+html.dark .text-gray-800 {
+  color: color-mix(in srgb, var(--brand-light) 80%, var(--brand-muted) 20%) !important;
+}
+
+/* Ensure readable text on light glass surfaces */
+.bg-white,
+.bg-white\/80,
+.bg-white\/70 {
+  color: var(--brand-dark);
+}
+
+/* Dark glass */
+html.dark .bg-black\/60,
+html.dark .bg-black\/70 {
+  color: var(--brand-light);
+}
+
+html[data-mode="calm"]::view-transition-old(root),
+html[data-mode="calm"]::view-transition-new(root) {
+  animation-duration: 1ms;
+}
+
+/* Consolidated Calm ↔ Vivid control (replace all previous .mode-toggle / .labels / .label-* / .knob rules) */
+.mode-toggle {
+  --mode-knob-size: 22px;
+  --mode-padding: 12px;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  min-width: 120px;
+  padding: 0 calc(var(--mode-padding));
+  border-radius: 999px;
+  border: 1px solid rgba(11,15,20,0.06);
+  background: var(--page-light);
+  color: var(--brand-dark);
+  font-weight: 700;
+  font-size: 0.9rem;
+  line-height: 1;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: background .22s ease, color .22s ease, box-shadow .18s ease;
+}
+
+/* labels container: full area; labels absolutely positioned */
+.mode-toggle .labels {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* base label styles */
+.mode-toggle .label-calm,
+.mode-toggle .label-vivid {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-weight: 700;
+  white-space: nowrap;
+  transition: opacity .18s ease, transform .18s ease, visibility .01s linear;
+  will-change: opacity, transform;
+  z-index: 1; /* labels below knob */
+}
+
+/* Calm label default: place on right and visible */
+.mode-toggle .label-calm {
+  right: calc(var(--mode-padding) + 2px);
+  left: auto;
+  opacity: 1;
+  visibility: visible;
+  color: var(--brand-dark);
+  transform: translateY(-50%) translateX(0);
+}
+
+/* Vivid label default: place on left and hidden */
+.mode-toggle .label-vivid {
+  left: calc(var(--mode-padding) + 2px);
+  right: auto;
+  opacity: 0;
+  visibility: hidden;
+  color: var(--brand-light);
+  transform: translateY(-50%) translateX(0);
+}
+
+/* Knob (on top of labels) */
+.mode-toggle .knob {
+  position: absolute;
+  top: 50%;
+  left: var(--mode-padding);
+  transform: translateY(-50%);
+  width: var(--mode-knob-size);
+  height: var(--mode-knob-size);
+  border-radius: 50%;
+  background: var(--brand-light);
+  box-shadow: 0 6px 14px rgba(11,15,20,0.12);
+  transition: left .22s cubic-bezier(.23,.9,.32,1), background .22s ease, box-shadow .18s ease;
+  z-index: 2; /* above labels */
+  pointer-events: none;
+}
+
+/* Vivid state: swap visibility and slide knob */
+.mode-toggle[aria-pressed="true"] {
+  background: linear-gradient(90deg, var(--brand-primary), var(--brand-secondary));
+  border-color: color-mix(in srgb, var(--brand-primary) 40%, black 10%);
+  color: var(--brand-light);
+  box-shadow: 0 8px 22px rgba(0,0,0,0.08);
+}
+.mode-toggle[aria-pressed="true"] .label-calm {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-50%) translateX(6px);
+}
+.mode-toggle[aria-pressed="true"] .label-vivid {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(-50%) translateX(0);
+}
+.mode-toggle[aria-pressed="true"] .knob {
+  left: calc(100% - var(--mode-padding) - var(--mode-knob-size));
+}
+
+/* Focus style */
+.mode-toggle:focus {
+  outline: none;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--brand-primary) 18%, transparent);
+  z-index: 70;
+}
+
+/* compact mobile variant */
+.mode-toggle.icon-only {
+  padding: 6px;
+  width: 52px;
+  min-width: 52px;
+}
+.mode-toggle.icon-only .labels { display: none; }
+.mode-toggle.icon-only .knob { left: 14px; }
+
+/* responsive tweak */
+@media (max-width: 640px) {
+  .mode-toggle { min-width: 100px; height: 36px; --mode-padding: 10px; --mode-knob-size: 20px; }
+  .mode-toggle .knob { width: var(--mode-knob-size); height: var(--mode-knob-size); }
+  .mode-toggle .label-calm, .mode-toggle .label-vivid { font-size: 0.85rem; }
+}
+
+.mode-toggle .knob {
+  position: absolute;
+  top: 50% !important;                        /* anchor to midline */
+  transform: translateY(-50%) !important;     /* ensure centre-aligned vertically */
+  left: var(--mode-padding);                   /* calm (left) position */
+  width: var(--mode-knob-size);
+  height: var(--mode-knob-size);
+  border-radius: 50%;
+  background: var(--brand-light);
+  box-shadow: 0 6px 14px rgba(11,15,20,0.12);
+  transition: left .22s cubic-bezier(.23,.9,.32,1), background .22s ease, box-shadow .18s ease;
+  z-index: 2;
+  pointer-events: none;
+  box-sizing: border-box;
+}
+
+/* vivid (right) — only change left; keep top/transform the same */
+.mode-toggle[aria-pressed="true"] .knob {
+  left: calc(100% - var(--mode-padding) - var(--mode-knob-size)) !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+}
+
+.decor-circle {
+  position: absolute;
+  width: var(--size, 96px);
+  height: var(--size, 96px);
+  border-radius: 9999px;
+  background: radial-gradient(circle at 30% 30%, var(--c1), var(--c2));
+  filter: blur(var(--blur, 20px));
+  opacity: var(--op, 0.5);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Optional gentle float animation */
+.decor-float {
+  animation: decor-float 12s ease-in-out infinite;
+}
+
+@keyframes decor-float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-12px); }
+}
+
+/* Ensure hero content stays above decor */
+.hero-content,
+.hero-image {
+  position: relative;
+  z-index: 10;
+}
+.page-decor {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
 }

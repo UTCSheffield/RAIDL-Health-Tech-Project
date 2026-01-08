@@ -8,40 +8,54 @@ import { withBase } from "../utils/helpers";
   <!-- Hero Section -->
   <section class="relative bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-indigo-900 dark:to-purple-900 min-h-screen flex items-center px-4 py-20 overflow-hidden">
     <div class="w-full max-w-screen-xl mx-auto flex flex-col lg:flex-row items-center gap-16">
-      <div class="flex-1 text-center lg:text-left z-10">
+      <div class="flex-1 text-center lg:text-left z-10 hero-content">
         <h1 class="text-6xl lg:text-7xl font-bold bg-gradient-to-r from-orange-500 to-amber-500 bg-clip-text text-transparent mb-8 leading-tight">
           Caring Hearts
         </h1>
         <p class="text-2xl lg:text-3xl text-gray-700 dark:text-gray-200 mb-12 leading-relaxed max-w-4xl">
-          Supporting families and children who think differently with compassion, resources, and community.
+          Informing young people about Autism with a welcoming environment. 
         </p>
         <div class="flex flex-col sm:flex-row gap-6 justify-center lg:justify-start">
-         <a href={withBase("/help/")}
-   class="bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600 text-white px-10 py-5 rounded-full font-semibold text-xl transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:-translate-y-1">
-  Get Support
-</a>
- 
-<a href={withBase("/about-us/")}
-   class="bg-white/80 hover:bg-white text-teal-600 border-2 border-teal-600 px-10 py-5 rounded-full font-semibold text-xl transition-all duration-300 shadow-lg hover:shadow-xl backdrop-blur-sm">
-  Learn More
-</a>
-
+          <a href={withBase("/help/")}
+             class="bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600 text-white px-10 py-5 rounded-full font-semibold text-xl transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:-translate-y-1">
+            Get Support
+          </a>
+          <a href={withBase("/about-us/")}
+             class="bg-white/80 hover:bg-white text-teal-600 border-2 border-teal-600 px-10 py-5 rounded-full font-semibold text-xl transition-all duration-300 shadow-lg hover:shadow-xl backdrop-blur-sm">
+            Learn More
+          </a>
         </div>
       </div>
-      
+
       <!-- Image -->
-      <div class="flex-1 relative z-10">
+      <div class="flex-1 relative z-10 hero-image">
         <div class="relative">
-          <img src="https://picsum.photos/700/500?random=1" alt="Inclusive and supportive community illustration" class="rounded-3xl shadow-2xl w-full transform hover:scale-105 transition-transform duration-500" />
-          <div class="absolute -top-8 -left-8 bg-gradient-to-br from-yellow-400 to-orange-400 rounded-full p-6 shadow-xl animate-bounce"><span class="text-3xl">✨</span></div>
-          <div class="absolute -bottom-6 -right-6 bg-gradient-to-br from-pink-400 to-rose-400 rounded-full p-5 shadow-xl animate-pulse"><span class="text-2xl">💝</span></div>
+          <img src="https://picsum.photos/700/500?random=1"
+               alt="Inclusive and supportive community illustration"
+               class="rounded-3xl shadow-2xl w-full transform hover:scale-105 transition-transform duration-500" />
         </div>
       </div>
     </div>
 
-    <div class="absolute top-1/4 left-1/4 w-32 h-32 bg-gradient-to-br from-blue-200 to-indigo-300 rounded-full opacity-30 animate-pulse"></div>
-    <div class="absolute bottom-1/3 right-1/5 w-24 h-24 bg-gradient-to-br from-purple-200 to-pink-300 rounded-full opacity-40 animate-pulse delay-1000"></div>
-    <div class="absolute top-2/3 left-1/6 w-16 h-16 bg-gradient-to-br from-green-200 to-teal-300 rounded-full opacity-50 animate-pulse delay-2000"></div>
+    <!-- Decorative blobs (kept inside hero so layout stays valid) -->
+    <div
+      class="decor-circle decor-medium decor-float decor-themed"
+      aria-hidden="true"
+      style="top: -28px; left: -28px; --size:96px; --c1: rgba(244,162,97,0.85); --c2: rgba(255,200,87,0.45); --blur:10px; --op:0.9;"
+    ></div>
+
+    <div
+      class="decor-circle decor-small decor-float"
+      aria-hidden="true"
+      style="bottom: -18px; right: -18px; --size:64px; --c1: rgba(255,183,197,0.7); --c2: rgba(255,140,170,0.22); --blur:8px; --op:0.6;"
+    ></div>
+
+    <div
+      class="decor-circle decor-large"
+      aria-hidden="true"
+      style="top: 25%; left: 18%; --size:160px; --c1: rgba(107,168,167,0.18); --c2: rgba(167,199,197,0.06); --blur:28px; --op:0.32;"
+    ></div>
+
   </section>
 
   <!-- Flowing Mission Section -->
@@ -58,18 +72,17 @@ import { withBase } from "../utils/helpers";
       </div>
 
       <div class="flex flex-wrap justify-center gap-8 lg:gap-12">
-        <div class="flex-1 min-w-80 max-w-md bg-gradient-to-br from-blue-100 to-indigo-200 dark:from-blue-900 dark:to-indigo-800 p-10 rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
-
+        <div class="flex-1 min-w-80 max-w-md bg-gradient-to-br from-blue-100 to-indigo-200 dark:from-blue-900 dark:to-indigo-800 p-10 rounded-3xl shadow-xl">
           <h3 class="text-2xl font-bold text-gray-800 dark:text-white mb-4">Accessible Resources</h3>
           <p class="text-gray-700 dark:text-gray-200 leading-relaxed">Easy-to-understand guides and information tailored for families and children.</p>
         </div>
-        
-        <div class="flex-1 min-w-80 max-w-md bg-gradient-to-br from-green-100 to-emerald-200 dark:from-green-900 dark:to-emerald-800 p-10 rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
+
+        <div class="flex-1 min-w-80 max-w-md bg-gradient-to-br from-green-100 to-emerald-200 dark:from-green-900 dark:to-emerald-800 p-10 rounded-3xl shadow-xl">
           <h3 class="text-2xl font-bold text-gray-800 dark:text-white mb-4">Community Support</h3>
           <p class="text-gray-700 dark:text-gray-200 leading-relaxed">Connect with others who understand your experiences and challenges.</p>
         </div>
-        
-        <div class="flex-1 min-w-80 max-w-md bg-gradient-to-br from-purple-100 to-violet-200 dark:from-purple-900 dark:to-violet-800 p-10 rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
+
+        <div class="flex-1 min-w-80 max-w-md bg-gradient-to-br from-purple-100 to-violet-200 dark:from-purple-900 dark:to-violet-800 p-10 rounded-3xl shadow-xl">
           <h3 class="text-2xl font-bold text-gray-800 dark:text-white mb-4">Practical Guidance</h3>
           <p class="text-gray-700 dark:text-gray-200 leading-relaxed">Real-world tips and strategies from lived experiences and experts.</p>
         </div>
@@ -77,16 +90,12 @@ import { withBase } from "../utils/helpers";
     </div>
   </section>
 
-   <section class="relative py-32 px-4 bg-gradient-to-r from-orange-500 via-amber-500 to-rose-500 text-white overflow-hidden">
+  <section class="relative py-32 px-4 bg-gradient-to-r from-orange-500 via-amber-500 to-rose-500 text-white overflow-hidden">
     <div class="absolute inset-0 bg-gradient-to-br from-orange-600/20 via-amber-600/20 to-rose-600/20" style="border-radius: 20%;"></div>
 
-    <div class="relative max-w-screen-xl mx-auto text-center">
-      <h2 class="text-5xl lg:text-6xl font-bold mb-8 leading-tight text-black">Ready to Get Started?</h2>
-      <p class="text-2xl lg:text-3xl mb-12 opacity-90 max-w-3xl mx-auto leading-relaxed text-black">
-        Join our community of supportive families and discover resources that make a difference.
-      </p>
+    <div class="relative text-center">
       <button id="openPositiveMessages" class="bg-white text-orange-600 px-12 py-6 rounded-full font-bold text-xl hover:bg-gray-100 transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:-translate-y-1">
-        Try Positive Messages
+        If you're feeling down or just want a feel-good message use this!
       </button>
     </div>
   </section>
@@ -94,54 +103,52 @@ import { withBase } from "../utils/helpers";
   <section id="positiveMessageSection" class="hidden py-24 px-4 bg-gradient-to-b from-white to-indigo-50 dark:from-gray-900 dark:to-indigo-900">
     <div class="mx-auto text-center" style="width:1000px;max-width:100%;">
       <div class="rounded-2xl p-8 bg-white/80 dark:bg-black/60 shadow-xl">
-        <h2 class="text-3xl font-bold mb-4">A Gentle Message for You</h2>
+        <h2 class="text-3xl font-bold mb-4">Just for you...</h2>
         <p id="messageBox" class="mt-4 text-lg min-h-[80px] transition-opacity duration-300 mx-auto">Click the button when you’re ready.</p>
-<button id="generateBtn"
-  class="mt-6 px-6 py-3 rounded-full bg-teal-500 text-white font-semibold hover:bg-teal-600 transition-transform duration-200 hover:scale-105">
-  Generate Message
-</button>
+        <button id="generateBtn" class="mt-6 px-6 py-3 rounded-full bg-teal-500 text-white font-semibold hover:bg-teal-600 transition-transform duration-200 hover:scale-105">
+          Generate Message
+        </button>
       </div>
     </div>
   </section>
 
   <script is:inline>
-  function initPositiveMessages() {
-    const messages = [
-      "You are not broken — your way of experiencing the world is valid.",
-      "It’s okay to move at your own pace. There is no deadline for being yourself.",
-      "Your needs matter, even when they’re hard to explain.",
-      "You’re allowed to rest without earning it.",
-      "Being autistic is not a flaw — it’s part of who you are.",
-      "You don’t have to go through this alone. Support exists, and you deserve it.",
-      "Small steps still count. Progress looks different for everyone.",
-      "Your experiences and feelings are real and worthy of respect.",
-      "It’s okay if today is overwhelming. Tomorrow can be different.",
-      "You are allowed to set boundaries that protect your wellbeing.",
-      "You belong, exactly as you are."
-    ];
+    function initPositiveMessages() {
+      const messages = [
+        "You are not broken — your way of experiencing the world is valid.",
+        "It’s okay to move at your own pace. There is no deadline for being yourself.",
+        "Your needs matter, even when they’re hard to explain.",
+        "You’re allowed to rest without earning it.",
+        "Being autistic is not a flaw — it’s part of who you are.",
+        "You don’t have to go through this alone. Support exists, and you deserve it.",
+        "Small steps still count. Progress looks different for everyone.",
+        "Your experiences and feelings are real and worthy of respect.",
+        "It’s okay if today is overwhelming. Tomorrow can be different.",
+        "You are allowed to set boundaries that protect your wellbeing.",
+        "You belong, exactly as you are."
+      ];
 
-    const openBtn = document.getElementById('openPositiveMessages');
-    const section = document.getElementById('positiveMessageSection');
-    const generateBtn = document.getElementById('generateBtn');
-    const box = document.getElementById('messageBox');
+      const openBtn = document.getElementById('openPositiveMessages');
+      const section = document.getElementById('positiveMessageSection');
+      const generateBtn = document.getElementById('generateBtn');
+      const box = document.getElementById('messageBox');
 
-    if (!openBtn || !section) return;
+      if (!openBtn || !section) return;
 
-    openBtn.onclick = () => {
-      section.classList.remove('hidden');
-      section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    };
-
-    if (generateBtn && box) {
-      generateBtn.onclick = () => {
-        const randomIndex = Math.floor(Math.random() * messages.length);
-        box.textContent = messages[randomIndex];
+      openBtn.onclick = () => {
+        section.classList.remove('hidden');
+        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
       };
+
+      if (generateBtn && box) {
+        generateBtn.onclick = () => {
+          const randomIndex = Math.floor(Math.random() * messages.length);
+          box.textContent = messages[randomIndex];
+        };
+      }
     }
-  }
 
-  document.addEventListener('DOMContentLoaded', initPositiveMessages);
-  document.addEventListener('astro:page-load', initPositiveMessages);
-</script>
-
+    document.addEventListener('DOMContentLoaded', initPositiveMessages);
+    document.addEventListener('astro:page-load', initPositiveMessages);
+  </script>
 </MainLayout>
