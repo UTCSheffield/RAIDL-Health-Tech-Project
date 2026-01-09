@@ -74,23 +74,20 @@ const siteConfig: SiteConfig = {
             href: withBase('/')
         },
         {
-            text: 'About Us',
-            href: withBase('/about-us/')
-        },
-        {
-            text: 'Fun Stuff',
-            href: withBase('/fun-stuff/')
+            text: 'Support Card',
+            href: withBase('/support-card/')
         },
         {
             text: 'Help',
             href: withBase('/help/')
+        },
+        // new blog link
+        {
+            text: 'Blog',
+            href: withBase('/blog/')
         }
     ],
     footerNavLinks: [
-        {
-            text: 'About',
-            href: withBase('/about')
-        },
         {
             text: 'Contact',
             href: withBase('/contact')
@@ -99,29 +96,29 @@ const siteConfig: SiteConfig = {
             text: 'RSS Feed',
             href: withBase('/rss.xml')
         },
-                {
+        {
             text: 'Sitemap',
             href: withBase('/sitemap-index.xml')
         }
     ],
     socialLinks: [
         {
-            text: 'Dribbble',
-            href: 'https://dribbble.com/'
+            text: "LinkedIn",
+            href: "https://www.linkedin.com/"
         },
         {
-            text: 'Instagram',
-            href: 'https://instagram.com/'
+            text: "Peerlist",
+            href: "https://www.peerlist.io/"
         },
         {
-            text: 'X/Twitter',
-            href: 'https://twitter.com/'
+            text: "GitHub",
+            href: "https://github.com/"
         }
     ],
     hero: {
         eyebrowText: 'Support & Resources',
         title: 'Caring Hearts',
-        text: 'Supporting families and children who think differently',
+        text: 'Supporting children who think differently',
         image: {
             src: '/assets/images/pixeltrue-space-discovery.svg',
             alt: 'A person sitting at a desk in front of a computer'
@@ -165,7 +162,8 @@ const siteConfig: SiteConfig = {
         ]
     },
     blog: {
-        description: "Read about my space adventures, explorations and the aliens I've met on my journeys."
+        // make this descriptive so your blog listing page can show useful text
+        description: "Articles, ideas and practical resources about supporting neurodivergent children — tips, how-tos, and stories."
     },
     postsPerPage: 2,
     recentPostLimit: 3

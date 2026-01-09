@@ -27,11 +27,9 @@ const allPosts = page.data;
       )
     }
 
-    <div
-      class="flex flex-col text-left gap-8 mb-4 text-sm sm:text-base max-w-fit mx-auto"
-    >
-      {allPosts.map((post) => <PostCardPreview post={post} />)}
-    </div>
+<div class="flex flex-col items-stretch text-left gap-8 mb-4 text-sm sm:text-base w-full max-w-3xl mx-auto">
+  {allPosts.map((post) => <PostCardPreview post={post} />)}
+</div>
     <Pagination page={page} class="mb-16 sm:mb-24" />
   </div>
 </MainLayout>
