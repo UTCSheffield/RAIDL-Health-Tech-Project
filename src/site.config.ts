@@ -74,6 +74,10 @@ const siteConfig: SiteConfig = {
             href: withBase('/')
         },
         {
+            text: 'About Us',
+            href: withBase('/about-us/')
+        },
+        {
             text: 'Support Card',
             href: withBase('/support-card/')
         },
@@ -163,7 +167,7 @@ const siteConfig: SiteConfig = {
     },
     blog: {
         // make this descriptive so your blog listing page can show useful text
-        description: "Articles, ideas and practical resources about supporting neurodivergent children — tips, how-tos, and stories."
+        description: "Learn more about Neurodivergence and how it effects people, and how we can lend a helping hand."
     },
     postsPerPage: 2,
     recentPostLimit: 3

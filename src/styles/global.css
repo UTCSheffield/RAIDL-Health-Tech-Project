@@ -217,7 +217,6 @@ html[data-mode="calm"] button.button-link.space-btn-outlined:not(:disabled):hove
 /* Reduce non-essential motion in calm mode */
 /* Animate.css adds .animate__animated — disable in calm */
 html[data-mode="calm"] .animate__animated,
-html[data-mode="calm"] .animate-float,
 html[data-mode="calm"] .blinking {
   animation: none !important;
 }
@@ -225,7 +224,6 @@ html[data-mode="calm"] .blinking {
 /* Also respect OS setting (WCAG technique C39) */
 @media (prefers-reduced-motion: reduce) {
   .animate__animated,
-  .animate-float,
   .blinking {
     animation: none !important;
   }
@@ -656,19 +654,7 @@ main, .page-content, section, article {
     0px 3px 0 var(--brand-dark);
 }
 
-/* Custom animations for organic flow */
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-20px);
-  }
-}
 
-.animate-float {
-  animation: float 6s ease-in-out infinite;
-}
 
 /* Ensure action group and CTA align consistently */
 .site-nav .flex.items-center.gap-4,
@@ -962,25 +948,9 @@ html[data-mode="calm"] {
   --calm-motion-speed: 2.2;    /* slower = larger number */
 }
 
-/* Slow down all non-essential animations */
-html[data-mode="calm"] .animate__animated,
-html[data-mode="calm"] .animate-float,
-html[data-mode="calm"] .decor-float {
-  animation-duration: calc(var(--animate-duration, 1s) * var(--calm-motion-speed)) !important;
-  animation-timing-function: ease-in-out !important;
-}
 
-/* Reduce translation amplitude for float effects */
-html[data-mode="calm"] .animate-float,
-html[data-mode="calm"] .decor-float {
-  --float-distance: 12px;
-  animation-name: calm-float;
-}
 
-@keyframes calm-float {
-  0%, 100% { transform: translateY(0); }
-  50%      { transform: translateY(calc(var(--float-distance) * var(--calm-motion-scale))); }
-}
+
 
 /* Remove attention-grabbing effects */
 html[data-mode="calm"] .blinking {
@@ -990,6 +960,8 @@ html[data-mode="calm"] .blinking {
 /* Remove bouncy / elastic easings in calm */
 html[data-mode="calm"] * {
   transition-timing-function: ease !important;
+  transition: none !important;
+  animation: none !important;
 }
 
 /* Prevent sudden view transitions in calm */
@@ -1017,7 +989,6 @@ html[data-mode="calm"] {
 
 /* Kill decorative motion entirely */
 html[data-mode="calm"] .animate__animated,
-html[data-mode="calm"] .animate-float,
 html[data-mode="calm"] .decor-float {
   animation: none !important;
 }
@@ -1055,6 +1026,7 @@ html[data-mode="calm"] *:hover {
 
 
 
+
 /* Soften opacity slightly to reduce visual salience */
 
 html[data-mode="calm"] header,
@@ -1085,4 +1057,28 @@ html[data-mode="calm"] .allow-border {
     3px 0px 0 var(--brand-dark),
     0px -3px 0 var(--brand-dark),
     0px 3px 0 var(--brand-dark) !important;
+}
+
+
+
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%      { transform: translateY(-20px); }
+}
+
+
+.decor-float {
+  animation: decor-float 12s ease-in-out infinite;
+}
+
+/* =====================================================
+   FINAL CALM MODE MOTION KILL — DO NOT OVERRIDE BELOW
+   ===================================================== */
+
+html[data-mode="calm"] .animate-float,
+html[data-mode="calm"] .decor-float,
+html[data-mode="calm"] .animate__animated,
+html[data-mode="calm"] .blinking {
+  animation: none !important;
 }

@@ -1,37 +1,68 @@
 ---
-import { Image } from "astro:assets";
+// src/components/PostCardPreview.astro
 import type { CollectionEntry } from "astro:content";
 import FormattedDate from "./FormattedDate.astro";
 import { withBase } from "../utils/helpers";
 
 type Props = { post: CollectionEntry<"blogs"> };
-const { post } = Astro.props;
-const { title, pubDate, description, image } = post.data;
+const { post } = Astro.props as Props;
+
+// frontmatter and values
+const fm = (post as any)?.data ?? (post as any);
+const { title, pubDate, description, image } = fm as any;
+
+// Resolve slug/id safely for URL generation
+const slug =
+  // prefer an explicit slug if present on the entry
+  (post as any).slug ??
+  // otherwise use collection id (typically a string like 'post-1')
+  (post as any).id ??
+  // fallback to a slug in frontmatter if present
+  (fm && (fm.slug || fm.id)) ??
+  null;
+
+// import images as URL strings (eager)
+const blogImages = import.meta.glob(
+  '/src/content/blogs/**/images/*.{png,jpg,jpeg,webp,gif,svg}',
+  { eager: true, query: '?url', import: 'default' }
+) as Record<string, string>;
+
+function resolveImageUrl(relPath?: string | null): string | null {
+  if (!relPath) return null;
+  if (/^(https?:)?\/\//i.test(relPath) || relPath.startsWith('/')) return relPath;
+  const filename = relPath.split('/').pop();
+  if (!filename) return null;
+  for (const p in blogImages) {
+    if (p.endsWith(`/${filename}`)) return blogImages[p];
+  }
+  return null;
+}
+
+const imageUrl = image ? (typeof image.url === 'string' ? resolveImageUrl(image.url) : image.url?.src ?? image.url?.default ?? null) : null;
 ---
 
-<a class="font-bold" href={withBase("/blog/" + post.id)}>
+<a class="font-bold" href={withBase(slug ? `/blog/${slug}` : `/blog`)}>
   <div class="flex flex-col sm:flex-row gap-2 sm:gap-4">
-    {
-      image && image.url && (
-        <>
-          <Image
-            class=""
-            src={image.url}
-            alt={image.alt || ""}
-            width={300}
-            height={167}
-          />
-        </>
-      )
-    }
+    {imageUrl ? (
+      <img
+        src={imageUrl}
+        alt={image?.alt ?? ""}
+        class="mb-4 sm:mb-0 sm:mr-4 w-full sm:w-48 object-cover rounded"
+        loading="lazy"
+      />
+    ) : image?.url && typeof image.url === "string" ? (
+      <img
+        src={image.url}
+        alt={image?.alt ?? ""}
+        class="mb-4 sm:mb-0 sm:mr-4 w-full sm:w-48 object-cover rounded"
+        loading="lazy"
+      />
+    ) : null}
+
     <div class="flex flex-col flex-1">
       <h2 class="mb-1">{title}</h2>
       <FormattedDate date={new Date(pubDate)} />
-      {
-        description && (
-          <p class="font-light text-base text-balance">{description}</p>
-        )
-      }
+      {description && <p class="font-light text-base text-balance">{description}</p>}
     </div>
   </div>
 </a>

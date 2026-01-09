@@ -1,6 +1,6 @@
 ---
 import "../styles/global.css";
-
+import ChatWidget from '../components/ChatWidget.astro';
 import Footer from "../components/Footer.astro";
 import Nav from "../components/Nav.astro";
 import { withBase } from "../utils/helpers";
@@ -60,8 +60,9 @@ const {
     <script is:inline>document.documentElement.classList.remove('dark');document.documentElement.classList.add('light');localStorage?.setItem('theme','light');</script>
     <main class="w-full min-h-screen pt-6 sm:pt-8 px-4">
       <Nav activePage={activePage} />
+      <ChatWidget />
       <slot />
-      <Footer />
+      <Footer />  
     </main>
   </body>
 </html>

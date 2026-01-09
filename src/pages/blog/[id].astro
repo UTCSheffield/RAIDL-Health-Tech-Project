@@ -1,6 +1,6 @@
 ---
+// src/pages/blog/[id].astro
 import "../../styles/global.css";
-import { Image } from "astro:assets";
 import {
   sortItemsByDateDesc,
   createSlugFromTitle,
@@ -16,10 +16,10 @@ import siteConfig from "../../site.config";
 export async function getStaticPaths() {
   const posts = (await getCollection("blogs")).sort(sortItemsByDateDesc);
   const postCount = posts.length;
-  return posts.map((post, index) => ({
-    params: { id: post.id },
+  return posts.map((p, index) => ({
+    params: { id: p.id },
     props: {
-      post,
+      post: p,
       prevPost: index + 1 !== postCount ? posts[index + 1] : null,
       nextPost: index !== 0 ? posts[index - 1] : null,
     },
@@ -28,60 +28,123 @@ export async function getStaticPaths() {
 
 type Props = {
   post: CollectionEntry<"blogs">;
-  prevPost: CollectionEntry<"blogs">;
-  nextPost: CollectionEntry<"blogs">;
+  prevPost: CollectionEntry<"blogs"> | null;
+  nextPost: CollectionEntry<"blogs"> | null;
 };
 
-const { post, prevPost, nextPost } = Astro.props;
-const { title, pubDate, author, tags = [], image } = post.data;
+// single destructure of Astro.props
+const { post, prevPost, nextPost } = Astro.props as Props;
+
+// frontmatter and content render
+const fm = (post as any)?.data ?? (post as any);
+const { title, pubDate, author, tags = [], image } = fm as any;
 const { Content } = await render(post);
+
+// import all content images as URL strings (eager) using modern glob options
+const blogImages = import.meta.glob(
+  '/src/content/blogs/**/images/*.{png,jpg,jpeg,webp,gif,svg}',
+  { eager: true, query: '?url', import: 'default' }
+) as Record<string, string>;
+
+/**
+ * Resolve a frontmatter relative path (e.g. "./images/2.jpg" or "images/2.jpg")
+ * to one of the URLs provided by the glob, or return an absolute/external URL unchanged.
+ */
+function resolveImageUrl(relPath?: string | null): string | null {
+  if (!relPath) return null;
+
+  // If the value is already an absolute path or external URL, return it.
+  if (/^(https?:)?\/\//i.test(relPath) || relPath.startsWith('/')) {
+    return relPath;
+  }
+
+  const filename = relPath.split('/').pop();
+  if (!filename) return null;
+
+  for (const p in blogImages) {
+    if (p.endsWith(`/${filename}`)) {
+      return blogImages[p];
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Accepts different shapes of frontmatter `image` and returns a usable URL string (or null).
+ */
+function getSafeImageUrl(imgField: any): string | null {
+  if (!imgField) return null;
+
+  // Common frontmatter shape: image: { url: "./images/2.jpg", alt: "..." }
+  if (typeof imgField.url === 'string') {
+    return resolveImageUrl(imgField.url);
+  }
+
+  // Some pipelines may expose an object with `.src`
+  if (imgField.url && typeof imgField.url === 'object') {
+    if (typeof imgField.url.src === 'string') return imgField.url.src;
+    if (typeof imgField.url.default === 'string') return imgField.url.default;
+  }
+
+  // If frontmatter used a plain string instead of an object
+  if (typeof imgField === 'string') return resolveImageUrl(imgField);
+
+  return null;
+}
+
+const imageUrl = getSafeImageUrl(image);
 ---
 
-<MainLayout pageTitle={siteConfig.title + " | " + title}>
+<MainLayout pageTitle={`${siteConfig.title} | ${title}`}>
   <div class="page-content">
     <h1 class="text-center text-balance">{title}</h1>
+
     <p class="leading-8 text-center kanit-regular text-balance text-xs">
-      by 🧑‍🚀 <span class="kanit-bold">{author}</span> on <span class="kanit-bold"
-        >{new Date(pubDate).toDateString()}</span
-      >
+      by <span class="kanit-bold">🧑‍🚀 {author}</span> on
+      <span class="kanit-bold"> {new Date(pubDate).toDateString()}</span>
     </p>
-    {
-      image && image.url && (
-        <Image class="mb-8 my-6" src={image?.url} alt={image?.alt || ""} />
-      )
-    }
+
+    {/** Use native <img> with the resolved URL (avoids LocalImageUsedWrongly) */}
+    {imageUrl ? (
+  <div class="mb-8 mx-auto w-full flex justify-center">
+    <img
+      src={imageUrl}
+      alt={image?.alt ?? ""}
+      class="w-full max-w-3xl h-auto object-contain rounded"
+      style="max-width: 20%;"
+      loading="lazy"
+    />
+  </div>
+) : null}
+
     <div class="font-light text-left">
       <Content />
     </div>
+
     <p class="kanit-regular text-center text-balance text-xs">
-      Tagged: {
-        tags.map((tag) => (
-          <Button
-            class="px-4! m-2"
-            href={withBase("/tags/" + createSlugFromTitle(tag))}
-          >
-            {tag}
-          </Button>
-        ))
-      }
+      Tagged:
+      {tags.map((tag: string) => (
+        <Button
+          class="px-4! m-2"
+          href={withBase("/tags/" + createSlugFromTitle(tag))}
+        >
+          {tag}
+        </Button>
+      ))}
     </p>
-    <div
-      class="flex flex-col sm:flex-row items-center justify-center gap-4 my-8"
-    >
+
+    <div class="flex flex-col sm:flex-row items-center justify-center gap-4 my-8">
       <Button class="back-link" href={withBase("/blog")}>
         <ArrowLeft class="w-5 h-5 fill-current mr-4" /> Back to All Stories
       </Button>
-      {
-        (prevPost || nextPost) && nextPost && (
-          <Button
-            class="back-link text-balance"
-            href={withBase("/blog/" + nextPost.id)}
-          >
-            Next Post: {nextPost.data.title}{" "}
-            <ArrowRight class="w-5 h-5 fill-current ml-4" />
-          </Button>
-        )
-      }
+
+      {nextPost && (
+        <Button class="back-link text-balance" href={withBase("/blog/" + nextPost.id)}>
+          Next Post: {nextPost.data.title}
+          <ArrowRight class="w-5 h-5 fill-current ml-4" />
+        </Button>
+      )}
     </div>
   </div>
 </MainLayout>

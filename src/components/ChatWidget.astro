@@ -1,0 +1,127 @@
+---
+// src/components/ChatWidget.astro
+import { withBase } from "../utils/helpers";
+---
+<div class="z-50">
+  <!-- Floating button -->
+  <div class="fixed bottom-6 right-6 sm:bottom-8 sm:right-8" aria-hidden="false">
+    <button
+      id="chatToggleBtn"
+      aria-controls="chatPanel"
+      aria-expanded="false"
+      class="group relative flex items-center justify-center w-14 h-14 rounded-full bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-4 focus:ring-teal-300 shadow-lg transition-transform transform hover:-translate-y-1"
+      title="Open chat (coming soon)"
+    >
+      <!-- simple chat icon (SVG) -->
+      <svg class="w-7 h-7 text-white" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+        <path d="M21 15a2 2 0 0 1-2 2H8l-5 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+
+      <!-- small badge (optional) -->
+      <span class="sr-only">Open chat</span>
+    </button>
+  </div>
+
+  <!-- Panel (hidden by default) -->
+  <div
+    id="chatPanel"
+    class="fixed bottom-20 right-4 sm:bottom-24 sm:right-8 w-[92vw] max-w-xs sm:max-w-sm bg-white dark:bg-gray-800 rounded-xl shadow-2xl ring-1 ring-black/5 dark:ring-white/5 p-4 transition-transform transform scale-95 opacity-0 pointer-events-none"
+    role="dialog"
+    aria-modal="false"
+    aria-labelledby="chatPanelTitle"
+    aria-hidden="true"
+  >
+    <div class="flex items-start justify-between gap-3">
+      <div>
+        <h3 id="chatPanelTitle" class="text-sm font-semibold text-gray-900 dark:text-gray-100" style="font-size: 1.5rem;">Care Bot</h3>
+        <!-- <p id="chatPanelDesc" class="text-xs text-gray-600 dark:text-gray-300 mt-1">A personi</p> -->
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button id="chatCloseBtn" aria-label="Close chat" class="p-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-teal-300">
+          <svg class="w-4 h-4 text-gray-700 dark:text-gray-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 6L6 18M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="mt-3">
+      <div id="chatMessage" class="text-sm text-gray-700 dark:text-gray-200 bg-gray-50 dark:bg-gray-900/40 p-3 rounded-md" aria-live="polite">
+        Coming soon - Advice and tips tailored to you.
+          <div class="mt-2 text-xs">
+    <a  href={withBase("/blog/")} class="text-teal-600 hover:underline">But for now... Check out our Blog!</a>
+  </div>
+      </div>
+    </div>
+
+    <div class="mt-3 flex justify-end">
+      <button id="chatDismissBtn" class="text-xs px-3 py-1 rounded-full bg-transparent border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition">Close</button>
+    </div>
+  </div>
+</div>
+
+<script is:inline>
+  (function () {
+    const toggleBtn = document.getElementById('chatToggleBtn');
+    const panel = document.getElementById('chatPanel');
+    const closeBtn = document.getElementById('chatCloseBtn');
+    const dismissBtn = document.getElementById('chatDismissBtn');
+
+    if (!toggleBtn || !panel) return;
+
+    function openPanel() {
+      panel.classList.remove('pointer-events-none');
+      panel.classList.remove('scale-95');
+      panel.classList.remove('opacity-0');
+      panel.classList.add('scale-100');
+      panel.classList.add('opacity-100');
+      panel.setAttribute('aria-hidden', 'false');
+      toggleBtn.setAttribute('aria-expanded', 'true');
+      // focus the close button for keyboard users
+      const focusTarget = closeBtn || panel;
+      if (focusTarget && focusTarget.focus) focusTarget.focus();
+    }
+
+    function closePanel() {
+      panel.classList.add('pointer-events-none');
+      panel.classList.add('scale-95');
+      panel.classList.add('opacity-0');
+      panel.classList.remove('scale-100');
+      panel.classList.remove('opacity-100');
+      panel.setAttribute('aria-hidden', 'true');
+      toggleBtn.setAttribute('aria-expanded', 'false');
+      // return focus to toggle button
+      if (toggleBtn && toggleBtn.focus) toggleBtn.focus();
+    }
+
+    toggleBtn.addEventListener('click', () => {
+      const expanded = toggleBtn.getAttribute('aria-expanded') === 'true';
+      if (expanded) {
+        closePanel();
+      } else {
+        openPanel();
+      }
+    });
+
+    if (closeBtn) closeBtn.addEventListener('click', closePanel);
+    if (dismissBtn) dismissBtn.addEventListener('click', closePanel);
+
+    // close on Escape
+    document.addEventListener('keydown', (ev) => {
+      if (ev.key === 'Escape') {
+        const expanded = toggleBtn.getAttribute('aria-expanded') === 'true';
+        if (expanded) closePanel();
+      }
+    });
+
+    // click outside to close
+    document.addEventListener('click', (ev) => {
+      const target = ev.target;
+      if (!panel.contains(target) && !toggleBtn.contains(target)) {
+        const expanded = toggleBtn.getAttribute('aria-expanded') === 'true';
+        if (expanded) closePanel();
+      }
+    });
+  })();
+</script>

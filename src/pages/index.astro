@@ -6,7 +6,7 @@ import { withBase } from "../utils/helpers";
 
 <MainLayout activePage="home" pageTitle={siteConfig.title}>
   <!-- Hero Section -->
-  <section class="relative bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-indigo-900 dark:to-purple-900 min-h-screen flex items-center px-4 py-20 overflow-hidden">
+  <section class="relative bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-indigo-900 dark:to-purple-900 flex items-center px-4 py-20 overflow-hidden">
     <div class="w-full max-w-screen-xl mx-auto flex flex-col lg:flex-row items-center gap-16">
       <div class="flex-1 text-center lg:text-left z-10 hero-content">
         <h1 class="text-6xl lg:text-7xl font-bold bg-gradient-to-r from-orange-500 to-amber-500 bg-clip-text text-transparent mb-8 leading-tight">
@@ -16,11 +16,11 @@ import { withBase } from "../utils/helpers";
           Informing young people about Autism. 
         </p>
         <div class="flex flex-col sm:flex-row gap-6 justify-center lg:justify-start">
-          <a href={withBase("/help/")}
+          <a href={withBase("/blog/")}
              class="bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600 text-white px-10 py-5 rounded-full font-semibold text-xl transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:-translate-y-1">
-            Get Support
+            Our Blog
           </a>
-          <a href={withBase("/about-us/")}
+          <a href=#about-us
              class="bg-white/80 hover:bg-white text-teal-600 border-2 border-teal-600 px-10 py-5 rounded-full font-semibold text-xl transition-all duration-300 shadow-lg hover:shadow-xl backdrop-blur-sm">
             Learn More
           </a>
@@ -43,63 +43,67 @@ import { withBase } from "../utils/helpers";
 />
     <figcaption id="rotator-caption" class="text-sm text-gray-600 mt-2 sr-only">Photo credit</figcaption>
 
-<div
-  id="rotator-controls"
-  class="absolute left-4 bottom-4 z-20 flex gap-2"
-  hidden
->
-  <button id="rot-prev" type="button"
-    class="px-3 py-1 rounded bg-white/80 hover:bg-white text-sm">
-    Prev
-  </button>
-  <button id="rot-toggle" type="button"
-    class="px-3 py-1 rounded bg-white/80 hover:bg-white text-sm">
-    Pause
-  </button>
-  <button id="rot-next" type="button"
-    class="px-3 py-1 rounded bg-white/80 hover:bg-white text-sm">
-    Next
-  </button>
-</div>
-  </figure>
-</div>
-    
-
 
   </section>
 
   <!-- Flowing Mission Section -->
-  <section class="relative py-32 px-4 bg-gradient-to-b from-white to-blue-50 dark:from-gray-800 dark:to-indigo-900 overflow-hidden">
-    <div class="absolute inset-0 bg-gradient-to-r from-transparent via-blue-100/20 to-transparent dark:via-indigo-800/20"></div>
-    <div class="relative max-w-screen-xl mx-auto">
-      <div class="text-center mb-20">
-        <h2 class="text-5xl lg:text-6xl font-bold bg-gradient-to-r from-orange-500 to-amber-500 bg-clip-text text-transparent mb-8">
-          Our Mission
-        </h2>
-        <p class="text-xl lg:text-2xl text-gray-600 dark:text-gray-300 leading-relaxed max-w-4xl mx-auto">
-          At Caring Hearts we want to inform young people about Autism and how to help yourself or others who could be struggling with this condition.
-          We believe that by spreading awareness and understanding, we can create an environment where everyone feels like they belong.
-        </p>
+ <section id="about-us" class="relative py-32 px-4 bg-gradient-to-b from-white to-blue-50 dark:from-gray-800 dark:to-indigo-900 overflow-hidden">
+  <div class="absolute inset-0 bg-gradient-to-r from-transparent via-blue-100/20 to-transparent dark:via-indigo-800/20"></div>
+  <div class="relative max-w-screen-xl mx-auto">
+    <div class="text-center mb-12">
+      <h2 class="text-5xl lg:text-6xl font-bold bg-gradient-to-r from-teal-600 to-cyan-600 bg-clip-text text-transparent mb-6">
+        What is Autism?
+      </h2>
+      <p class="text-lg lg:text-xl text-gray-600 dark:text-gray-300 leading-relaxed max-w-3xl mx-auto">
+        Autism is a lifelong neurodevelopmental difference that affects how people understand the world, communicate and process sensory information. Everyone’s experience is unique — some people need lots of support, others need little or none.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div class="bg-white/90 dark:bg-black/60 p-6 rounded-2xl shadow-lg">
+        <h3 class="text-2xl font-semibold mb-3">Core characteristics</h3>
+        <ul class="list-disc pl-5 space-y-2 text-gray-700 dark:text-gray-200">
+          <li><strong>Social communication differences</strong> — challenges with non-verbal cues and two-way conversation.</li>
+          <li><strong>Restricted & repetitive behaviours</strong> — routines, focused interests or repeated actions.</li>
+          <li><strong>Sensory differences</strong> — stronger or weaker responses to sounds, lights, touch or taste.</li>
+        </ul>
+        <p class="mt-4 text-sm text-gray-600 dark:text-gray-400">These traits vary widely between people and are part of how someone experiences life.</p>
       </div>
 
-      <!-- <div class="flex flex-wrap justify-center gap-8 lg:gap-12">
-        <div class="flex-1 min-w-80 max-w-md bg-gradient-to-br from-blue-100 to-indigo-200 dark:from-blue-900 dark:to-indigo-800 p-10 rounded-3xl shadow-xl">
-          <h3 class="text-2xl font-bold text-gray-800 dark:text-white mb-4">Accessible Resources</h3>
-          <p class="text-gray-700 dark:text-gray-200 leading-relaxed">Easy-to-understand guides and information tailored for families and children.</p>
-        </div>
+      <div class="bg-white/90 dark:bg-black/60 p-6 rounded-2xl shadow-lg">
+        <h3 class="text-2xl font-semibold mb-3">Signs & diagnosis</h3>
+        <p class="text-gray-700 dark:text-gray-200 mb-3">Signs can appear early but sometimes show later. Diagnosis is made by a specialist team using recognised criteria and tools.</p>
+        <details class="text-sm text-gray-600 dark:text-gray-400">
+          <summary class="cursor-pointer font-medium">Common signs (expand)</summary>
+          <ul class="list-disc pl-5 mt-2 space-y-1">
+            <li>Limited eye contact or unusual social responses</li>
+            <li>Delayed or repetitive speech</li>
+            <li>Strong reactions to sensory input</li>
+            <li>Intense interests or strong preference for routines</li>
+          </ul>
+        </details>
+      </div>
 
-        <div class="flex-1 min-w-80 max-w-md bg-gradient-to-br from-green-100 to-emerald-200 dark:from-green-900 dark:to-emerald-800 p-10 rounded-3xl shadow-xl">
-          <h3 class="text-2xl font-bold text-gray-800 dark:text-white mb-4">Community Support</h3>
-          <p class="text-gray-700 dark:text-gray-200 leading-relaxed">Connect with others who understand your experiences and challenges.</p>
-        </div>
-
-        <div class="flex-1 min-w-80 max-w-md bg-gradient-to-br from-purple-100 to-violet-200 dark:from-purple-900 dark:to-violet-800 p-10 rounded-3xl shadow-xl">
-          <h3 class="text-2xl font-bold text-gray-800 dark:text-white mb-4">Practical Guidance</h3>
-          <p class="text-gray-700 dark:text-gray-200 leading-relaxed">Real-world tips and strategies from lived experiences and experts.</p>
-        </div>
-      </div> -->
+      <div class="bg-white/90 dark:bg-black/60 p-6 rounded-2xl shadow-lg">
+        <h3 class="text-2xl font-semibold mb-3">Practical support</h3>
+        <p class="text-gray-700 dark:text-gray-200 mb-3">Simple changes can make a big difference at school, home or socially:</p>
+        <ul class="list-disc pl-5 text-gray-700 dark:text-gray-200 space-y-2">
+          <li>Use clear language and give extra processing time.</li>
+          <li>Offer quiet spaces or sensory supports (headphones, dim lighting).</li>
+          <li>Provide visual schedules and give advance notice of changes.</li>
+          <li>Work with strengths and interests to encourage learning.</li>
+        </ul>
+      </div>
     </div>
-  </section>
+
+    <div class="mt-12 text-center">
+      <p class="text-sm text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
+        For detailed guidance, visit the National Autistic Society and the NHS pages on autism. If you’re worried about a child or yourself, your GP or local health services can advise about assessment and support.
+      </p>
+    </div>
+  </div>
+</section>
+
 
   <section class="relative py-32 px-4 bg-gradient-to-r from-orange-500 via-amber-500 to-rose-500 text-white overflow-hidden">
     <div class="absolute inset-0 bg-gradient-to-br from-orange-600/20 via-amber-600/20 to-rose-600/20" style="border-radius: 20%;"></div>
@@ -138,17 +142,18 @@ import { withBase } from "../utils/helpers";
   <script is:inline>
     function initPositiveMessages() {
       const messages = [
-        "You are not broken — your way of experiencing the world is valid.",
-        "It’s okay to move at your own pace. There is no deadline for being yourself.",
-        "Your needs matter, even when they’re hard to explain.",
-        "You’re allowed to rest without earning it.",
-        "Being autistic is not a flaw — it’s part of who you are.",
-        "You don’t have to go through this alone. Support exists, and you deserve it.",
-        "Small steps still count. Progress looks different for everyone.",
-        "Your experiences and feelings are real and worthy of respect.",
-        "It’s okay if today is overwhelming. Tomorrow can be different.",
-        "You are allowed to set boundaries that protect your wellbeing.",
-        "You belong, exactly as you are."
+    "You’re doing more than you notice — small steps add up.",
+    "It’s okay to have a hard day. it doesn’t erase the progress you’ve made.",
+    "Your needs matter. it’s fine to rest or ask for help.",
+    "Permission to set a boundary: this is for your wellbeing.",
+    "You’re allowed to take things one step at a time.",
+    "What you’re feeling is valid. you don’t have to explain it to be respected.",
+    "Progress isn’t always visible. steady effort still counts.",
+    "You matter to people, even when it doesn’t feel obvious.",
+    "If this feels heavy, try one small routine you can manage today.",
+    "It’s okay to be gentle with yourself right now.",
+    "You’re learning even when it’s difficult — that itself is enough.",
+    "A short break can help you come back with clearer energy."
       ];
 
       const openBtn = document.getElementById('openPositiveMessages');
