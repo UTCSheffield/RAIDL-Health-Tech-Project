@@ -8,9 +8,17 @@ import tailwindcss from "@tailwindcss/vite";
 // https://astro.build/config
 export default defineConfig({
   site: "https://utcsheffield.github.io",
-  base: "/RAIDL---Health-Tech-Project",
+  base: "/RAIDL-Health-Tech-Project",
   server: {
-    open: '/RAIDL---Health-Tech-Project'
+    open: '/RAIDL-Health-Tech-Project',
+    
+ watch: {
+        // ✅ Ignore big local model files during dev to prevent the watcher from scanning them
+        ignored: ['**/public/models/**'],
+        // Optional but helpful when using relative paths for ignored:
+        cwd: process.cwd(),
+      },
+
   },
   integrations: [
     swup({
@@ -30,6 +38,8 @@ export default defineConfig({
     plugins: [tailwindcss()],
   },
 });
+
+
 
 //swup theme variations:
 // theme: "fade"

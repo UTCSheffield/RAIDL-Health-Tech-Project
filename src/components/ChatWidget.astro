@@ -61,67 +61,136 @@ import { withBase } from "../utils/helpers";
   </div>
 </div>
 
-<script is:inline>
+
+<script type="module" is:inline>
+  // Transformers.js v3 (WebGPU-ready) — import env to configure local-only loading
+  import { pipeline, env } from 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.0.0';
+  import { withBase } from "../utils/helpers";
+
+  // Point to your local models directory and disallow remote downloads
+  env.localModelPath    = withBase('/models/');   // same-origin path (uses Astro base)
+  env.allowRemoteModels = false;                  // **critical**: do NOT fetch from Hugging Face
+  env.useBrowserCache   = true;                   // cache locally once loaded
+
+  // Your bot's personality
+  const SYSTEM_PROMPT = `You are "Care Bot" — warm, concise, practical.
+  Provide general wellbeing tips (not medical advice).
+  Prefer short paragraphs or bullets. End with one actionable next step.`;
+
+  // Local model id = folder name under public/models/
+  const MODEL_ID = 'Qwen2.5-0.5B-Instruct';
+
+  let generator = null;
+  let isLoading = false;
+
+  async function checkGPU() {
+    try { return !!(await navigator.gpu?.requestAdapter()); } catch { return false; }
+  }
+
+  async function ensureGenerator() {
+    if (generator || isLoading) return generator;
+    isLoading = true;
+    try {
+      // WebGPU acceleration; dtype is optional—omit if the model repo does not include q4f16
+      generator = await pipeline('text-generation', MODEL_ID, {
+        device: 'webgpu'
+        // dtype: 'q4f16' // <-- uncomment only if your local /onnx contains q4f16 weights
+      });
+      return generator;
+    } finally { isLoading = false; }
+  }
+
   (function () {
-    const toggleBtn = document.getElementById('chatToggleBtn');
-    const panel = document.getElementById('chatPanel');
-    const closeBtn = document.getElementById('chatCloseBtn');
-    const dismissBtn = document.getElementById('chatDismissBtn');
+    const toggleBtn   = document.getElementById('chatToggleBtn');
+    const panel       = document.getElementById('chatPanel');
+    const closeBtn    = document.getElementById('chatCloseBtn');
+    const dismissBtn  = document.getElementById('chatDismissBtn');
+    const form        = document.getElementById('chatForm');
+    const input       = document.getElementById('chatInput');
+    const log         = document.getElementById('chatLog');
 
-    if (!toggleBtn || !panel) return;
+    function scrollToBottom(){ log.scrollTop = log.scrollHeight; }
+    function addBubble(text, who = 'bot') {
+      const bubble = document.createElement('div');
+      bubble.className = `p-3 rounded-md ${
+        who === 'user'
+          ? 'bg-teal-50 dark:bg-teal-900/30 text-teal-900 dark:text-teal-100'
+          : 'bg-gray-50 dark:bg-gray-900/40 text-gray-700 dark:text-gray-200'
+      }`;
+      bubble.textContent = text;
+      log.appendChild(bubble);
+      scrollToBottom();
+      return bubble;
+    }
 
-    function openPanel() {
-      panel.classList.remove('pointer-events-none');
-      panel.classList.remove('scale-95');
-      panel.classList.remove('opacity-0');
-      panel.classList.add('scale-100');
-      panel.classList.add('opacity-100');
+    async function openPanel() {
+      panel.classList.remove('pointer-events-none', 'scale-95', 'opacity-0');
+      panel.classList.add('scale-100', 'opacity-100');
       panel.setAttribute('aria-hidden', 'false');
       toggleBtn.setAttribute('aria-expanded', 'true');
-      // focus the close button for keyboard users
-      const focusTarget = closeBtn || panel;
-      if (focusTarget && focusTarget.focus) focusTarget.focus();
+      (closeBtn || panel).focus?.();
+
+      // Begin loading on open (non-blocking)
+      ensureGenerator();
     }
 
     function closePanel() {
-      panel.classList.add('pointer-events-none');
-      panel.classList.add('scale-95');
-      panel.classList.add('opacity-0');
-      panel.classList.remove('scale-100');
-      panel.classList.remove('opacity-100');
+      panel.classList.add('pointer-events-none', 'scale-95', 'opacity-0');
+      panel.classList.remove('scale-100', 'opacity-100');
       panel.setAttribute('aria-hidden', 'true');
       toggleBtn.setAttribute('aria-expanded', 'false');
-      // return focus to toggle button
-      if (toggleBtn && toggleBtn.focus) toggleBtn.focus();
+      toggleBtn.focus?.();
     }
 
-    toggleBtn.addEventListener('click', () => {
+    toggleBtn?.addEventListener('click', () => {
       const expanded = toggleBtn.getAttribute('aria-expanded') === 'true';
-      if (expanded) {
-        closePanel();
-      } else {
-        openPanel();
-      }
+      expanded ? closePanel() : openPanel();
+    });
+    closeBtn?.addEventListener('click', closePanel);
+    dismissBtn?.addEventListener('click', closePanel);
+    document.addEventListener('keydown', (e) => e.key === 'Escape' && toggleBtn.getAttribute('aria-expanded') === 'true' && closePanel());
+    document.addEventListener('click', (e) => {
+      const t = e.target;
+      if (!panel.contains(t) && !toggleBtn.contains(t) && toggleBtn.getAttribute('aria-expanded') === 'true') closePanel();
     });
 
-    if (closeBtn) closeBtn.addEventListener('click', closePanel);
-    if (dismissBtn) dismissBtn.addEventListener('click', closePanel);
+    form?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const text = input.value.trim();
+      if (!text) return;
 
-    // close on Escape
-    document.addEventListener('keydown', (ev) => {
-      if (ev.key === 'Escape') {
-        const expanded = toggleBtn.getAttribute('aria-expanded') === 'true';
-        if (expanded) closePanel();
-      }
-    });
+      addBubble(text, 'user');
+      input.value = '';
 
-    // click outside to close
-    document.addEventListener('click', (ev) => {
-      const target = ev.target;
-      if (!panel.contains(target) && !toggleBtn.contains(target)) {
-        const expanded = toggleBtn.getAttribute('aria-expanded') === 'true';
-        if (expanded) closePanel();
+      const thinking = addBubble('Loading model… (first run may take a bit)');
+      try {
+        const gen = await ensureGenerator();
+        if (!gen) throw new Error('Model init failed');
+
+        // Build short rolling history; prepend system prompt for personality
+        const history = Array.from(log.querySelectorAll('div'))
+          .map(div => ({
+            role: div.className.includes('bg-teal-50') ? 'user' : 'assistant',
+            content: div.textContent
+          }))
+          .filter(m => m.content && m.content !== 'Loading model… (first run may take a bit)' && m.content !== '…');
+
+        const messages = [{ role: 'system', content: SYSTEM_PROMPT }, ...history, { role: 'user', content: text }];
+
+        const out = await gen(messages, {
+          max_new_tokens: 128,    // keep responses snappy
+          temperature: 0.6,
+          do_sample: true,
+          top_k: 5
+        });
+
+        const reply = out[0].generated_text.at(-1).content;
+        thinking.textContent = reply;
+      } catch (err) {
+        thinking.textContent = 'Sorry—something went wrong loading the local model.';
+        console.error(err);
       }
     });
   })();
 </script>
+
