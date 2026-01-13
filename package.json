@@ -2,6 +2,7 @@
   "name": "space-ahead",
   "type": "module",
   "version": "0.11.4",
+  "packageManager": "npm@11.6.2",
   "scripts": {
     "dev": "NODE_ENV=development node server.js",
     "start": "node server.js",
