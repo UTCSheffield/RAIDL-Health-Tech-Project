@@ -3,21 +3,56 @@ import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
 
+let chatHistory = []; // in-memory history (process-lifetime)
+const HISTORY_LIMIT = 20; // keep last N messages
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
 app.use(express.json());
 
-// API route
+// Helper to trim history
+function trimHistory() {
+  if (chatHistory.length > HISTORY_LIMIT) {
+    chatHistory = chatHistory.slice(-HISTORY_LIMIT);
+  }
+}
+
+// System prompt controlling persona and safety rules
+const SYSTEM_PROMPT = `
+You are Care Bot, a compassionate, non-judgemental friend for young people.
+Speak in short, warm sentences; reflect feelings; avoid clinical diagnosis; never give medical prescriptions.
+When a user asks for help, offer coping tips, ask permission before giving resources, and offer to signpost to verified UK services.
+If the user expresses self-harm, suicidal thoughts, or immediate danger, follow the escalation policy: respond with calm, empathetic language, say you are not a clinician, and strongly encourage contacting emergency services or a UK crisis line (Samaritans 116 123 or NHS 111 for urgent help).
+Always keep replies concise (1–4 short paragraphs). Do not ask for or store sensitive personal data. Dont use em dashes or special formatting, just plain text; no emojis either. Avoid phrases like "As an AI language model", and never mention you are an AI.
+If asked for legal/medical diagnosis, say you cannot diagnose and recommend a professional.
+`.trim();
+
+// API route: chat
 app.post("/api/chat", async (req, res) => {
   try {
     const { message } = req.body || {};
-    if (!message) return res.status(400).json({ error: "Missing message" });
+    if (!message || typeof message !== "string" || !message.trim()) {
+      return res.status(400).json({ error: "Missing message" });
+    }
 
     const GROQ_KEY = process.env.GROQ_API_KEY;
-    if (!GROQ_KEY) return res.status(500).json({ error: "Server missing GROQ_API_KEY" });
+    if (!GROQ_KEY) {
+      return res.status(500).json({ error: "Server missing GROQ_API_KEY" });
+    }
 
+    // Add user message to history
+    chatHistory.push({ role: "user", content: message.trim() });
+    trimHistory();
+
+    // Build messages array: system prompt + recent history
+    const messages = [
+      { role: "system", content: SYSTEM_PROMPT },
+      ...chatHistory
+    ];
+
+    // Call Groq / OpenAI-compatible chat completions endpoint
     const resp = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -26,20 +61,25 @@ app.post("/api/chat", async (req, res) => {
       },
       body: JSON.stringify({
         model: "llama-3.1-8b-instant",
-        messages: [
-          { role: "system", content: "You are a helpful assistant." },
-          { role: "user", content: message }
-        ],
+        messages,
         stream: false,
         max_completion_tokens: 512
       })
     });
 
     const data = await resp.json().catch(() => null);
-    if (!resp.ok) return res.status(500).json({ error: "Groq API error", details: data || await resp.text() });
+    if (!resp.ok) {
+      return res.status(500).json({ error: "Groq API error", details: data || await resp.text() });
+    }
 
     const reply = data?.choices?.[0]?.message?.content ?? null;
-    if (!reply) return res.status(500).json({ error: "No reply from model", completion: data });
+    if (!reply) {
+      return res.status(500).json({ error: "No reply from model", completion: data });
+    }
+
+    // Store assistant reply in history and trim
+    chatHistory.push({ role: "assistant", content: reply });
+    trimHistory();
 
     return res.json({ reply });
   } catch (err) {
@@ -48,23 +88,18 @@ app.post("/api/chat", async (req, res) => {
   }
 });
 
+// Endpoint to reset conversation history
+app.post("/api/reset", (req, res) => {
+  chatHistory = [];
+  res.json({ ok: true });
+});
+
 // Serve static files from Astro build output
 const staticDir = path.join(__dirname, "dist");
 app.use(express.static(staticDir));
 
-// SPA / fallback: serve index.html for unknown GET routes so client-side routing works
-// Replace this block:
-// app.get("*", (req, res) => {
-//   res.sendFile(path.join(staticDir, "index.html"), (err) => {
-//     if (err) {
-//       res.status(404).send("Not found");
-//     }
-//   });
-// });
-
-// With this middleware fallback:
+// SPA / fallback: serve index.html for GET requests that accept HTML
 app.use((req, res, next) => {
-  // Only serve index.html for GET requests that accept HTML
   if (req.method === "GET" && req.headers.accept && req.headers.accept.includes("text/html")) {
     return res.sendFile(path.join(staticDir, "index.html"), (err) => {
       if (err) {
@@ -73,10 +108,8 @@ app.use((req, res, next) => {
       }
     });
   }
-  // For other requests, continue to next handler (so API routes still work)
   next();
 });
-
 
 // Railway provides PORT; default to 3000 locally
 const PORT = process.env.PORT || 3000;
