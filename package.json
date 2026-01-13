@@ -3,8 +3,8 @@
   "type": "module",
   "version": "0.11.4",
   "scripts": {
-    "dev": "astro dev",
-    "start": "astro build && astro preview",
+    "dev": "NODE_ENV=development node server.js",
+    "start": "node server.js",
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro"
