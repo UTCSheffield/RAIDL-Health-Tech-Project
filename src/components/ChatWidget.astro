@@ -1,196 +1,162 @@
 ---
-// src/components/ChatWidget.astro
-import { withBase } from "../utils/helpers";
+/* ChatWidget.astro
+   Minimal, visible, pure-JS widget for development and debugging.
+   Replace your existing ChatWidget.astro with this to confirm rendering.
+*/
 ---
-<div class="z-50">
-  <!-- Floating button -->
-  <div class="fixed bottom-6 right-6 sm:bottom-8 sm:right-8" aria-hidden="false">
-    <button
-      id="chatToggleBtn"
-      aria-controls="chatPanel"
-      aria-expanded="false"
-      class="group relative flex items-center justify-center w-14 h-14 rounded-full bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-4 focus:ring-teal-300 shadow-lg transition-transform transform hover:-translate-y-1"
-      title="Open chat (coming soon)"
-    >
-      <!-- simple chat icon (SVG) -->
-      <svg class="w-7 h-7 text-white" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
-        <path d="M21 15a2 2 0 0 1-2 2H8l-5 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
+<div id="chatwidget-root" class="chatwidget-root" aria-live="polite">
+  <button id="cw-launch" class="cw-launch" aria-expanded="false" aria-controls="cw-panel">Chat</button>
 
-      <!-- small badge (optional) -->
-      <span class="sr-only">Open chat</span>
-    </button>
-  </div>
+  <aside id="cw-panel" class="cw-panel" aria-hidden="true" role="dialog" aria-label="Site chat">
+    <header class="cw-header">
+      <strong>Caring Hearts — Chat</strong>
+      <button id="cw-close" class="cw-close" aria-label="Close">✕</button>
+    </header>
 
-  <!-- Panel (hidden by default) -->
-  <div
-    id="chatPanel"
-    class="fixed bottom-20 right-4 sm:bottom-24 sm:right-8 w-[92vw] max-w-xs sm:max-w-sm bg-white dark:bg-gray-800 rounded-xl shadow-2xl ring-1 ring-black/5 dark:ring-white/5 p-4 transition-transform transform scale-95 opacity-0 pointer-events-none"
-    role="dialog"
-    aria-modal="false"
-    aria-labelledby="chatPanelTitle"
-    aria-hidden="true"
-  >
-    <div class="flex items-start justify-between gap-3">
-      <div>
-        <h3 id="chatPanelTitle" class="text-sm font-semibold text-gray-900 dark:text-gray-100" style="font-size: 1.5rem;">Care Bot</h3>
-        <!-- <p id="chatPanelDesc" class="text-xs text-gray-600 dark:text-gray-300 mt-1">A personi</p> -->
-      </div>
+    <div id="cw-body" class="cw-body" role="log">Welcome — click the input to send a message.</div>
 
-      <div class="flex items-center gap-2">
-        <button id="chatCloseBtn" aria-label="Close chat" class="p-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-teal-300">
-          <svg class="w-4 h-4 text-gray-700 dark:text-gray-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M18 6L6 18M6 6l12 12"></path>
-          </svg>
-        </button>
-      </div>
+    <div class="cw-input">
+      <input id="cw-input" class="cw-input-el" placeholder="Type a message..." aria-label="Message" />
+      <button id="cw-send" class="cw-send">Send</button>
     </div>
-
-    <div class="mt-3">
-      <div id="chatMessage" class="text-sm text-gray-700 dark:text-gray-200 bg-gray-50 dark:bg-gray-900/40 p-3 rounded-md" aria-live="polite">
-        Coming soon - Advice and tips tailored to you.
-          <div class="mt-2 text-xs">
-    <a  href={withBase("/blog/")} class="text-teal-600 hover:underline">But for now... Check out our Blog!</a>
-  </div>
-      </div>
-    </div>
-
-    <div class="mt-3 flex justify-end">
-      <button id="chatDismissBtn" class="text-xs px-3 py-1 rounded-full bg-transparent border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition">Close</button>
-    </div>
-  </div>
+  </aside>
 </div>
 
+<style>
+  /* Ensure widget sits above everything and is visible */
+  .chatwidget-root { position: fixed; right: 20px; bottom: 20px; z-index: 99999; font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; }
 
-<script type="module" is:inline>
-  // Transformers.js v3 (WebGPU-ready) — import env to configure local-only loading
-  import { pipeline, env } from 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.0.0';
-  import { withBase } from "../utils/helpers";
-
-  // Point to your local models directory and disallow remote downloads
-  env.localModelPath    = withBase('/models/');   // same-origin path (uses Astro base)
-  env.allowRemoteModels = false;                  // **critical**: do NOT fetch from Hugging Face
-  env.useBrowserCache   = true;                   // cache locally once loaded
-
-  // Your bot's personality
-  const SYSTEM_PROMPT = `You are "Care Bot" — warm, concise, practical.
-  Provide general wellbeing tips (not medical advice).
-  Prefer short paragraphs or bullets. End with one actionable next step.`;
-
-  // Local model id = folder name under public/models/
-  const MODEL_ID = 'Qwen2.5-0.5B-Instruct';
-
-  let generator = null;
-  let isLoading = false;
-
-  async function checkGPU() {
-    try { return !!(await navigator.gpu?.requestAdapter()); } catch { return false; }
+  /* Launch button */
+  .cw-launch {
+    background: var(--brand-primary, #F4A261);
+    color: #111;
+    border: none;
+    border-radius: 999px;
+    padding: 10px 14px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.12);
   }
 
-  async function ensureGenerator() {
-    if (generator || isLoading) return generator;
-    isLoading = true;
-    try {
-      // WebGPU acceleration; dtype is optional—omit if the model repo does not include q4f16
-      generator = await pipeline('text-generation', MODEL_ID, {
-        device: 'webgpu'
-        // dtype: 'q4f16' // <-- uncomment only if your local /onnx contains q4f16 weights
-      });
-      return generator;
-    } finally { isLoading = false; }
+  /* Panel */
+  .cw-panel {
+    width: 340px;
+    max-width: calc(100vw - 48px);
+    height: 420px;
+    display: flex;
+    flex-direction: column;
+    background: white;
+    color: #111;
+    border-radius: 12px;
+    box-shadow: 0 18px 50px rgba(2,6,23,0.18);
+    overflow: hidden;
+    margin-bottom: 10px;
+  }
+  .cw-panel[aria-hidden="true"] { display: none; }
+
+  .cw-header {
+    display:flex;
+    justify-content: space-between;
+    align-items:center;
+    padding: 12px 14px;
+    background: linear-gradient(90deg, rgba(0,0,0,0.02), rgba(0,0,0,0.01));
+    border-bottom: 1px solid rgba(0,0,0,0.04);
+    font-weight: 700;
+  }
+  .cw-close {
+    background: transparent;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
   }
 
-  (function () {
-    const toggleBtn   = document.getElementById('chatToggleBtn');
-    const panel       = document.getElementById('chatPanel');
-    const closeBtn    = document.getElementById('chatCloseBtn');
-    const dismissBtn  = document.getElementById('chatDismissBtn');
-    const form        = document.getElementById('chatForm');
-    const input       = document.getElementById('chatInput');
-    const log         = document.getElementById('chatLog');
+  .cw-body {
+    padding: 14px;
+    flex: 1 1 auto;
+    overflow-y: auto;
+    gap: 8px;
+    display: flex;
+    flex-direction: column;
+    scroll-behavior: smooth;
+    background: linear-gradient(180deg, rgba(0,0,0,0.01), rgba(0,0,0,0.00));
+  }
 
-    function scrollToBottom(){ log.scrollTop = log.scrollHeight; }
-    function addBubble(text, who = 'bot') {
-      const bubble = document.createElement('div');
-      bubble.className = `p-3 rounded-md ${
-        who === 'user'
-          ? 'bg-teal-50 dark:bg-teal-900/30 text-teal-900 dark:text-teal-100'
-          : 'bg-gray-50 dark:bg-gray-900/40 text-gray-700 dark:text-gray-200'
-      }`;
-      bubble.textContent = text;
-      log.appendChild(bubble);
-      scrollToBottom();
-      return bubble;
+  .msg { padding: 8px 10px; border-radius: 8px; max-width: 85%; line-height:1.2; }
+  .msg.user { align-self: flex-end; background: var(--brand-primary, #F4A261); color: #111; }
+  .msg.bot  { align-self: flex-start; background: #f3f4f6; color: #111; }
+
+  .cw-input { display:flex; gap:8px; padding: 12px; border-top: 1px solid rgba(0,0,0,0.04); background: white; }
+  .cw-input-el { flex:1; padding:10px 12px; border-radius: 999px; border:1px solid rgba(0,0,0,0.08); outline:none; }
+  .cw-send { padding:10px 14px; border-radius:999px; border:none; background:var(--brand-primary, #F4A261); color:#111; cursor:pointer; font-weight:700; }
+  @media (max-width: 520px) {
+    .cw-panel { width: 90vw; height: 60vh; }
+  }
+</style>
+
+<script is:inline>
+if (!window.__cw_loaded_visual) {
+  window.__cw_loaded_visual = true;
+
+  const elPanel = document.getElementById('cw-panel');
+  const btnLaunch = document.getElementById('cw-launch');
+  const btnClose = document.getElementById('cw-close');
+  const body = document.getElementById('cw-body');
+  const input = document.getElementById('cw-input');
+  const btnSend = document.getElementById('cw-send');
+
+  // small, deterministic bot for demo
+  const RESPONSES = [
+    { test: /hi\b|hello|hey/i, text: "Hello — how can I support you today?" },
+    { test: /help|support/i, text: "You can visit /help or tell me what you need." },
+    { test: /thanks|thank/i, text: "You're welcome — glad to help." }
+  ];
+
+  function addMessage(text, from='bot') {
+    const d = document.createElement('div');
+    d.className = 'msg ' + (from === 'user' ? 'user' : 'bot');
+    d.textContent = text;
+    body.appendChild(d);
+    body.scrollTop = body.scrollHeight;
+  }
+
+  function botReply(userText) {
+    for (const r of RESPONSES) {
+      if (r.test.test(userText)) return r.text;
     }
+    return "Sorry — I don't know that yet. Try 'help'.";
+  }
 
-    async function openPanel() {
-      panel.classList.remove('pointer-events-none', 'scale-95', 'opacity-0');
-      panel.classList.add('scale-100', 'opacity-100');
-      panel.setAttribute('aria-hidden', 'false');
-      toggleBtn.setAttribute('aria-expanded', 'true');
-      (closeBtn || panel).focus?.();
+  function openPanel() {
+    elPanel.setAttribute('aria-hidden', 'false');
+    btnLaunch.setAttribute('aria-expanded', 'true');
+    input.focus();
+  }
+  function closePanel() {
+    elPanel.setAttribute('aria-hidden', 'true');
+    btnLaunch.setAttribute('aria-expanded', 'false');
+    btnLaunch.focus();
+  }
 
-      // Begin loading on open (non-blocking)
-      ensureGenerator();
-    }
+  btnLaunch.addEventListener('click', () => {
+    const isHidden = elPanel.getAttribute('aria-hidden') === 'true';
+    if (isHidden) openPanel(); else closePanel();
+  });
+  btnClose.addEventListener('click', closePanel);
 
-    function closePanel() {
-      panel.classList.add('pointer-events-none', 'scale-95', 'opacity-0');
-      panel.classList.remove('scale-100', 'opacity-100');
-      panel.setAttribute('aria-hidden', 'true');
-      toggleBtn.setAttribute('aria-expanded', 'false');
-      toggleBtn.focus?.();
-    }
+  btnSend.addEventListener('click', () => {
+    const v = input.value && input.value.trim();
+    if (!v) return;
+    addMessage(v, 'user');
+    input.value = '';
+    setTimeout(() => addMessage(botReply(v), 'bot'), 250);
+  });
 
-    toggleBtn?.addEventListener('click', () => {
-      const expanded = toggleBtn.getAttribute('aria-expanded') === 'true';
-      expanded ? closePanel() : openPanel();
-    });
-    closeBtn?.addEventListener('click', closePanel);
-    dismissBtn?.addEventListener('click', closePanel);
-    document.addEventListener('keydown', (e) => e.key === 'Escape' && toggleBtn.getAttribute('aria-expanded') === 'true' && closePanel());
-    document.addEventListener('click', (e) => {
-      const t = e.target;
-      if (!panel.contains(t) && !toggleBtn.contains(t) && toggleBtn.getAttribute('aria-expanded') === 'true') closePanel();
-    });
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') btnSend.click();
+    if (e.key === 'Escape') closePanel();
+  });
 
-    form?.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const text = input.value.trim();
-      if (!text) return;
-
-      addBubble(text, 'user');
-      input.value = '';
-
-      const thinking = addBubble('Loading model… (first run may take a bit)');
-      try {
-        const gen = await ensureGenerator();
-        if (!gen) throw new Error('Model init failed');
-
-        // Build short rolling history; prepend system prompt for personality
-        const history = Array.from(log.querySelectorAll('div'))
-          .map(div => ({
-            role: div.className.includes('bg-teal-50') ? 'user' : 'assistant',
-            content: div.textContent
-          }))
-          .filter(m => m.content && m.content !== 'Loading model… (first run may take a bit)' && m.content !== '…');
-
-        const messages = [{ role: 'system', content: SYSTEM_PROMPT }, ...history, { role: 'user', content: text }];
-
-        const out = await gen(messages, {
-          max_new_tokens: 128,    // keep responses snappy
-          temperature: 0.6,
-          do_sample: true,
-          top_k: 5
-        });
-
-        const reply = out[0].generated_text.at(-1).content;
-        thinking.textContent = reply;
-      } catch (err) {
-        thinking.textContent = 'Sorry—something went wrong loading the local model.';
-        console.error(err);
-      }
-    });
-  })();
+  // sanity-check visible marker for debugging
+  addMessage('Widget initialised. Type "help" to test.', 'bot');
+}
 </script>
-
