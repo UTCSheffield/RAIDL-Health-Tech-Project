@@ -1,18 +1,15 @@
 // server.js
 import express from "express";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 app.use(express.json());
 
-// Allow simple CORS for testing; tighten in production
-app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "*"); // change to your origin in production
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-  if (req.method === "OPTIONS") return res.sendStatus(204);
-  next();
-});
-
+// API route
 app.post("/api/chat", async (req, res) => {
   try {
     const { message } = req.body || {};
@@ -39,10 +36,7 @@ app.post("/api/chat", async (req, res) => {
     });
 
     const data = await resp.json().catch(() => null);
-
-    if (!resp.ok) {
-      return res.status(500).json({ error: "Groq API error", details: data || await resp.text() });
-    }
+    if (!resp.ok) return res.status(500).json({ error: "Groq API error", details: data || await resp.text() });
 
     const reply = data?.choices?.[0]?.message?.content ?? null;
     if (!reply) return res.status(500).json({ error: "No reply from model", completion: data });
@@ -53,6 +47,36 @@ app.post("/api/chat", async (req, res) => {
     return res.status(500).json({ error: String(err) });
   }
 });
+
+// Serve static files from Astro build output
+const staticDir = path.join(__dirname, "dist");
+app.use(express.static(staticDir));
+
+// SPA / fallback: serve index.html for unknown GET routes so client-side routing works
+// Replace this block:
+// app.get("*", (req, res) => {
+//   res.sendFile(path.join(staticDir, "index.html"), (err) => {
+//     if (err) {
+//       res.status(404).send("Not found");
+//     }
+//   });
+// });
+
+// With this middleware fallback:
+app.use((req, res, next) => {
+  // Only serve index.html for GET requests that accept HTML
+  if (req.method === "GET" && req.headers.accept && req.headers.accept.includes("text/html")) {
+    return res.sendFile(path.join(staticDir, "index.html"), (err) => {
+      if (err) {
+        console.error("Error sending index.html:", err);
+        return res.status(500).send("Server error");
+      }
+    });
+  }
+  // For other requests, continue to next handler (so API routes still work)
+  next();
+});
+
 
 // Railway provides PORT; default to 3000 locally
 const PORT = process.env.PORT || 3000;

@@ -8,7 +8,7 @@ import tailwindcss from "@tailwindcss/vite";
 // https://astro.build/config
 export default defineConfig({
   site: "https://utcsheffield.github.io",
-  base: "/RAIDL-Health-Tech-Project",
+  base: "/",
   server: {
     open: '/RAIDL-Health-Tech-Project',
     
