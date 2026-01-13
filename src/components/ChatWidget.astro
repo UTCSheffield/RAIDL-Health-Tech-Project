@@ -45,8 +45,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const input = document.getElementById("cw-input");
   const btnSend = document.getElementById("cw-send");
 
-  
-
   function openPanel() {
     panel.setAttribute("aria-hidden", "false");
     btnLaunch.setAttribute("aria-expanded", "true");
@@ -71,30 +69,63 @@ document.addEventListener("DOMContentLoaded", () => {
     d.textContent = text;
     body.appendChild(d);
     body.scrollTop = body.scrollHeight;
+    return d;
   }
-btnSend.addEventListener("click", async () => {
-  const v = input.value.trim();
-  if (!v) return;
 
-  addMessage(v, "user");
-  input.value = "";
+  async function sendMessageToServer(message) {
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message })
+      });
 
-  addMessage("Thinking...", "bot");
+      const contentType = res.headers.get("content-type") || "";
+      if (!res.ok) {
+        if (contentType.includes("application/json")) {
+          const errJson = await res.json();
+          throw new Error(errJson.error || JSON.stringify(errJson));
+        } else {
+          const text = await res.text();
+          throw new Error(text || res.statusText);
+        }
+      }
 
-const res = await fetch("/api/chat", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ message: v })
-});
-const data = await res.json();
-last.textContent = data.reply || data.error || "No reply";
+      if (!contentType.includes("application/json")) {
+        const text = await res.text();
+        throw new Error("Unexpected response: " + text);
+      }
 
-});
+      const data = await res.json();
+      return data.reply || data.error || null;
+    } catch (err) {
+      console.error("sendMessageToServer error:", err);
+      throw err;
+    }
+  }
 
+  btnSend.addEventListener("click", async () => {
+    const v = input.value.trim();
+    if (!v) return;
 
+    addMessage(v, "user");
+    input.value = "";
+
+    const thinkingEl = addMessage("Thinking...", "bot");
+
+    try {
+      const reply = await sendMessageToServer(v);
+      thinkingEl.textContent = reply ?? "No reply";
+    } catch (err) {
+      thinkingEl.textContent = "Error: " + (err.message || "Request failed");
+    }
+  });
 
   input.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") btnSend.click();
+    if (e.key === "Enter") {
+      e.preventDefault();
+      btnSend.click();
+    }
     if (e.key === "Escape") closePanel();
   });
 });
