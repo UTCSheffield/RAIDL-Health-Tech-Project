@@ -45,6 +45,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const input = document.getElementById("cw-input");
   const btnSend = document.getElementById("cw-send");
 
+  
+
   function openPanel() {
     panel.setAttribute("aria-hidden", "false");
     btnLaunch.setAttribute("aria-expanded", "true");
@@ -70,14 +72,26 @@ document.addEventListener("DOMContentLoaded", () => {
     body.appendChild(d);
     body.scrollTop = body.scrollHeight;
   }
+btnSend.addEventListener("click", async () => {
+  const v = input.value.trim();
+  if (!v) return;
 
-  btnSend.addEventListener("click", () => {
-    const v = input.value.trim();
-    if (!v) return;
-    addMessage(v, "user");
-    input.value = "";
-    addMessage("Example message.", "bot");
-  });
+  addMessage(v, "user");
+  input.value = "";
+
+  addMessage("Thinking...", "bot");
+
+const res = await fetch("/api/chat", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ message: v })
+});
+const data = await res.json();
+last.textContent = data.reply || data.error || "No reply";
+
+});
+
+
 
   input.addEventListener("keydown", (e) => {
     if (e.key === "Enter") btnSend.click();
