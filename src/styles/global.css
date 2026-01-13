@@ -1008,7 +1008,7 @@ html[data-mode="calm"] * {
 
 html[data-mode="calm"] .bg-white\/80,
 html[data-mode="calm"] .bg-black\/60 {
-  background: var(--calm-flat-bg) !important;
+  background: #fffdf7 !important
 }
 
 /* Flatten buttons */
@@ -1201,3 +1201,5 @@ html[data-mode="calm"] .blinking {
   cursor: pointer;
   font-weight: 700;
 }
+
+
