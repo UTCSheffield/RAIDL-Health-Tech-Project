@@ -1,162 +1,87 @@
----
-/* ChatWidget.astro
-   Minimal, visible, pure-JS widget for development and debugging.
-   Replace your existing ChatWidget.astro with this to confirm rendering.
-*/
----
-<div id="chatwidget-root" class="chatwidget-root" aria-live="polite">
-  <button id="cw-launch" class="cw-launch" aria-expanded="false" aria-controls="cw-panel">Chat</button>
+<div id="chatwidget-root" class="fixed bottom-6 right-6 z-[99999]">
 
-  <aside id="cw-panel" class="cw-panel" aria-hidden="true" role="dialog" aria-label="Site chat">
+  <!-- Floating round button -->
+  <button
+    id="cw-launch"
+    aria-controls="cw-panel"
+    aria-expanded="false"
+    class="cw-fab"
+    title="Open chat"
+  >
+    <svg class="w-7 h-7 text-white" viewBox="0 0 24 24" fill="none">
+      <path d="M21 15a2 2 0 0 1-2 2H8l-5 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+        stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" />
+    </svg>
+  </button>
+
+  <!-- Chat panel -->
+  <aside
+    id="cw-panel"
+    class="cw-panel"
+    aria-hidden="true"
+    role="dialog"
+    aria-label="Chat panel"
+  >
     <header class="cw-header">
       <strong>Caring Hearts — Chat</strong>
       <button id="cw-close" class="cw-close" aria-label="Close">✕</button>
     </header>
 
-    <div id="cw-body" class="cw-body" role="log">Welcome — click the input to send a message.</div>
+    <div id="cw-body" class="cw-body">Welcome — click the input to send a message.</div>
 
     <div class="cw-input">
-      <input id="cw-input" class="cw-input-el" placeholder="Type a message..." aria-label="Message" />
+      <input id="cw-input" class="cw-input-el" placeholder="Type a message..." />
       <button id="cw-send" class="cw-send">Send</button>
     </div>
   </aside>
 </div>
 
-<style>
-  /* Ensure widget sits above everything and is visible */
-  .chatwidget-root { position: fixed; right: 20px; bottom: 20px; z-index: 99999; font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; }
-
-  /* Launch button */
-  .cw-launch {
-    background: var(--brand-primary, #F4A261);
-    color: #111;
-    border: none;
-    border-radius: 999px;
-    padding: 10px 14px;
-    font-weight: 700;
-    cursor: pointer;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.12);
-  }
-
-  /* Panel */
-  .cw-panel {
-    width: 340px;
-    max-width: calc(100vw - 48px);
-    height: 420px;
-    display: flex;
-    flex-direction: column;
-    background: white;
-    color: #111;
-    border-radius: 12px;
-    box-shadow: 0 18px 50px rgba(2,6,23,0.18);
-    overflow: hidden;
-    margin-bottom: 10px;
-  }
-  .cw-panel[aria-hidden="true"] { display: none; }
-
-  .cw-header {
-    display:flex;
-    justify-content: space-between;
-    align-items:center;
-    padding: 12px 14px;
-    background: linear-gradient(90deg, rgba(0,0,0,0.02), rgba(0,0,0,0.01));
-    border-bottom: 1px solid rgba(0,0,0,0.04);
-    font-weight: 700;
-  }
-  .cw-close {
-    background: transparent;
-    border: none;
-    font-size: 16px;
-    cursor: pointer;
-  }
-
-  .cw-body {
-    padding: 14px;
-    flex: 1 1 auto;
-    overflow-y: auto;
-    gap: 8px;
-    display: flex;
-    flex-direction: column;
-    scroll-behavior: smooth;
-    background: linear-gradient(180deg, rgba(0,0,0,0.01), rgba(0,0,0,0.00));
-  }
-
-  .msg { padding: 8px 10px; border-radius: 8px; max-width: 85%; line-height:1.2; }
-  .msg.user { align-self: flex-end; background: var(--brand-primary, #F4A261); color: #111; }
-  .msg.bot  { align-self: flex-start; background: #f3f4f6; color: #111; }
-
-  .cw-input { display:flex; gap:8px; padding: 12px; border-top: 1px solid rgba(0,0,0,0.04); background: white; }
-  .cw-input-el { flex:1; padding:10px 12px; border-radius: 999px; border:1px solid rgba(0,0,0,0.08); outline:none; }
-  .cw-send { padding:10px 14px; border-radius:999px; border:none; background:var(--brand-primary, #F4A261); color:#111; cursor:pointer; font-weight:700; }
-  @media (max-width: 520px) {
-    .cw-panel { width: 90vw; height: 60vh; }
-  }
-</style>
-
 <script is:inline>
-if (!window.__cw_loaded_visual) {
-  window.__cw_loaded_visual = true;
+document.addEventListener("DOMContentLoaded", () => {
+  const panel = document.getElementById("cw-panel");
+  const btnLaunch = document.getElementById("cw-launch");
+  const btnClose = document.getElementById("cw-close");
+  const body = document.getElementById("cw-body");
+  const input = document.getElementById("cw-input");
+  const btnSend = document.getElementById("cw-send");
 
-  const elPanel = document.getElementById('cw-panel');
-  const btnLaunch = document.getElementById('cw-launch');
-  const btnClose = document.getElementById('cw-close');
-  const body = document.getElementById('cw-body');
-  const input = document.getElementById('cw-input');
-  const btnSend = document.getElementById('cw-send');
+  function openPanel() {
+    panel.setAttribute("aria-hidden", "false");
+    btnLaunch.setAttribute("aria-expanded", "true");
+    input.focus();
+  }
 
-  // small, deterministic bot for demo
-  const RESPONSES = [
-    { test: /hi\b|hello|hey/i, text: "Hello — how can I support you today?" },
-    { test: /help|support/i, text: "You can visit /help or tell me what you need." },
-    { test: /thanks|thank/i, text: "You're welcome — glad to help." }
-  ];
+  function closePanel() {
+    panel.setAttribute("aria-hidden", "true");
+    btnLaunch.setAttribute("aria-expanded", "false");
+  }
 
-  function addMessage(text, from='bot') {
-    const d = document.createElement('div');
-    d.className = 'msg ' + (from === 'user' ? 'user' : 'bot');
+  btnLaunch.addEventListener("click", () => {
+    const hidden = panel.getAttribute("aria-hidden") === "true";
+    hidden ? openPanel() : closePanel();
+  });
+
+  btnClose.addEventListener("click", closePanel);
+
+  function addMessage(text, from = "bot") {
+    const d = document.createElement("div");
+    d.className = "msg " + (from === "user" ? "user" : "bot");
     d.textContent = text;
     body.appendChild(d);
     body.scrollTop = body.scrollHeight;
   }
 
-  function botReply(userText) {
-    for (const r of RESPONSES) {
-      if (r.test.test(userText)) return r.text;
-    }
-    return "Sorry — I don't know that yet. Try 'help'.";
-  }
-
-  function openPanel() {
-    elPanel.setAttribute('aria-hidden', 'false');
-    btnLaunch.setAttribute('aria-expanded', 'true');
-    input.focus();
-  }
-  function closePanel() {
-    elPanel.setAttribute('aria-hidden', 'true');
-    btnLaunch.setAttribute('aria-expanded', 'false');
-    btnLaunch.focus();
-  }
-
-  btnLaunch.addEventListener('click', () => {
-    const isHidden = elPanel.getAttribute('aria-hidden') === 'true';
-    if (isHidden) openPanel(); else closePanel();
-  });
-  btnClose.addEventListener('click', closePanel);
-
-  btnSend.addEventListener('click', () => {
-    const v = input.value && input.value.trim();
+  btnSend.addEventListener("click", () => {
+    const v = input.value.trim();
     if (!v) return;
-    addMessage(v, 'user');
-    input.value = '';
-    setTimeout(() => addMessage(botReply(v), 'bot'), 250);
+    addMessage(v, "user");
+    input.value = "";
+    addMessage("Example message.", "bot");
   });
 
-  input.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') btnSend.click();
-    if (e.key === 'Escape') closePanel();
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") btnSend.click();
+    if (e.key === "Escape") closePanel();
   });
-
-  // sanity-check visible marker for debugging
-  addMessage('Widget initialised. Type "help" to test.', 'bot');
-}
+});
 </script>
