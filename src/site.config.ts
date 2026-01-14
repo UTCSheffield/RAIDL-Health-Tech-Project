@@ -62,11 +62,11 @@ export type SiteConfig = {
 
 const siteConfig: SiteConfig = {
     website: 'https://example.com',
-    title: 'Caring Hearts',
+    title: 'RAIDL',
     description: 'Care for children who think differently',
     image: {
         src: '/caring-hearts-preview.jpeg',
-        alt: 'Caring Hearts - Care for children who think differently'
+        alt: 'RAIDL - Care for children who think differently'
     },
     headerNavLinks: [
         {
@@ -121,7 +121,7 @@ const siteConfig: SiteConfig = {
     ],
     hero: {
         eyebrowText: 'Support & Resources',
-        title: 'Caring Hearts',
+        title: 'RAIDL',
         text: 'Supporting children who think differently',
         image: {
             src: '/assets/images/pixeltrue-space-discovery.svg',
@@ -140,7 +140,7 @@ const siteConfig: SiteConfig = {
     },
     about: {
         title: 'About',
-        text: 'Caring Hearts is dedicated to supporting families and children with autism and neurodivergence. We provide accessible resources, practical guidance, and community connection to help children thrive.',
+        text: 'RAIDL is dedicated to supporting families and children with autism and neurodivergence. We provide accessible resources, practical guidance, and community connection to help children thrive.',
     },
     contactInfo: {
         title: 'Contact',
