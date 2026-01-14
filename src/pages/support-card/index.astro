@@ -4,345 +4,246 @@ import siteConfig from "../../site.config";
 ---
 
 <MainLayout activePage="fun stuff" pageTitle={`${siteConfig.title} — Fun Stuff`}>
-<style>
-  /* Using project-wide theme tokens (no local color definitions) */
+  <style>
+    :root{--text:#111;--muted:#555;--accent:#0b5;}
+    body{font-family:Inter,system-ui,Arial,Helvetica,sans-serif;margin:18px;background:#f6f6f6;color:var(--text)}
+    .wrap{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 420px;gap:18px;align-items:start}
+    .panel{background:#fff;border-radius:10px;padding:18px;box-shadow:0 1px 0 rgba(0,0,0,.06)}
+    label{display:block;font-weight:700;margin:10px 0 6px;color:var(--muted)}
+    input,select,textarea{width:100%;padding:10px;border-radius:8px;border:1px solid #d0d0d0;font-size:16px;box-sizing:border-box}
+    .controls{display:flex;gap:8px;margin-top:12px}
+    button{background:var(--accent);color:#fff;border:none;padding:10px 12px;border-radius:8px;cursor:pointer;font-weight:700}
+    .muted-btn{background:transparent;border:1px solid #d0d0d0;padding:8px 10px;border-radius:8px}
+    .preview{border-radius:10px;padding:18px;min-height:320px;display:flex;align-items:center;justify-content:center;background:#fff}
+    .card-screen{width:360px;border-radius:8px;padding:14px;background:#fff;border:1px solid #e6e6e6}
+    .card-title{font-size:20px;font-weight:800;margin-bottom:8px}
+    .card-line{margin:8px 0;font-size:16px}
+    .card-label{font-weight:800;color:var(--muted);display:block;font-size:12px;margin-bottom:4px}
+    .small{font-size:13px;color:var(--muted);margin-top:8px}
 
-  /* rely on your global variables: --brand-primary, --brand-muted, --brand-light,
-     --brand-dark, --page-light, --text-primary, --text-secondary, --text-muted, etc. */
+    /* PRINT: single A4 page with front (left) and back (right) */
+    @media print{
+      /* try to set page margins small; browsers may still apply user margins */
+      @page { size: A4 portrait; margin: 6mm; }
+      html,body{height:100%;margin:0;padding:0}
+      /* Force the browser to center the printable container in print preview */
+      body{display:flex;justify-content:center;align-items:flex-start;background:#fff}
+      /* sheet is exactly A4 width minus page margins; center it with margin:auto */
+      .sheet {
+        width: calc(210mm - 12mm); /* A4 width minus @page margins */
+        max-width:210mm;
+        margin: 0 auto;
+        display:flex;
+        flex-wrap:nowrap;
+        gap:8mm;
+        padding:0;
+        box-sizing:border-box;
+        justify-content:center;
+      }
+      .panel-card{ width: calc(50% - 4mm); box-sizing:border-box; padding:6mm; min-height:85mm; }
+      .wallet-area{ width:85mm; height:55mm; margin:6mm auto; position:relative; box-sizing:border-box; background:#fff }
+      .cut-mark{ position:absolute; width:8mm; height:8mm }
+      .cut-mark.tl{ left:-5mm; top:-5mm; border-top:2px solid #000; border-left:2px solid #000 }
+      .cut-mark.tr{ right:-5mm; top:-5mm; border-top:2px solid #000; border-right:2px solid #000 }
+      .cut-mark.bl{ left:-5mm; bottom:-5mm; border-bottom:2px solid #000; border-left:2px solid #000 }
+      .cut-mark.br{ right:-5mm; bottom:-5mm; border-bottom:2px solid #000; border-right:2px solid #000 }
+      .fold-line{ position:absolute; left:50%; top:6mm; bottom:6mm; width:0; border-left:1px dotted #333; transform:translateX(-50%) }
+      .scissor{ position:absolute; left:50%; top:2mm; transform:translateX(-50%); font-size:8px; color:#333 }
+      .wallet-title{ font-weight:800; font-size:14px; margin-bottom:6px }
+      .wallet-line{ font-size:12px; margin:4px 0 }
+      /* ensure the printable sheet is not pushed left by any residual body padding */
+      body, .wrap { padding-left: 0 !important; padding-right: 0 !important; }
+      /* avoid page breaks inside the sheet */
+      .sheet{ page-break-after:avoid }
+    }
 
-  body {
-    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
-    margin: 18px;
-    color: var(--text-primary);
-    background: var(--page-light);
-  }
+    @media (max-width:1200px){ .wrap{ grid-template-columns:1fr } }
+  </style>
 
-  /* Responsive grid: main column + side preview that scales with viewport */
-  .wrap {
-    max-width: 1200px;
-    margin: 0 auto;
-    display: grid;
-    grid-template-columns: 1fr min(480px, 44vw); /* preview column will shrink on small screens */
-    gap: 18px;
-    align-items: start;
-    padding: 6px;
-    box-sizing: border-box;
-  }
+  <div class="wrap">
+    <div class="panel" aria-labelledby="form-title">
+      <h1 id="form-title">Create a printable Support Card</h1>
 
-  /* Panels now use transparent fill and a black border as requested */
-  .panel {
-    background: transparent;               /* no filled background */
-    border: 2px solid #000;                /* solid black border */
-    border-radius: 12px;
-    padding: 18px;
-    box-shadow: none;                      /* keep it flat per your earlier calm aesthetic */
-    box-sizing: border-box;
-  }
+      <label for="name">Name / Nickname</label>
+      <input id="name" type="text" placeholder="John" />
 
-  h1 {
-    font-size: 1.25rem;
-    margin: 0 0 10px 0;
-    color: var(--brand-dark);
-  }
+      <label for="how">How I like to be told things</label>
+      <select id="how">
+        <option>One instruction at a time</option>
+        <option>Show me first, then tell me</option>
+        <option>Write it down</option>
+        <option>Use visual steps</option>
+        <option>Other</option>
+      </select>
 
-  label {
-    display: block;
-    font-weight: 600;
-    margin: 10px 0 6px 0;
-    font-size: 0.95rem;
-    color: var(--text-secondary);
-  }
+      <label for="sensory">Sensory triggers (short)</label>
+      <input id="sensory" type="text" placeholder="loud noises, bright lights" />
 
-  input[type=text], select, textarea {
-    width: 100%;
-    padding: 10px;
-    border-radius: 8px;
-    border: 1px solid color-mix(in srgb, var(--brand-muted) 85%, var(--brand-light) 15%);
-    font-size: 0.95rem;
-    background: transparent;
-    color: var(--text-primary);
-    box-sizing: border-box;
-  }
+      <label for="helps">What helps me (2 things)</label>
+      <input id="helps" type="text" placeholder="Quiet space; a timer" />
 
-  textarea { min-height: 64px; resize: vertical; }
+      <label for="health">Health note (meds/time or 'none')</label>
+      <input id="health" type="text" placeholder="Meds at 8:00 - methylphenidate" />
 
-  .small {
-    font-size: 0.85rem;
-    color: var(--text-muted);
-    margin-top: 6px;
-  }
+      <label for="confident">What builds my confidence (one short sentence)</label>
+      <input id="confident" type="text" placeholder="Praise when I finish a step" />
 
-  .row { display:flex; gap:8px; }
+      <label for="contact">Emergency contact (name + phone)</label>
+      <input id="contact" type="text" placeholder="Alex - 07123 456789" />
 
-  button {
-    background: var(--brand-primary);
-    color: var(--brand-light);
-    border: none;
-    padding: 10px 12px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 600;
-  }
+      <div class="controls" role="group" aria-label="controls">
+        <button id="print">Print / Download</button>
+        <button id="clear" class="muted-btn">Clear</button>
+      </div>
 
-  .muted-btn {
-    background: transparent;
-    border: 1px solid color-mix(in srgb, var(--brand-muted) 70%, var(--brand-light) 30%);
-    color: var(--brand-dark);
-    padding: 8px 10px;
-    border-radius: 8px;
-    cursor: pointer;
-  }
+      <div class="small">Recommended: <strong>160–200gsm</strong> card stock; laminate 125–250 micron for durability. Cut on marks; fold on dotted line to double thickness before laminating.</div>
 
-  /* Preview panel uses border (no fill) and keeps internal centering */
-  .preview {
-    background: transparent;               /* removed fill */
-    border: 2px solid #000;                /* black border */
-    border-radius: 10px;
-    padding: 18px;
-    min-height: 320px;                     /* slightly smaller min height for better fit */
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    box-sizing: border-box;
-  }
-
-  /* card-screen becomes responsive: scale to available space up to a comfortable max */
-  .card-screen {
-    width: min(360px, 86%);                /* responsive width */
-    max-width: 420px;                      /* safeguard for very wide preview columns */
-    border-radius: 8px;
-    border: 1px solid #000;                /* black border around the inner card too */
-    padding: 14px;
-    background: transparent;               /* remove inner fill */
-    color: var(--text-primary);
-    box-sizing: border-box;
-  }
-
-  .card-title {
-    font-size: 1.1rem;
-    font-weight: 700;
-    margin-bottom: 8px;
-    color: var(--brand-dark);
-  }
-
-  .card-line {
-    margin: 8px 0;
-    font-size: 0.98rem;
-    line-height: 1.35;
-    color: var(--text-primary);
-  }
-
-  .card-label {
-    font-weight: 700;
-    font-size: 0.9rem;
-    color: var(--text-muted);
-    display:block;
-    margin-bottom:4px;
-  }
-
-  .controls {
-    display:flex;
-    gap:8px;
-    margin-top:12px;
-    align-items:center;
-  }
-
-  input[type=checkbox] { width:18px; height:18px; }
-
-  /* Stack cleanly on smaller screens and give preview full width */
-  @media (max-width:1200px) {
-    .wrap { grid-template-columns: 1fr; }
-    .preview { order:-1; width: 100%; }
-    .panel { order:2; width: 100%; }
-  }
-
-  /* Small screens: reduce margins & ensure card fills reasonably */
-  @media (max-width:640px) {
-    body { margin: 10px; }
-    .wrap { gap: 12px; padding: 4px; }
-    .card-screen { width: 92%; max-width: 380px; padding: 12px; }
-    .panel { padding: 14px; border-width: 1px; }
-    .preview { padding: 12px; border-width: 1px; min-height: 280px; }
-  }
-
-  /* NOTE: low-arousal mode removed as requested (no related styles) */
-</style>
-
-<div class="wrap">
-  <div class="panel" aria-labelledby="form-title">
-    <h1 id="form-title">Create a printable Support Card</h1>
-    
-
-    <label for="name">Name / Nickname</label>
-    <input id="name" type="text" placeholder="John" />
-
-    <label for="how">How I like to be told things</label>
-    <select id="how">
-      <option value="One instruction at a time">One instruction at a time</option>
-      <option value="Show me first, then tell me">Show me first, then tell me</option>
-      <option value="Write it down">Write it down</option>
-      <option value="Use visual steps">Use visual steps</option>
-      <option value="Other">Other</option>
-    </select>
-
-    <label for="sensory">Sensory triggers (short)</label>
-    <input id="sensory" type="text" placeholder="loud noises, bright lights" />
-
-    <label for="helps">What helps me (2 things)</label>
-    <input id="helps" type="text" placeholder="Quiet space; a timer" />
-
-    <label for="money">Money support (Yes/No) + short note</label>
-    <input id="money" type="text" placeholder="No" />
-
-    <label for="health">Health note (meds/time or 'none')</label>
-    <input id="health" type="text" placeholder="Meds at 8:00 - methylphenidate" />
-
-    <label for="confident">What helps me feel confident (one short sentence)</label>
-    <input id="confident" type="text" placeholder="Praise when I finish a step" />
-
-    <label for="contact">Emergency contact (name + phone)</label>
-    <input id="contact" type="text" placeholder="Alex - 07123 456789" />
-
-    <div class="controls" role="group" aria-label="controls">
-      <button id="print">Print / Download</button>
-      <button id="clear" class="muted-btn">Clear</button>
+      <div class="print-instructions no-print">
+        <strong>How to print (quick):</strong>
+        <ul>
+          <li>Choose A4 paper and set scaling to <strong>100%</strong> or "Actual size".</li>
+          <li>Print this single page (front on the left, back on the right).</li>
+          <li>Cut on the solid corner marks. Fold each card on the dotted line to create a double‑thickness card before laminating.</li>
+        </ul>
+      </div>
     </div>
 
-   
-  </div>
-
-  <div class="" aria-live="polite">
-    <div id="preview-area">
+    <div class="preview" aria-live="polite">
       <div class="card-screen" id="card-screen">
         <div class="card-title">My Support Card</div>
-        <div class="card-line"><span class="card-label">Name:</span> <span id="p-name">—</span></div>
-        <div class="card-line"><span class="card-label">How I like to be told things:</span> <span id="p-how">—</span></div>
-        <div class="card-line"><span class="card-label">Sensory triggers:</span> <span id="p-sensory">—</span></div>
-        <div class="card-line"><span class="card-label">What helps me:</span> <span id="p-helps">—</span></div>
-        <div class="card-line"><span class="card-label">Money support:</span> <span id="p-money">—</span></div>
-        <div class="card-line"><span class="card-label">Health note:</span> <span id="p-health">—</span></div>
-        <div class="card-line"><span class="card-label">What builds my confidence:</span> <span id="p-confident">—</span></div>
-        <div class="card-line"><span class="card-label">Emergency contact:</span> <span id="p-contact">—</span></div>
-        <div class="card-line" style="margin-top:12px; font-size:0.9rem; color:var(--text-muted);"><strong>How to use:</strong> Give this card to my teacher, carer or doctor.</div>
+        <div class="card-line"><span class="card-label">Name:</span><span id="p-name">—</span></div>
+        <div class="card-line"><span class="card-label">How I like to be told things:</span><span id="p-how">—</span></div>
+        <div class="card-line"><span class="card-label">Sensory triggers:</span><span id="p-sensory">—</span></div>
+        <div class="card-line"><span class="card-label">What helps me:</span><span id="p-helps">—</span></div>
+        <div class="card-line"><span class="card-label">Health note:</span><span id="p-health">—</span></div>
+        <div class="card-line"><span class="card-label">Emergency contact:</span><span id="p-contact">—</span></div>
+        <div class="card-line small"><strong>How to use:</strong> Give this card to my teacher, carer or doctor.</div>
       </div>
     </div>
   </div>
-</div>
 
-<script>
-  // Short helpers
-  const $ = id => document.getElementById(id);
-  const fields = ['name','how','sensory','helps','money','health','confident','contact'];
+  <script>
+    // Classic JS for broad compatibility
+    var $ = function(id){ return document.getElementById(id); };
+    var fields = ['name','how','sensory','helps','health','confident','contact'];
 
-  // Restore saved values if any
-  try {
-    const saved = JSON.parse(localStorage.getItem('supportCard') || '{}');
-    fields.forEach(f => { if (saved[f]) $(f).value = saved[f]; });
-  } catch(e) { /* ignore */ }
-
-  function updatePreview(){
-    fields.forEach(f => {
-      const v = ($(f).value || '').toString().trim();
-      $('p-'+f).textContent = v || '—';
-    });
-    // sync preview card-screen text (already updated)
     try {
-      const obj = {}; fields.forEach(f => obj[f] = $(f).value); localStorage.setItem('supportCard', JSON.stringify(obj));
-    } catch(e){}
-  }
+      var saved = JSON.parse(localStorage.getItem('supportCard') || '{}');
+      for (var i = 0; i < fields.length; i++) {
+        var f = fields[i];
+        if (saved[f]) { $(f).value = saved[f]; }
+      }
+    } catch (e) {}
 
-  // initial render
-  updatePreview();
-
-  // removed the update button listener (auto-updates on input)
-  $('clear').addEventListener('click', ()=>{
-    fields.forEach(f => $(f).value = '');
-    updatePreview();
-    try { localStorage.removeItem('supportCard'); } catch(e){}
-  });
-
-  function esc(s){
-    if(!s) return '';
-    return s.toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-  }
-
-  // PRINT: larger, centered, A4-ready
-  $('print').addEventListener('click', ()=>{
-    updatePreview();
-    const data = {};
-    fields.forEach(f => data[f] = $(f).value ? $(f).value.toString().trim() : '—');
-
-    // precise print CSS: A4 page, centered vertically and horizontally, card width 160mm
-    const printCSS = `
-      <style>
-        @page { size: A4 portrait; margin: 12mm; }
-        html,body { height: 100%; margin: 0; padding: 0; }
-        body{ font-family: Arial, Helvetica, sans-serif; -webkit-print-color-adjust: exact; color: var(--text-primary); }
-        /* center the card on the page */
-        .page-wrap { min-height: 100vh; display:flex; align-items:center; justify-content:center; padding:0; box-sizing:border-box; }
-        .card{ width:160mm; max-width:100%; border:1px solid color-mix(in srgb, var(--brand-muted) 85%, var(--brand-light) 15%); padding:14mm; border-radius:6px; box-sizing:border-box; background: var(--brand-light); }
-        .card-title{ font-weight:700; font-size:20px; margin-bottom:10px; color: var(--brand-dark); }
-        .card-line{ margin:8px 0; font-size:15px; line-height:1.4; color: var(--text-primary); }
-        .card-label{ font-weight:700; color: var(--text-muted); display:block; font-size:12px; margin-bottom:4px; }
-        /* ensure no extra UI elements print */
-        @media print {
-          button, input { -webkit-print-color-adjust: none; }
-        }
-      </style>`;
-
-    const html = `
-      <!doctype html>
-      <html>
-        <head>
-          <meta charset="utf-8">
-          <title>Support Card</title>
-          ${printCSS}
-        </head>
-        <body>
-          <div class="page-wrap">
-            <div class="card" role="region" aria-label="Support Card">
-              <div class="card-title">My Support Card</div>
-              <div class="card-line"><span class="card-label">Name:</span>${esc(data.name)}</div>
-              <div class="card-line"><span class="card-label">How I like to be told things:</span>${esc(data.how)}</div>
-              <div class="card-line"><span class="card-label">Sensory triggers:</span>${esc(data.sensory)}</div>
-              <div class="card-line"><span class="card-label">What helps me:</span>${esc(data.helps)}</div>
-              <div class="card-line"><span class="card-label">Money support:</span>${esc(data.money)}</div>
-              <div class="card-line"><span class="card-label">Health note:</span>${esc(data.health)}</div>
-              <div class="card-line"><span class="card-label">What builds my confidence:</span>${esc(data.confident)}</div>
-              <div class="card-line"><span class="card-label">Emergency contact:</span>${esc(data.contact)}</div>
-              <div class="card-line" style="margin-top:12px; font-size:13px; color:var(--text-muted);"><strong>How to use:</strong> Give this card to my teacher, carer or doctor.</div>
-            </div>
-          </div>
-        </body>
-      </html>`;
-
-    const w = window.open('', '_blank');
-    if (!w) {
-      // Popup blocked — fallback: open printable content in same tab via blob
-      const blob = new Blob([html], {type: 'text/html'});
-      const url = URL.createObjectURL(blob);
-      window.location.href = url;
-      return;
+    function updatePreview(){
+      for (var i = 0; i < fields.length; i++) {
+        var f = fields[i];
+        var v = ($(f).value || '').toString().trim();
+        var el = $('p-' + f);
+        if (el) { el.textContent = v || '—'; }
+      }
+      try {
+        var obj = {};
+        for (var j = 0; j < fields.length; j++) { obj[fields[j]] = $(fields[j]).value; }
+        localStorage.setItem('supportCard', JSON.stringify(obj));
+      } catch (e) {}
     }
 
-    w.document.open();
-    w.document.write(html);
-    w.document.close();
-    w.focus();
+    updatePreview();
 
-    // Slightly longer delay to allow fonts & layout to settle on slow devices
-    setTimeout(() => {
-      try { w.print(); } catch(e) { console.error('Print failed', e); }
-    }, 520);
-  });
-
-  // live update on typing (debounced)
-  let t;
-  fields.forEach(f => {
-    $(f).addEventListener('input', ()=> {
-      clearTimeout(t);
-      t = setTimeout(updatePreview, 180);
+    $('clear').addEventListener('click', function(){
+      for (var i = 0; i < fields.length; i++) { $(fields[i]).value = ''; }
+      updatePreview();
+      localStorage.removeItem('supportCard');
     });
-  });
-</script>
+
+    var debounceTimer;
+    for (var k = 0; k < fields.length; k++) {
+      (function(field){
+        $(field).addEventListener('input', function(){
+          clearTimeout(debounceTimer);
+          debounceTimer = setTimeout(updatePreview, 180);
+        });
+      })(fields[k]);
+    }
+
+    function esc(s){
+      if (!s) return '';
+      return s.toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    // Print: single A4 page with front (left) and back (right) side-by-side
+    $('print').addEventListener('click', function(){
+      updatePreview();
+      var data = {};
+      for (var i = 0; i < fields.length; i++) { data[fields[i]] = $(fields[i]).value ? $(fields[i]).value.toString().trim() : '—'; }
+
+      var html = '<!doctype html><html><head><meta charset="utf-8"><title>Support Card Print</title><style>';
+      html += '@page{size:A4;margin:6mm} body{font-family:Arial,Helvetica,sans-serif;margin:0;padding:0;color:#111}';
+      html += 'body{display:flex;justify-content:center;align-items:flex-start;background:#fff}';
+      html += '.sheet{width:calc(210mm - 12mm);max-width:210mm;margin:0 auto;display:flex;flex-wrap:nowrap;gap:8mm;padding:0;box-sizing:border-box;justify-content:center}';
+      html += '.panel-card{width:calc(50% - 4mm);box-sizing:border-box;padding:6mm;min-height:85mm}';
+      html += '.wallet-area{width:85mm;height:55mm;margin:6mm auto;position:relative;box-sizing:border-box;background:#fff}';
+      html += '.cut-mark{position:absolute;width:8mm;height:8mm}';
+      html += '.cut-mark.tl{left:-5mm;top:-5mm;border-top:2px solid #000;border-left:2px solid #000}';
+      html += '.cut-mark.tr{right:-5mm;top:-5mm;border-top:2px solid #000;border-right:2px solid #000}';
+      html += '.cut-mark.bl{left:-5mm;bottom:-5mm;border-bottom:2px solid #000;border-left:2px solid #000}';
+      html += '.cut-mark.br{right:-5mm;bottom:-5mm;border-bottom:2px solid #000;border-right:2px solid #000}';
+      html += '.fold-line{position:absolute;left:50%;top:6mm;bottom:6mm;width:0;border-left:1px dotted #333;transform:translateX(-50%)}';
+      html += '.scissor{position:absolute;left:50%;top:2mm;transform:translateX(-50%);font-size:8px;color:#333}';
+      html += '.wallet-title{font-weight:800;font-size:14px;margin-bottom:6px}';
+      html += '.wallet-line{font-size:12px;margin:4px 0}';
+      html += '.sheet{page-break-after:avoid}';
+      html += '.print-note{font-size:10px;color:#333;margin-top:6px}';
+      html += '</style></head><body>';
+
+      html += '<div class="sheet" role="main">';
+      // LEFT: FRONT
+      html += '<div class="panel-card" aria-label="Front">';
+      html += '<div class="wallet-area">';
+      html += '<div class="cut-mark tl"></div><div class="cut-mark tr"></div><div class="cut-mark bl"></div><div class="cut-mark br"></div>';
+      html += '<div class="fold-line"></div><div class="scissor">✂</div>';
+      html += '<div class="wallet-title">My Support Card</div>';
+      html += '<div class="wallet-line"><strong>Name:</strong> ' + esc(data.name) + '</div>';
+      html += '<div class="wallet-line"><strong>How I like to be told things:</strong> ' + esc(data.how) + '</div>';
+      html += '<div class="wallet-line"><strong>What helps me:</strong> ' + esc(data.helps) + '</div>';
+      html += '<div class="wallet-line"><strong>Health note:</strong> ' + esc(data.health) + '</div>';
+      html += '<div class="wallet-line"><strong>Emergency:</strong> ' + esc(data.contact) + '</div>';
+      html += '</div>';
+      html += '<div class="print-note">Cut on the corner marks. Fold on the dotted line to double thickness before laminating.</div>';
+      html += '</div>';
+
+      // RIGHT: BACK
+      html += '<div class="panel-card" aria-label="Back">';
+      html += '<div class="wallet-area">';
+      html += '<div class="cut-mark tl"></div><div class="cut-mark tr"></div><div class="cut-mark bl"></div><div class="cut-mark br"></div>';
+      html += '<div class="fold-line"></div><div class="scissor">✂</div>';
+      html += '<div class="wallet-title">Emergency Info</div>';
+      html += '<div class="wallet-line"><strong>Sensory triggers:</strong> ' + esc(data.sensory) + '</div>';
+      html += '<div class="wallet-line"><strong>Confidence tip:</strong> ' + esc(data.confident) + '</div>';
+      
+      html += '</div>';
+      
+      html += '</div>';
+
+      html += '</div>'; // sheet
+
+     
+      html += '<script>function tryPrint(){try{window.focus();window.print();}catch(e){console.error(e);}}window.onload=function(){setTimeout(tryPrint,300);};setTimeout(tryPrint,800);<\/script>';
+      html += '</body></html>';
+
+      var w = window.open('', '_blank');
+      if (!w) {
+        var blob = new Blob([html], {type: 'text/html'});
+        var url = URL.createObjectURL(blob);
+        window.location.href = url;
+        return;
+      }
+      w.document.open();
+      w.document.write(html);
+      w.document.close();
+      try { w.focus(); } catch (e) {}
+      setTimeout(function(){ try { w.print(); } catch (e) {} }, 600);
+    });
+  </script>
 </MainLayout>
