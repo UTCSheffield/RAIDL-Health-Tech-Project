@@ -1416,3 +1416,13 @@ html[data-mode="calm"] .highlight-cta {
 }
 
 
+
+
+.spectrum-timeline { max-width:1100px; margin:2rem auto; padding:0 1rem; }
+.timeline-track { position:relative; display:flex; gap:1rem; align-items:center; justify-content:space-between; padding:2.5rem 1rem; }
+.track-line { position:absolute; left:4%; right:4%; height:4px; background:linear-gradient(90deg,#e6e6e6,#f3f3f3); top:50%; transform:translateY(-50%); border-radius:4px; z-index:0; }
+.node { position:relative; z-index:2; background:#fff; border:2px solid #f0f0f0; padding:10px 14px; border-radius:999px; min-width:84px; text-align:center; cursor:pointer; transition:transform .18s, box-shadow .18s; box-shadow:0 6px 18px rgba(0,0,0,0.06); }
+.node::after { content:""; position:absolute; left:50%; transform:translateX(-50%); top:calc(100% + 8px); width:10px; height:10px; background:linear-gradient(180deg,#fff,#f8fafc); border-radius:50%; border:2px solid #ddd; }
+.node:focus, .node:hover { transform:translateY(-10px); box-shadow:0 14px 30px rgba(0,0,0,0.12); outline:none; }
+.timeline-tip { margin-top:1rem; padding:14px; border-radius:10px; background:linear-gradient(90deg,#fff7ed,#fff3f2); color:#111; min-height:72px; }
+@media (max-width:640px){ .timeline-track{flex-wrap:wrap; gap:.75rem;} .node{flex:1 1 45%;} }

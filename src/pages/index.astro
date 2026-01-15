@@ -105,22 +105,30 @@ import { withBase } from "../utils/helpers";
     </div>
   </div>
 </section>
-<!-- Autism timeline (compact, interactive) -->
-<section id="autism-spectrum" class="autism-timeline" aria-label="Autism spectrum overview">
+
+<section id="autism-spectrum" class="spectrum-timeline" aria-label="Autism spectrum overview">
   <h2 class="sr-only">Autism spectrum at a glance</h2>
-  <div class="timeline" role="list">
-    <button class="node" data-key="early" aria-describedby="tip" role="listitem">Early signs</button>
-    <button class="node" data-key="senses" aria-describedby="tip" role="listitem">Senses</button>
-    <button class="node" data-key="social" aria-describedby="tip" role="listitem">Social</button>
-    <button class="node" data-key="interests" aria-describedby="tip" role="listitem">Interests</button>
-    <button class="node" data-key="check" aria-describedby="tip" role="listitem">Getting checked</button>
-    <button class="node" data-key="support" aria-describedby="tip" role="listitem">Support</button>
+
+  <div class="timeline-track" role="list" aria-hidden="false">
+    <div class="track-line" aria-hidden="true"></div>
+
+    <button class="node" data-key="level1" aria-describedby="tip" role="listitem">Level 1</button>
+    <button class="node" data-key="level2" aria-describedby="tip" role="listitem">Level 2</button>
+    <button class="node" data-key="level3" aria-describedby="tip" role="listitem">Level 3</button>
+    <button class="node" data-key="level4" aria-describedby="tip" role="listitem">Level 4</button>
+    <button class="node" data-key="level5" aria-describedby="tip" role="listitem">Level 5</button>
+    <button class="node" data-key="level6" aria-describedby="tip" role="listitem">Level 6</button>
   </div>
 
   <div id="tip" class="timeline-tip" role="status" aria-live="polite">
-    Hover or tap a point to learn more.
+    Hover, focus or tap a point to learn about that part of the spectrum.
   </div>
 </section>
+
+
+
+
+
 
 
 
@@ -161,18 +169,16 @@ import { withBase } from "../utils/helpers";
   <script is:inline>
     function initPositiveMessages() {
       const messages = [
-    "You’re doing more than you notice — small steps add up.",
-    "It’s okay to have a hard day. it doesn’t erase the progress you’ve made.",
-    "Your needs matter. it’s fine to rest or ask for help.",
-    "Permission to set a boundary: this is for your wellbeing.",
+    "You’re doing more than you notice; small steps add up.",
+    "It’s okay to have a hard day. It doesn’t erase the progress you’ve made.",
+    "Your needs matter. It’s perfectly fine to rest or ask for help.",
     "You’re allowed to take things one step at a time.",
-    "What you’re feeling is valid. you don’t have to explain it to be respected.",
-    "Progress isn’t always visible. steady effort still counts.",
+    "What you’re feeling is valid. You don’t have to explain it to be respected.",
+    "Progress isn’t always visible. Steady effort counts.",
     "You matter to people, even when it doesn’t feel obvious.",
     "If this feels heavy, try one small routine you can manage today.",
-    "It’s okay to be gentle with yourself right now.",
-    "You’re learning even when it’s difficult — that itself is enough.",
-    "A short break can help you come back with clearer energy."
+    "You’re learning even when it’s difficult. That itself is enough.",
+    "A short break can help you come back with greater energy."
       ];
 
       const openBtn = document.getElementById('openPositiveMessages');
@@ -298,73 +304,46 @@ import { withBase } from "../utils/helpers";
 
 
 <script is:inline>
-(function () {
-  // Tip texts (kept simple and evidence-aligned)
+(function(){
   var TIPS = {
-    early: "You may notice differences in play, speech or routines. These can show up early in childhood.",
-    senses: "Lights, sounds, touch or food can feel too strong or too weak. This is common and can be managed with simple tools.",
-    social: "Reading social cues or joining groups can be hard. Small steps and clear instructions help.",
-    interests: "Having strong interests is normal and can be a strength for learning and work.",
-    check: "If you want answers, talk to your GP. They can refer you for an assessment if needed.",
-    support: "Small changes (quiet spaces, clear routines, sensory tools) and people who understand make a big difference."
+    level1: "Level 1: Mild support. May need small changes like clear instructions and quiet corners.",
+    level2: "Level 2: Noticeable support. May need structured routines, sensory tools and social coaching.",
+    level3: "Level 3: Regular support. May need one-to-one help, sensory planning and communication aids.",
+    level4: "Level 4: High support. May need daily care plans, specialist therapies and environmental adjustments.",
+    level5: "Level 5: Complex needs. Multi-disciplinary support, tailored education and health plans are common.",
+    level6: "Level 6: Intensive support. Full-time care, specialist teams and personalised strategies."
   };
 
   var tipEl = document.getElementById('tip');
-  if (!tipEl) return;
+  if(!tipEl) return;
+  var nodes = Array.prototype.slice.call(document.querySelectorAll('.spectrum-timeline .node'));
 
-  // Collect nodes and ensure they are HTMLButtonElement-like
-  var nodeList = Array.prototype.slice.call(document.querySelectorAll('.autism-timeline .node'));
-  var nodes = nodeList.filter(function (n) { return n && typeof n.addEventListener === 'function'; });
-
-  function clearActive() {
-    nodes.forEach(function (n) { n.classList.remove('active'); });
-  }
-
-  function showTip(key, node) {
-    if (!tipEl) return;
+  function clearActive(){ nodes.forEach(function(n){ n.classList.remove('active'); }); }
+  function showTip(key, node){
     tipEl.textContent = TIPS[key] || 'More info coming soon.';
     clearActive();
-    if (node && node.classList) node.classList.add('active');
+    if(node) node.classList.add('active');
   }
 
-  nodes.forEach(function (btn) {
-    var keyAttr = btn.getAttribute('data-key');
-    if (!keyAttr) return;
-    var key = keyAttr;
-
-    btn.addEventListener('mouseenter', function () { showTip(key, btn); });
-    btn.addEventListener('focus', function () { showTip(key, btn); });
-    btn.addEventListener('click', function () { showTip(key, btn); });
-
-    // touch-friendly: toggle on tap (prevent default to avoid double events)
-    btn.addEventListener('touchstart', function (e) {
-      e.preventDefault();
-      showTip(key, btn);
-    }, { passive: false });
+  nodes.forEach(function(btn){
+    var key = btn.getAttribute('data-key');
+    if(!key) return;
+    btn.addEventListener('mouseenter', function(){ showTip(key, btn); });
+    btn.addEventListener('focus', function(){ showTip(key, btn); });
+    btn.addEventListener('click', function(){ showTip(key, btn); });
+    btn.addEventListener('touchstart', function(e){ e.preventDefault(); showTip(key, btn); }, {passive:false});
   });
 
-  // keyboard: arrow navigation between nodes
-  document.addEventListener('keydown', function (e) {
+  document.addEventListener('keydown', function(e){
     var active = document.activeElement;
-    if (!active || !active.classList || !active.classList.contains('node')) return;
+    if(!active || !active.classList || !active.classList.contains('node')) return;
     var idx = nodes.indexOf(active);
-    if (idx === -1) return;
-
-    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
-      var next = nodes[(idx + 1) % nodes.length];
-      if (next && typeof next.focus === 'function') next.focus();
-      if (next) showTip(next.getAttribute('data-key'), next);
-      e.preventDefault();
-    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
-      var prev = nodes[(idx - 1 + nodes.length) % nodes.length];
-      if (prev && typeof prev.focus === 'function') prev.focus();
-      if (prev) showTip(prev.getAttribute('data-key'), prev);
-      e.preventDefault();
-    }
+    if(idx === -1) return;
+    if(e.key === 'ArrowRight' || e.key === 'ArrowDown'){ var next = nodes[(idx+1)%nodes.length]; next.focus(); showTip(next.getAttribute('data-key'), next); e.preventDefault(); }
+    if(e.key === 'ArrowLeft' || e.key === 'ArrowUp'){ var prev = nodes[(idx-1+nodes.length)%nodes.length]; prev.focus(); showTip(prev.getAttribute('data-key'), prev); e.preventDefault(); }
   });
 })();
 </script>
-
 
 
 </MainLayout>
