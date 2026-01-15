@@ -18,12 +18,12 @@ const { page } = Astro.props;
 const allPosts = page.data;
 ---
 
-<MainLayout activePage="blog" pageTitle={siteConfig.title + " | Blog Archive"}>
+<MainLayout activePage="articles" pageTitle={siteConfig.title + ""}>
   <div class="page-content py-8 text-center">
-    <h1>Blog</h1>
+    <h1>Articles</h1>
     {
-      siteConfig.blog?.description && (
-        <p class="font-light text-balance">{siteConfig.blog?.description}</p>
+      siteConfig.articles?.description && (
+        <p class="font-light text-balance">{siteConfig.articles?.description}</p>
       )
     }
 

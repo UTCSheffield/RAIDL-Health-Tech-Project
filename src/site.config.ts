@@ -24,7 +24,7 @@ export type About = {
     text?: string;
 };
 
-export type Blog = {
+export type Articles = {
     description?: string;
 };
 
@@ -54,7 +54,7 @@ export type SiteConfig = {
     hero?: Hero;
     about?: About;
     contactInfo?: ContactInfo;
-    blog?: Blog;
+    articles?: Articles;
     postsPerPage?: number;
     recentPostLimit: number;
     projectsPerPage?: number;
@@ -87,8 +87,8 @@ const siteConfig: SiteConfig = {
         },
         // new blog link
         {
-            text: 'Blog',
-            href: withBase('/blog/')
+            text: 'Articles',
+            href: withBase('/articles/')
         }
     ],
     footerNavLinks: [
@@ -165,7 +165,7 @@ const siteConfig: SiteConfig = {
             }
         ]
     },
-    blog: {
+    articles: {
         // make this descriptive so your blog listing page can show useful text
         description: "Learn more about Neurodivergence and how it effects people, and how we can lend a helping hand."
     },
