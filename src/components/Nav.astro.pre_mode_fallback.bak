@@ -75,7 +75,6 @@ const { activePage } = Astro.props;
 </header>
 
 <script is:inline>
-  window.mode = typeof window.mode !== "undefined" ? window.mode : "default";
   window.MODE_KEY = window.MODE_KEY || 'site:mode';
   const VALID_MODES = ['calm', 'vivid'];
 
