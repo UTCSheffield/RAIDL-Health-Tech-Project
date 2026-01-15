@@ -75,8 +75,16 @@ const { activePage } = Astro.props;
 </header>
 
 <script is:inline>
-  window.mode = typeof window.mode !== "undefined" ? window.mode : "default";
+(function () {
+  if (window.__nav_mode_initialized) return;
+  window.__nav_mode_initialized = true;
+
+  // safe globals
   window.MODE_KEY = window.MODE_KEY || 'site:mode';
+  window.mode = typeof window.mode !== 'undefined' ? window.mode : undefined;
+
+  const MODE_KEY = window.MODE_KEY;
+  const DEFAULT_MODE = 'calm';
   const VALID_MODES = ['calm', 'vivid'];
 
   const VAR_MAP = {
@@ -93,7 +101,7 @@ const { activePage } = Astro.props;
   };
 
   function setMode(mode, { persist = true } = {}) {
-    if (!VALID_MODES.includes(mode)) mode = 'calm';
+    if (!VALID_MODES.includes(mode)) mode = DEFAULT_MODE;
 
     document.documentElement.setAttribute('data-mode', mode);
 
@@ -108,7 +116,7 @@ const { activePage } = Astro.props;
 
   function getStoredMode() {
     const stored = localStorage.getItem(MODE_KEY);
-    return VALID_MODES.includes(stored) ? stored : 'calm';
+    return VALID_MODES.includes(stored) ? stored : DEFAULT_MODE;
   }
 
   function toggleMode() {
@@ -122,15 +130,20 @@ const { activePage } = Astro.props;
     document.querySelectorAll('#mode-toggle, #mobile-mode-toggle').forEach(btn => {
       if (!btn) return;
       btn.setAttribute('aria-pressed', String(pressed));
-      const label = btn.querySelector('.mode-label');
-      if (label) label.textContent = pressed ? 'Vivid' : 'Calm';
+    });
+
+    // Update visible labels in your markup (.labels .label-calm / .label-vivid)
+    document.querySelectorAll('.labels').forEach(labels => {
+      const calmEl = labels.querySelector('.label-calm');
+      const vividEl = labels.querySelector('.label-vivid');
+      if (calmEl) calmEl.style.display = mode === 'calm' ? '' : 'none';
+      if (vividEl) vividEl.style.display = mode === 'vivid' ? '' : 'none';
     });
   }
 
   function bindToggleHandlers() {
     document.querySelectorAll('#mode-toggle, #mobile-mode-toggle').forEach(btn => {
       if (!btn || btn.dataset.bound) return;
-
       btn.dataset.bound = 'true';
       btn.addEventListener('click', toggleMode);
       btn.addEventListener('keydown', e => {
@@ -143,21 +156,35 @@ const { activePage } = Astro.props;
   }
 
   function initMode() {
-    const mode = getStoredMode();
-    setMode(mode, { persist: false });
+    const initial = typeof window.mode !== 'undefined' ? window.mode : getStoredMode();
+    setMode(initial, { persist: false });
     bindToggleHandlers();
   }
 
   // initial load
-  initMode();
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initMode);
+  } else {
+    initMode();
+  }
 
   // re-run after Astro client-side navigation
   document.addEventListener('astro:page-load', () => {
-    initMode();
+    // don't redeclare anything here; just re-run init logic
+    try {
+      bindToggleHandlers();
+      const stored = getStoredMode();
+      // ensure UI matches stored mode after navigation
+      const current = document.documentElement.getAttribute('data-mode') || stored;
+      updateToggleUI(current);
+    } catch (e) {
+      console.error('nav mode re-init error', e);
+    }
   });
 
   // expose if needed
-  window.setSiteMode = setMode;
+  window.setSiteMode = function (m, opts) { setMode(m, opts); };
+})();
 </script>
 
 
