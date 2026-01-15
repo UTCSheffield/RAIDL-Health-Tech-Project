@@ -81,10 +81,10 @@ const siteConfig: SiteConfig = {
             text: 'Support Card',
             href: withBase('/support-card/')
         },
-        {
-            text: 'Help',
-            href: withBase('/help/')
-        },
+        // {
+        //     text: 'Help',
+        //     href: withBase('/help/')
+        // },
         // new blog link
         {
             text: 'Articles',

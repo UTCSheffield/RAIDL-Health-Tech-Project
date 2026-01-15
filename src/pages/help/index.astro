@@ -1,152 +1,237 @@
 ---
 import MainLayout from "../../layouts/MainLayout.astro";
 import siteConfig from "../../site.config";
+import { withBase } from "../../utils/helpers";
 ---
 
-<MainLayout activePage="help" pageTitle={`${siteConfig.title}  -  Get Help`}>
+<MainLayout activePage="help" pageTitle={`${siteConfig.title} - Get Help`}>
   <div class="page-content px-4 sm:px-8">
-    <section class="mb-12">
-      <h1 class="text-4xl mb-4">Need Help? We're Here</h1>
-      <p class="kanit-regular text-lg">If you're struggling or have questions, friendly services and people are available to help.</p>
-    </section>
 
-    <!-- Emergency/Crisis Support -->
-    <section class="mb-12 p-6 rounded-lg bg-red-50 border-l-4 border-violet-red">
-      <h2 class="text-2xl mb-4">Feeling Upset? Talk to Someone Now</h2>
-      <p class="kanit-regular mb-4">If you're feeling distressed or thinking about harming yourself, you are not alone. These services are available 24/7:</p>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 kanit-regular">
-        <div class="bg-white p-4 rounded">
-          <p class="font-bold text-lg mb-1">Childline</p>
-          <p class="text-xl font-bold text-violet-red mb-2">0800 1111</p>
-          <p class="text-sm">Free and confidential for under-19s. Call or use online chat anytime.</p>
-        </div>
-        <div class="bg-white p-4 rounded">
-          <p class="font-bold text-lg mb-1">Samaritans</p>
-          <p class="text-xl font-bold text-violet-red mb-2">116 123</p>
-          <p class="text-sm">Call 24/7 for emotional support.</p>
-        </div>
-        <div class="bg-white p-4 rounded">
-          <p class="font-bold text-lg mb-1">Emergency services</p>
-          <p class="text-xl font-bold text-violet-red mb-2">999</p>
-          <p class="text-sm">Call if there is immediate danger or serious injury.</p>
-        </div>
-        <div class="bg-white p-4 rounded">
-          <p class="font-bold text-lg mb-1">Text support</p>
-          <p class="text-xl font-bold text-violet-red mb-2">Text HELLO to 50808</p>
-          <p class="text-sm">Free, confidential text messages 24/7.</p>
-        </div>
-      </div>
-    </section>
+    <!-- 1. Understanding Autism (lead with this) -->
+    <section class="mb-10">
+      <div class="rounded-lg p-6 bg-white/90 shadow-md">
+        <h1 class="text-3xl sm:text-4xl font-bold mb-3">Am I Autistic? Getting Answers</h1>
+        <p class="text-lg mb-4">You might notice you think, feel, or sense things differently from others. That can be confusing. Here are simple steps you can try.</p>
 
-    <!-- Understanding Autism -->
-    <section class="mb-12">
-      <div class="rounded-lg p-6 bg-white/70 shadow-sm">
-        <h2 class="text-2xl mb-3">Am I Autistic? Getting Answers</h2>
-        <p class="kanit-regular mb-4">If you think you might be autistic or notice different ways of thinking, try these steps:</p>
-        <ol class="kanit-regular list-decimal pl-6 space-y-3 mb-4">
-          <li><strong>Talk to someone you trust</strong>  -  a parent, teacher or counsellor.</li>
-          <li><strong>See your GP</strong>  -  explain your concerns so they can refer you to local services.</li>
-          <li><strong>Specialist assessment</strong>  -  local teams can assess needs and suggest support.</li>
+        <ol class="list-decimal pl-6 space-y-3 text-base mb-4">
+          <li>
+            <strong>Talk to someone you trust</strong> — a parent, teacher, or school counsellor. Tell them what you notice.
+          </li>
+          <li>
+            <strong>See your GP</strong> — explain your concerns. They can refer you to local services for assessment.
+          </li>
+          <li>
+            <strong>Specialist assessment</strong> — local teams can assess and suggest support if needed.
+          </li>
         </ol>
+
+        <div class="mt-10 flex flex-col sm:flex-row sm:items-center sm:gap-4">
+          <a href={withBase("/#autism-spectrum")} class="highlight-cta text-white inline-flex items-center justify-center px-5 py-3 rounded-md font-semibold" aria-label="Read more on the autism spectrum section">
+        Read more on the autism spectrum
+      </a>
+         <button id="cw-launch-from-help" class="ml-0 sm:ml-3 mt-3 sm:mt-0 inline-flex items-center gap-2 px-4 py-3 rounded-md bg-gradient-to-r from-brand-warm to-brand-secondary font-semibold" aria-label="Open chat assistant">
+  Up for a quick chat? Chat with our bot! 👆
+</button>
+
+
+        </div>
+
+     
       </div>
     </section>
 
-    <!-- Support at School -->
-    <section class="mb-12">
-      <div class="rounded-lg p-6 bg-white/70 shadow-sm">
-        <h2 class="text-2xl mb-3">Help at School</h2>
-        <p class="kanit-regular mb-4">Schools can provide specific support to help with learning and wellbeing.</p>
+    <!-- 2. Emergency / Crisis (clear, prominent) -->
+    <section class="mb-10">
+      <div class="rounded-lg p-6 bg-red-50 border-l-4 border-red-500 shadow-sm emergency-card">
+        <h2 class="text-2xl font-bold mb-2">Feeling Upset? Talk to Someone Now</h2>
+        <p class="mb-4">If you are in danger or thinking about harming yourself, get help right away. These services are available 24/7.</p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="card p-4 bg-white rounded">
+            <p class="font-bold text-lg">Childline</p>
+            <p class="text-2xl font-extrabold text-red-600 my-2">0800 1111</p>
+            <p class="text-sm mb-2">Free and confidential for under-19s. Call or use online chat.</p>
+            <div class="flex gap-2">
+              <a href="tel:08001111" class="btn-cta">Call</a>
+              <a href="https://www.childline.org.uk/get-support/" target="_blank" class="btn-link">Chat online</a>
+            </div>
+          </div>
+
+          <div class="card p-4 bg-white rounded">
+            <p class="font-bold text-lg">Samaritans</p>
+            <p class="text-2xl font-extrabold text-red-600 my-2">116 123</p>
+            <p class="text-sm mb-2">Call 24/7 for emotional support.</p>
+            <div class="flex gap-2">
+              <a href="tel:116123" class="btn-cta">Call</a>
+              <a href="https://www.samaritans.org/" target="_blank" class="btn-link">Visit site</a>
+            </div>
+          </div>
+
+          <div class="card p-4 bg-white rounded">
+            <p class="font-bold text-lg">Emergency services</p>
+            <p class="text-2xl font-extrabold text-red-600 my-2">999</p>
+            <p class="text-sm mb-2">Call if there is immediate danger or serious injury.</p>
+            <a href="tel:999" class="btn-cta">Call now</a>
+          </div>
+
+          <div class="card p-4 bg-white rounded">
+            <p class="font-bold text-lg">Text support</p>
+            <p class="text-2xl font-extrabold text-red-600 my-2">Text HELLO to 50808</p>
+            <p class="text-sm mb-2">Free, confidential text messages 24/7.</p>
+            <div class="flex gap-2">
+              <a href="sms:50808?body=HELLO" class="btn-cta">Text now</a>
+              <a href="https://iadt.ie/services/institute-student-services/student-counselling/50808-crisis-text-line/" target="_blank" class="btn-link">More info</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. Help at School -->
+    <section class="mb-10">
+      <div class="rounded-lg p-6 bg-white/90 shadow-sm">
+        <h2 class="text-2xl font-bold mb-3">Help at School</h2>
+        <p class="mb-4">Schools can make changes to help you learn and feel safe. Here are the main options.</p>
+
         <div class="space-y-3">
-          <div>
+          <div class="p-4 bg-gray-50 rounded">
             <p class="font-bold">SENCO</p>
-            <p class="kanit-regular text-sm">Ask the Special Educational Needs Co-ordinator about available support.</p>
+            <p class="text-sm">Talk to the Special Educational Needs Co‑ordinator about support at school.</p>
           </div>
-          <div>
+
+          <div class="p-4 bg-gray-50 rounded">
             <p class="font-bold">Adjustments</p>
-            <p class="kanit-regular text-sm">Examples: extra time in tests, a quiet space, or different ways to work.</p>
+            <p class="text-sm">Examples: extra time in tests, a quiet space, or different ways to work.</p>
           </div>
-          <div>
+
+          <div class="p-4 bg-gray-50 rounded">
             <p class="font-bold">EHCP</p>
-            <p class="kanit-regular text-sm">An Education, Health and Care Plan sets out long-term support. Parents and carers can request an assessment.</p>
+            <p class="text-sm">An Education, Health and Care Plan sets out long-term support. Parents or carers can ask for an assessment.</p>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Therapies & Support -->
-    <section class="mb-12">
-      <h2 class="text-2xl mb-4">Support and Therapy</h2>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div class="rounded-lg p-6 bg-white/70 shadow-sm">
-          <h3 class="text-xl mb-2">Talking support</h3>
-          <p class="kanit-regular mb-3">Counsellors and therapists help with anxiety, low mood and stress. Ask your GP or school about referrals.</p>
-        </div>
+    <!-- 4. Support and Therapy -->
+    <section class="mb-10">
+      <div class="rounded-lg p-6 bg-white/90 shadow-sm">
+        <h2 class="text-2xl font-bold mb-3">Support and Therapy</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="p-4 bg-gray-50 rounded">
+            <h3 class="font-semibold mb-2">Talking support</h3>
+            <p class="text-sm">Counsellors and therapists can help with anxiety, low mood and stress. Ask your GP or school about referrals.</p>
+          </div>
 
-        <div class="rounded-lg p-6 bg-white/70 shadow-sm">
-          <h3 class="text-xl mb-2">Speech and language therapy</h3>
-          <p class="kanit-regular mb-3">Supports communication and understanding in everyday situations.</p>
-        </div>
+          <div class="p-4 bg-gray-50 rounded">
+            <h3 class="font-semibold mb-2">Speech and language therapy</h3>
+            <p class="text-sm">Helps with communication and understanding in everyday situations.</p>
+          </div>
 
-        <div class="rounded-lg p-6 bg-white/70 shadow-sm">
-          <h3 class="text-xl mb-2">Occupational therapy</h3>
-          <p class="kanit-regular mb-3">Helps with daily tasks and sensory issues like noise or touch.</p>
-        </div>
+          <div class="p-4 bg-gray-50 rounded">
+            <h3 class="font-semibold mb-2">Occupational therapy</h3>
+            <p class="text-sm">Helps with daily tasks and sensory issues like noise or touch.</p>
+          </div>
 
-        <div class="rounded-lg p-6 bg-white/70 shadow-sm">
-          <h3 class="text-xl mb-2">Groups and activities</h3>
-          <p class="kanit-regular mb-3">Local groups provide practical tips and a place to meet others.</p>
+          <div class="p-4 bg-gray-50 rounded">
+            <h3 class="font-semibold mb-2">Groups and activities</h3>
+            <p class="text-sm">Local groups give practical tips and a place to meet others.</p>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- Resources & Websites -->
-    <section class="mb-12">
-      <div class="rounded-lg p-6 bg-white/70 shadow-sm">
-        <h2 class="text-2xl mb-4">Websites and Resources</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 kanit-regular">
-          <div>
+    <!-- 5. Websites and Resources -->
+    <section class="mb-10">
+      <div class="rounded-lg p-6 bg-white/90 shadow-sm">
+        <h2 class="text-2xl font-bold mb-3">Websites and Resources</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="p-4 bg-gray-50 rounded">
             <p class="font-bold">The National Autistic Society</p>
-            <p class="text-sm text-gray-700 mb-2">Guides, local services and practical advice.</p>
-            <a href="https://www.autism.org.uk/" target="_blank" class="text-violet-red font-bold text-sm">Visit</a>
+            <p class="text-sm mb-2">Guides, local services and practical advice.</p>
+            <a href="https://www.autism.org.uk/" target="_blank" class="resource-link">Visit</a>
           </div>
-          <div>
+
+          <div class="p-4 bg-gray-50 rounded">
             <p class="font-bold">Autism UK</p>
-            <p class="text-sm text-gray-700 mb-2">Information and community resources.</p>
-            <a href="https://www.autismuk.org.uk/" target="_blank" class="text-violet-red font-bold text-sm">Visit</a>
+            <p class="text-sm mb-2">Information and community resources.</p>
+            <a href="https://www.autismuk.org.uk/" target="_blank" class="resource-link">Visit</a>
           </div>
-          <div>
+
+          <div class="p-4 bg-gray-50 rounded">
             <p class="font-bold">Neurodiversity Hub</p>
-            <p class="text-sm text-gray-700 mb-2">Resources on autism, ADHD and other differences.</p>
-            <a href="https://www.neurodiversityhub.org/" target="_blank" class="text-violet-red font-bold text-sm">Visit</a>
+            <p class="text-sm mb-2">Resources on autism, ADHD and other differences.</p>
+            <a href="https://www.neurodiversityhub.org/" target="_blank" class="resource-link">Visit</a>
           </div>
-          <div>
+
+          <div class="p-4 bg-gray-50 rounded">
             <p class="font-bold">Young Minds</p>
-            <p class="text-sm text-gray-700 mb-2">Mental health support for young people.</p>
-            <a href="https://www.youngminds.org.uk/" target="_blank" class="text-violet-red font-bold text-sm">Visit</a>
+            <p class="text-sm mb-2">Mental health support for young people.</p>
+            <a href="https://www.youngminds.org.uk/" target="_blank" class="resource-link">Visit</a>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Money/Support -->
-    <section class="mb-12">
-      <div class="rounded-lg p-6 bg-white/70 shadow-sm">
-        <h2 class="text-2xl mb-3">Money and practical support (for parents and carers)</h2>
-        <p class="kanit-regular mb-4">Families may be eligible for financial help and practical services.</p>
-        <ul class="kanit-regular list-disc pl-6 space-y-2 text-sm">
-          <li><strong>Disability Living Allowance (DLA)</strong>  -  help with care and daily activities.</li>
-          <li><strong>School support</strong>  -  in-school therapies and help with learning.</li>
-          <li><strong>Local council support</strong>  -  short breaks, equipment and grants.</li>
+    <!-- 6. Money and Practical Support -->
+    <section class="mb-10">
+      <div class="rounded-lg p-6 bg-white/90 shadow-sm">
+        <h2 class="text-2xl font-bold mb-3">Money and Practical Support</h2>
+        <p class="mb-3">Families may be eligible for financial help and practical services. Check with your GP or local council.</p>
+        <ul class="list-disc pl-6 space-y-2 text-sm">
+          <li><strong>Disability Living Allowance (DLA)</strong> — help with care and daily activities.</li>
+          <li><strong>School support</strong> — in-school therapies and help with learning.</li>
+          <li><strong>Local council support</strong> — short breaks, equipment and grants.</li>
         </ul>
-        <p class="kanit-regular text-sm text-gray-700 mt-4">Contact your GP or local council for details and how to apply.</p>
+        <p class="text-sm text-gray-600 mt-4">If you need help applying, your GP, school or local support groups can help you find the right forms and advice.</p>
       </div>
     </section>
 
-    <!-- Reminder (removed from page but kept here in case you want it) -->
-    <!--
-    <section class="mb-8 p-6 rounded-lg bg-yellow-50 border-l-4 border-yellow-400">
-      <p class="kanit-regular text-lg"><strong>Remember:</strong> You are not alone. There are people and services that want to help. It's okay to ask for support.</p>
-    </section>
-    -->
   </div>
 </MainLayout>
+
+<script is:inline>
+(function () {
+  if (window.__cw_help_button_bound) return;
+  window.__cw_help_button_bound = true;
+
+  function openChatFab() {
+    // Try to click the existing FAB; if not present yet, retry briefly
+    const fab = document.getElementById('cw-launch');
+    if (fab) {
+      fab.click();
+      return;
+    }
+    // retry a couple times if DOM not ready (useful on client nav)
+    let tries = 0;
+    const t = setInterval(() => {
+      const f = document.getElementById('cw-launch');
+      if (f) {
+        clearInterval(t);
+        f.click();
+      } else if (++tries > 6) {
+        clearInterval(t);
+      }
+    }, 200);
+  }
+
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest && e.target.closest('#cw-launch-from-help');
+    if (!btn) return;
+    openChatFab();
+    e.preventDefault();
+  });
+
+  // Also handle keyboard activation for accessibility
+  document.addEventListener('keydown', (e) => {
+    const active = document.activeElement;
+    if (active && active.id === 'cw-launch-from-help' && (e.key === 'Enter' || e.key === ' ')) {
+      e.preventDefault();
+      openChatFab();
+    }
+  });
+
+  // If you want the chat to open directly when the user clicks the CTA link,
+  // you can also expose a global helper:
+  window.openSiteChat = openChatFab;
+})();
+</script>

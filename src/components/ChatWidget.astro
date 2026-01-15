@@ -23,7 +23,7 @@
     aria-label="Chat panel"
   >
     <header class="cw-header">
-      <strong>Caring Hearts — Chat</strong>
+      <strong>Care Bot</strong>
       <button id="cw-close" class="cw-close" aria-label="Close">✕</button>
     </header>
 
@@ -37,35 +37,42 @@
 </div>
 
 <script is:inline>
-document.addEventListener("DOMContentLoaded", () => {
-  const panel = document.getElementById("cw-panel");
-  const btnLaunch = document.getElementById("cw-launch");
-  const btnClose = document.getElementById("cw-close");
-  const body = document.getElementById("cw-body");
-  const input = document.getElementById("cw-input");
-  const btnSend = document.getElementById("cw-send");
+(function () {
+  if (window.__cw_delegation_installed) return;
+  window.__cw_delegation_installed = true;
+
+  // Helper to read current nodes (always uses the live DOM)
+  function nodes() {
+    return {
+      panel: document.getElementById('cw-panel'),
+      btnLaunch: document.getElementById('cw-launch'),
+      btnClose: document.getElementById('cw-close'),
+      body: document.getElementById('cw-body'),
+      input: document.getElementById('cw-input'),
+      btnSend: document.getElementById('cw-send')
+    };
+  }
 
   function openPanel() {
-    panel.setAttribute("aria-hidden", "false");
-    btnLaunch.setAttribute("aria-expanded", "true");
-    input.focus();
+    const { panel, input, btnLaunch } = nodes();
+    if (!panel) return;
+    panel.setAttribute('aria-hidden', 'false');
+    if (btnLaunch) btnLaunch.setAttribute('aria-expanded', 'true');
+    if (input) input.focus();
   }
 
   function closePanel() {
-    panel.setAttribute("aria-hidden", "true");
-    btnLaunch.setAttribute("aria-expanded", "false");
+    const { panel, btnLaunch } = nodes();
+    if (!panel) return;
+    panel.setAttribute('aria-hidden', 'true');
+    if (btnLaunch) btnLaunch.setAttribute('aria-expanded', 'false');
   }
 
-  btnLaunch.addEventListener("click", () => {
-    const hidden = panel.getAttribute("aria-hidden") === "true";
-    hidden ? openPanel() : closePanel();
-  });
-
-  btnClose.addEventListener("click", closePanel);
-
-  function addMessage(text, from = "bot") {
-    const d = document.createElement("div");
-    d.className = "msg " + (from === "user" ? "user" : "bot");
+  function addMessage(text, from = 'bot') {
+    const { body } = nodes();
+    if (!body) return null;
+    const d = document.createElement('div');
+    d.className = 'msg ' + (from === 'user' ? 'user' : 'bot');
     d.textContent = text;
     body.appendChild(d);
     body.scrollTop = body.scrollHeight;
@@ -74,15 +81,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function sendMessageToServer(message) {
     try {
-      const res = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message })
       });
 
-      const contentType = res.headers.get("content-type") || "";
+      const contentType = res.headers.get('content-type') || '';
       if (!res.ok) {
-        if (contentType.includes("application/json")) {
+        if (contentType.includes('application/json')) {
           const errJson = await res.json();
           throw new Error(errJson.error || JSON.stringify(errJson));
         } else {
@@ -91,42 +98,167 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       }
 
-      if (!contentType.includes("application/json")) {
+      if (!contentType.includes('application/json')) {
         const text = await res.text();
-        throw new Error("Unexpected response: " + text);
+        throw new Error('Unexpected response: ' + text);
       }
 
       const data = await res.json();
       return data.reply || data.error || null;
     } catch (err) {
-      console.error("sendMessageToServer error:", err);
+      console.error('sendMessageToServer error:', err);
       throw err;
     }
   }
 
-  btnSend.addEventListener("click", async () => {
-    const v = input.value.trim();
-    if (!v) return;
+  // Delegated click handler so it survives DOM swaps
+  document.addEventListener('click', (e) => {
+    const launch = e.target.closest && e.target.closest('#cw-launch');
+    const close = e.target.closest && e.target.closest('#cw-close');
+    const send = e.target.closest && e.target.closest('#cw-send');
 
-    addMessage(v, "user");
-    input.value = "";
-
-    const thinkingEl = addMessage("Thinking...", "bot");
-
-    try {
-      const reply = await sendMessageToServer(v);
-      thinkingEl.textContent = reply ?? "No reply";
-    } catch (err) {
-      thinkingEl.textContent = "Error: " + (err.message || "Request failed");
-    }
-  });
-
-  input.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") {
+    if (launch) {
+      const { panel } = nodes();
+      const hidden = panel && panel.getAttribute('aria-hidden') === 'true';
+      hidden ? openPanel() : closePanel();
       e.preventDefault();
-      btnSend.click();
+      return;
     }
-    if (e.key === "Escape") closePanel();
+
+    if (close) {
+      closePanel();
+      e.preventDefault();
+      return;
+    }
+
+    if (send) {
+      const { input } = nodes();
+      if (!input) return;
+      const v = input.value.trim();
+      if (!v) return;
+      addMessage(v, 'user');
+      input.value = '';
+      const thinkingEl = addMessage('Thinking...', 'bot');
+      sendMessageToServer(v).then(reply => {
+        if (thinkingEl) thinkingEl.textContent = reply ?? 'No reply';
+      }).catch(err => {
+        if (thinkingEl) thinkingEl.textContent = 'Error: ' + (err.message || 'Request failed');
+      });
+      e.preventDefault();
+      return;
+    }
   });
-});
+
+  // Key handling delegated to document
+  document.addEventListener('keydown', (e) => {
+    const active = document.activeElement;
+    if (active && active.id === 'cw-input' && e.key === 'Enter') {
+      e.preventDefault();
+      const sendBtn = document.getElementById('cw-send');
+      if (sendBtn) sendBtn.click();
+    }
+    if (e.key === 'Escape') {
+      closePanel();
+    }
+  });
+
+  // Close panel and reset on client-side navigation
+  document.addEventListener('astro:page-load', () => {
+    try {
+      closePanel();
+    } catch (err) {
+      console.error('chat reinit after navigation', err);
+    }
+  });
+})();
+</script>
+
+
+<script is:inline>
+(function () {
+  // idempotent bubble installer
+  if (window.__cw_bubble_installed) return;
+  window.__cw_bubble_installed = true;
+
+  const ROOT_ID = 'chatwidget-root';
+  const BUBBLE_ID = 'cw-bubble';
+  const SHOW_DELAY_MS = 2200; // delay before first show
+  const RESHOW_AFTER_NAV_MS = 2000; // delay after navigation
+
+  function createBubble() {
+    const root = document.getElementById(ROOT_ID);
+    if (!root) return null;
+    if (document.getElementById(BUBBLE_ID)) return document.getElementById(BUBBLE_ID);
+
+    const b = document.createElement('button');
+    b.id = BUBBLE_ID;
+    b.type = 'button';
+    b.setAttribute('aria-label', 'Open chat');
+    b.className = '';
+    b.innerHTML = `<span class="cw-bubble-text">What's up? Do you want to chat?</span><span aria-hidden="true"></span>`;
+    // ensure it doesn't steal focus on creation
+    b.tabIndex = -1;
+    root.appendChild(b);
+    return b;
+  }
+
+  function showBubble(opts = {}) {
+    const b = createBubble();
+    if (!b) return;
+    b.classList.add('show', 'pulse');
+    b.style.display = '';
+    // make it focusable after it appears
+    setTimeout(() => b.tabIndex = 0, 300);
+    // remove pulse after a short time
+    setTimeout(() => b.classList.remove('pulse'), 2200);
+    if (opts.autoHideMs) {
+      setTimeout(() => hideBubble(), opts.autoHideMs);
+    }
+  }
+
+  function hideBubble() {
+    const b = document.getElementById(BUBBLE_ID);
+    if (!b) return;
+    b.classList.remove('show', 'pulse');
+    // keep it in DOM but visually hide so it can be re-shown
+    b.style.display = 'none';
+    b.tabIndex = -1;
+  }
+
+  // open chat when bubble clicked
+  document.addEventListener('click', (e) => {
+    const b = e.target.closest && e.target.closest('#' + BUBBLE_ID);
+    if (!b) return;
+    // trigger the same behavior as clicking the FAB
+    const fab = document.getElementById('cw-launch');
+    if (fab) fab.click();
+    // hide bubble once user interacts
+    hideBubble();
+    e.preventDefault();
+  });
+
+  // hide bubble when panel opens via other means
+  const observer = new MutationObserver(() => {
+    const panel = document.getElementById('cw-panel');
+    if (!panel) return;
+    const hidden = panel.getAttribute('aria-hidden') === 'true';
+    if (!hidden) hideBubble();
+  });
+  const root = document.getElementById(ROOT_ID);
+  if (root) observer.observe(root, { childList: true, subtree: true });
+
+  // show after initial delay
+  setTimeout(() => showBubble({ autoHideMs: 8000 }), SHOW_DELAY_MS);
+
+  // re-show after client-side navigation if user hasn't opened it
+  document.addEventListener('astro:page-load', () => {
+    // small delay so DOM settles
+    setTimeout(() => {
+      const panel = document.getElementById('cw-panel');
+      const isOpen = panel && panel.getAttribute('aria-hidden') === 'false';
+      if (!isOpen) showBubble();
+    }, RESHOW_AFTER_NAV_MS);
+  });
+
+})();
 </script>

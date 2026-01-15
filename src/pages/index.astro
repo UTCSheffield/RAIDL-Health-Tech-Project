@@ -105,6 +105,23 @@ import { withBase } from "../utils/helpers";
     </div>
   </div>
 </section>
+<!-- Autism timeline (compact, interactive) -->
+<section id="autism-spectrum" class="autism-timeline" aria-label="Autism spectrum overview">
+  <h2 class="sr-only">Autism spectrum at a glance</h2>
+  <div class="timeline" role="list">
+    <button class="node" data-key="early" aria-describedby="tip" role="listitem">Early signs</button>
+    <button class="node" data-key="senses" aria-describedby="tip" role="listitem">Senses</button>
+    <button class="node" data-key="social" aria-describedby="tip" role="listitem">Social</button>
+    <button class="node" data-key="interests" aria-describedby="tip" role="listitem">Interests</button>
+    <button class="node" data-key="check" aria-describedby="tip" role="listitem">Getting checked</button>
+    <button class="node" data-key="support" aria-describedby="tip" role="listitem">Support</button>
+  </div>
+
+  <div id="tip" class="timeline-tip" role="status" aria-live="polite">
+    Hover or tap a point to learn more.
+  </div>
+</section>
+
 
 
   <section class="relative py-35 px-4 bg-gradient-to-r from-orange-500 via-amber-500 to-rose-500 text-white overflow-hidden">
@@ -278,6 +295,76 @@ import { withBase } from "../utils/helpers";
   })();
   
 </script>
+
+
+<script is:inline>
+(function () {
+  // Tip texts (kept simple and evidence-aligned)
+  var TIPS = {
+    early: "You may notice differences in play, speech or routines. These can show up early in childhood.",
+    senses: "Lights, sounds, touch or food can feel too strong or too weak. This is common and can be managed with simple tools.",
+    social: "Reading social cues or joining groups can be hard. Small steps and clear instructions help.",
+    interests: "Having strong interests is normal and can be a strength for learning and work.",
+    check: "If you want answers, talk to your GP. They can refer you for an assessment if needed.",
+    support: "Small changes (quiet spaces, clear routines, sensory tools) and people who understand make a big difference."
+  };
+
+  var tipEl = document.getElementById('tip');
+  if (!tipEl) return;
+
+  // Collect nodes and ensure they are HTMLButtonElement-like
+  var nodeList = Array.prototype.slice.call(document.querySelectorAll('.autism-timeline .node'));
+  var nodes = nodeList.filter(function (n) { return n && typeof n.addEventListener === 'function'; });
+
+  function clearActive() {
+    nodes.forEach(function (n) { n.classList.remove('active'); });
+  }
+
+  function showTip(key, node) {
+    if (!tipEl) return;
+    tipEl.textContent = TIPS[key] || 'More info coming soon.';
+    clearActive();
+    if (node && node.classList) node.classList.add('active');
+  }
+
+  nodes.forEach(function (btn) {
+    var keyAttr = btn.getAttribute('data-key');
+    if (!keyAttr) return;
+    var key = keyAttr;
+
+    btn.addEventListener('mouseenter', function () { showTip(key, btn); });
+    btn.addEventListener('focus', function () { showTip(key, btn); });
+    btn.addEventListener('click', function () { showTip(key, btn); });
+
+    // touch-friendly: toggle on tap (prevent default to avoid double events)
+    btn.addEventListener('touchstart', function (e) {
+      e.preventDefault();
+      showTip(key, btn);
+    }, { passive: false });
+  });
+
+  // keyboard: arrow navigation between nodes
+  document.addEventListener('keydown', function (e) {
+    var active = document.activeElement;
+    if (!active || !active.classList || !active.classList.contains('node')) return;
+    var idx = nodes.indexOf(active);
+    if (idx === -1) return;
+
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+      var next = nodes[(idx + 1) % nodes.length];
+      if (next && typeof next.focus === 'function') next.focus();
+      if (next) showTip(next.getAttribute('data-key'), next);
+      e.preventDefault();
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+      var prev = nodes[(idx - 1 + nodes.length) % nodes.length];
+      if (prev && typeof prev.focus === 'function') prev.focus();
+      if (prev) showTip(prev.getAttribute('data-key'), prev);
+      e.preventDefault();
+    }
+  });
+})();
+</script>
+
 
 
 </MainLayout>

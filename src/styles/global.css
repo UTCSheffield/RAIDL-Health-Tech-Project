@@ -1203,3 +1203,216 @@ html[data-mode="calm"] .blinking {
 }
 
 
+
+
+/* Chat bubble styles */
+/* bubble container */
+#cw-bubble {
+  position: absolute;
+  right: 76px;               /* move it left of the FAB; tweak as needed */
+  bottom: 18px;
+  min-width: 160px;         /* ensures it isn't too small */
+  max-width: 320px;         /* prevents it from growing too wide on large screens */
+  padding: 10px 14px;       /* more breathing room for text */
+  border-radius: 999px;
+  background: linear-gradient(90deg, #fb8a56 0%, #8d3db8 100%);
+  color: #fff;
+  font-weight: 600;
+  font-size: 13px;
+  line-height: 1.2;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.18);
+  z-index: 100001;
+  cursor: pointer;
+  pointer-events: auto;
+  user-select: none;
+  white-space: normal;      /* allow wrapping */
+  word-break: break-word;   /* break long words if needed */
+  overflow: visible;
+}
+
+/* caret (small triangle) */
+#cw-bubble::after {
+  content: "";
+  position: absolute;
+  right: -6px;              /* small offset so caret sits near FAB */
+  bottom: 10px;
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 6px solid rgba(0,0,0,0.06);
+  transform: translateX(0);
+}
+
+/* optional: make text truncate on very small screens */
+@media (max-width: 420px) {
+  #cw-bubble {
+    min-width: 120px;
+    max-width: 200px;
+    font-size: 12px;
+  }
+}
+
+
+/* pop animation */
+@keyframes cw-pop {
+  0% { transform: scale(0.85); opacity: 0; }
+  60% { transform: scale(1.05); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+#cw-bubble.show {
+  animation: cw-pop 360ms cubic-bezier(.2,.9,.3,1);
+}
+
+/* subtle pulse to draw attention (optional) */
+#cw-bubble.pulse {
+  box-shadow: 0 6px 18px rgba(0,0,0,0.18), 0 0 0 6px rgba(139, 58, 173, 0.08);
+}
+
+/* Help page cards and emphasis */
+.card { box-shadow: 0 6px 18px rgba(11,15,20,0.06); }
+
+
+/* CTA highlight (used for primary links) */
+.highlight-cta {
+  background: linear-gradient(90deg, var(--brand-warm), var(--brand-secondary));
+  color: white;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  text-decoration: none;
+  display: inline-block;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+}
+
+/* Buttons inside cards */
+.btn-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #ef4444; /* red for urgent actions */
+  color: white;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-weight: 700;
+  text-decoration: none;
+}
+.btn-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  color: var(--brand-secondary);
+  padding: 8px 12px;
+  border-radius: 8px;
+  text-decoration: underline;
+  font-weight: 600;
+}
+
+/* Resource link style */
+.resource-link {
+  display: inline-block;
+  margin-top: 8px;
+  color: var(--brand-warm);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+/* Make phone numbers very visible */
+.card .text-2xl { letter-spacing: -0.5px; }
+
+/* Slightly larger body text for readability */
+.page-content p, .page-content li {
+  font-size: 1rem;
+  line-height: 1.45;
+}
+
+/* Reduce visual clutter on calm mode (respect your existing tokens) */
+html[data-mode="calm"] .highlight-cta {
+  box-shadow: none;
+  background: linear-gradient(90deg, var(--brand-primary), var(--brand-secondary));
+}
+
+/* Small responsive tweaks */
+@media (max-width: 640px) {
+  .highlight-cta { width: 100%; text-align: center; }
+  .btn-cta, .btn-link { width: auto; }
+}
+
+/* Make the emergency section header and intro text white */
+.emergency-card {
+  color: #ffffff; /* primary text color for the red box */
+}
+
+/* Ensure the main heading and paragraph inside the red box are white */
+.emergency-card h2,
+.emergency-card > p,
+.emergency-card .mb-4,
+.emergency-card .text-sm {
+  color: #000000;
+}
+
+/* Keep the inner white cards readable (dark text on light card background) */
+.emergency-card .card {
+  background: #ffffff;
+  color: var(--brand-dark);
+}
+
+/* Make phone numbers and urgent CTAs stand out inside the inner cards */
+.emergency-card .card .text-2xl,
+.emergency-card .card .font-extrabold {
+  color: #b91c1c; /* strong red for phone numbers (adjust if needed) */
+}
+
+/* Ensure CTA buttons inside the red area remain visible */
+.emergency-card .btn-cta {
+  background: #ffffff;      /* white button */
+  color: #b91c1c;           /* red text to match urgency */
+  font-weight: 800;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+}
+
+/* If you want the header to use a slightly stronger white for contrast */
+.emergency-card h2 {
+  text-shadow: 0 1px 0 rgba(0,0,0,0.12);
+}
+
+.autism-timeline { max-width: 980px; margin: 2rem auto; padding: 0 1rem; }
+.timeline { display:flex; gap:12px; justify-content:space-between; align-items:center; }
+.node {
+  background:#fff; border:1px solid #e6e6e6; padding:10px 12px; border-radius:999px;
+  min-width:92px; text-align:center; cursor:pointer; transition:transform .18s, box-shadow .18s;
+  box-shadow:0 4px 10px rgba(0,0,0,0.04);
+}
+.node:focus, .node:hover { transform:translateY(-6px); box-shadow:0 10px 22px rgba(0,0,0,0.08); outline:none; }
+.timeline-tip {
+  margin-top:12px; padding:12px; border-radius:8px; background:linear-gradient(90deg,#fef3f2,#fff7ed);
+  color:#111; font-size:0.98rem; min-height:56px;
+}
+/* mobile: stack vertically */
+@media (max-width:640px) {
+  .timeline { flex-wrap:wrap; gap:10px; }
+  .node { flex:1 1 45%; min-width:120px; }
+}
+.autism-timeline { max-width: 980px; margin: 2rem auto; padding: 0 1rem; }
+.timeline { display:flex; gap:12px; justify-content:space-between; align-items:center; }
+.node {
+  background:#fff; border:1px solid #e6e6e6; padding:10px 12px; border-radius:999px;
+  min-width:92px; text-align:center; cursor:pointer; transition:transform .18s, box-shadow .18s;
+  box-shadow:0 4px 10px rgba(0,0,0,0.04);
+}
+.node:focus, .node:hover { transform:translateY(-6px); box-shadow:0 10px 22px rgba(0,0,0,0.08); outline:none; }
+.timeline-tip {
+  margin-top:12px; padding:12px; border-radius:8px; background:linear-gradient(90deg,#fef3f2,#fff7ed);
+  color:#111; font-size:0.98rem; min-height:56px;
+}
+/* mobile: stack vertically */
+@media (max-width:640px) {
+  .timeline { flex-wrap:wrap; gap:10px; }
+  .node { flex:1 1 45%; min-width:120px; }
+}
+
+
