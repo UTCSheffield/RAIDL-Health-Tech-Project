@@ -4,7 +4,7 @@ import type { CollectionEntry } from "astro:content";
 import FormattedDate from "./FormattedDate.astro";
 import { withBase } from "../utils/helpers";
 
-type Props = { post: CollectionEntry<"blogs"> };
+type Props = { post: CollectionEntry<"articles"> };
 const { post } = Astro.props as Props;
 
 // frontmatter and values
@@ -23,7 +23,7 @@ const slug =
 
 // import images as URL strings (eager)
 const blogImages = import.meta.glob(
-  '/src/content/blogs/**/images/*.{png,jpg,jpeg,webp,gif,svg}',
+  '/src/content/articles/**/images/*.{png,jpg,jpeg,webp,gif,svg}',
   { eager: true, query: '?url', import: 'default' }
 ) as Record<string, string>;
 
@@ -41,7 +41,7 @@ function resolveImageUrl(relPath?: string | null): string | null {
 const imageUrl = image ? (typeof image.url === 'string' ? resolveImageUrl(image.url) : image.url?.src ?? image.url?.default ?? null) : null;
 ---
 
-<a class="font-bold" href={withBase(slug ? `/blog/${slug}` : `/blog`)}>
+<a class="font-bold" href={withBase(slug ? `/articles/${slug}` : `/articles`)}>
   <div class="flex flex-col sm:flex-row gap-2 sm:gap-4">
     {imageUrl ? (
       <img

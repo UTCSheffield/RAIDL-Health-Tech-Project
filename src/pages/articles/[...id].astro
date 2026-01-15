@@ -14,7 +14,7 @@ import ArrowRight from "../../icons/ArrowRight.astro";
 import siteConfig from "../../site.config";
 
 export async function getStaticPaths() {
-  const posts = (await getCollection("blogs")).sort(sortItemsByDateDesc);
+  const posts = (await getCollection("articles")).sort(sortItemsByDateDesc);
   const postCount = posts.length;
   return posts.map((p, index) => ({
     params: { id: p.id },
@@ -27,9 +27,9 @@ export async function getStaticPaths() {
 }
 
 type Props = {
-  post: CollectionEntry<"blogs">;
-  prevPost: CollectionEntry<"blogs"> | null;
-  nextPost: CollectionEntry<"blogs"> | null;
+  post: CollectionEntry<"articles">;
+  prevPost: CollectionEntry<"articles"> | null;
+  nextPost: CollectionEntry<"articles"> | null;
 };
 
 // single destructure of Astro.props

@@ -1,6 +1,6 @@
 import { type CollectionEntry } from 'astro:content';
 
-export function sortItemsByDateDesc(itemA: CollectionEntry<'blogs'>, itemB: CollectionEntry<'blogs'>) {
+export function sortItemsByDateDesc(itemA: CollectionEntry<'articles'>, itemB: CollectionEntry<'articles'>) {
     return new Date(itemB.data.pubDate).getTime() - new Date(itemA.data.pubDate).getTime();
 }
 
@@ -13,7 +13,7 @@ export function createSlugFromTitle(title: string): string {
         .replace(/-+/g, '-'); // Replace multiple hyphens with a single hyphen
 }
 
-export function getAllTags(posts: CollectionEntry<'blogs'>[]) {
+export function getAllTags(posts: CollectionEntry<'articles'>[]) {
     const tags: string[] = [...new Set(posts.flatMap((post) => post.data.tags || []).filter(Boolean))];
     return tags
         .map((tag) => {
@@ -27,8 +27,8 @@ export function getAllTags(posts: CollectionEntry<'blogs'>[]) {
         });
 }
 
-export function getPostsByTag(posts: CollectionEntry<'blogs'>[], tagId: string) {
-    const filteredPosts: CollectionEntry<'blogs'>[] = posts.filter((post) => (post.data.tags || []).map((tag) => createSlugFromTitle(tag)).includes(tagId));
+export function getPostsByTag(posts: CollectionEntry<'articles'>[], tagId: string) {
+    const filteredPosts: CollectionEntry<'articles'>[] = posts.filter((post) => (post.data.tags || []).map((tag) => createSlugFromTitle(tag)).includes(tagId));
     return filteredPosts;
 }
 

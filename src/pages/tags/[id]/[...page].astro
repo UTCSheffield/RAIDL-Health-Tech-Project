@@ -13,7 +13,7 @@ import Pagination from "../../../components/Pagination.astro";
 import PostListPreview from "../../../components/PostListPreview.astro";
 
 export async function getStaticPaths({ paginate }: GetStaticPathsOptions) {
-  const posts = (await getCollection("blogs")).sort(sortItemsByDateDesc);
+  const posts = (await getCollection("articles")).sort(sortItemsByDateDesc);
   const tags = getAllTags(posts);
 
   return tags.flatMap((tag) => {
@@ -25,12 +25,12 @@ export async function getStaticPaths({ paginate }: GetStaticPathsOptions) {
   });
 }
 
-type Props = { page: Page<CollectionEntry<"blogs">> };
+type Props = { page: Page<CollectionEntry<"articles">> };
 
 const { page } = Astro.props;
 const blog = page.data;
 const params = Astro.params;
-const allPosts = await getCollection("blogs", (post) =>
+const allPosts = await getCollection("articles", (post) =>
   post.data.tags?.includes(params.id)
 );
 const allTags = getAllTags(allPosts);
