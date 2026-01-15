@@ -337,7 +337,7 @@ html.dark .site-nav {
   width: calc(var(--size) * 0.6);
   height: calc(var(--size) * 0.6);
   border-radius: 999px;
-  background: var(--brand-light);
+  background: rgba(196, 196, 196, 100);
   box-shadow: 0 2px 6px rgba(11,15,20,0.08);
   transition: transform 220ms cubic-bezier(.2,.9,.3,1), background 220ms ease;
   display: inline-block;
@@ -836,7 +836,7 @@ html[data-mode="calm"]::view-transition-new(root) {
   width: var(--mode-knob-size);
   height: var(--mode-knob-size);
   border-radius: 50%;
-  background: var(--brand-light);
+  background: rgba(196, 196, 196, 100);
   box-shadow: 0 6px 14px rgba(11,15,20,0.12);
   transition: left .22s cubic-bezier(.23,.9,.32,1), background .22s ease, box-shadow .18s ease;
   z-index: 2; /* above labels */
@@ -895,7 +895,7 @@ html[data-mode="calm"]::view-transition-new(root) {
   width: var(--mode-knob-size);
   height: var(--mode-knob-size);
   border-radius: 50%;
-  background: var(--brand-light);
+  background: rgba(196, 196, 196, 100);
   box-shadow: 0 6px 14px rgba(11,15,20,0.12);
   transition: left .22s cubic-bezier(.23,.9,.32,1), background .22s ease, box-shadow .18s ease;
   z-index: 2;
