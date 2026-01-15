@@ -42,12 +42,14 @@ import { withBase } from "../utils/helpers";
   decoding="async"
 />
     <figcaption id="rotator-caption" class="text-sm text-gray-600 mt-2 sr-only">Photo credit</figcaption>
-
-
+  </figure>
+  </div>
+  </div>
   </section>
 
+
   <!-- Flowing Mission Section -->
- <section id="about-us" class="relative py-32 px-4 bg-gradient-to-b from-white to-blue-50 dark:from-gray-800 dark:to-indigo-900 overflow-hidden">
+ <section id="about-us" class="relative py-0 px-4 bg-gradient-to-b from-white to-blue-50 dark:from-gray-800 dark:to-indigo-900 overflow-hidden">
   <div class="absolute inset-0 bg-gradient-to-r from-transparent via-blue-100/20 to-transparent dark:via-indigo-800/20"></div>
   <div class="relative max-w-screen-xl mx-auto">
     <div class="text-center mb-12">
@@ -105,11 +107,11 @@ import { withBase } from "../utils/helpers";
 </section>
 
 
-  <section class="relative py-32 px-4 bg-gradient-to-r from-orange-500 via-amber-500 to-rose-500 text-white overflow-hidden">
-    <div class="absolute inset-0 bg-gradient-to-br from-orange-600/20 via-amber-600/20 to-rose-600/20" style="border-radius: 20%; margin-top: 40px;"></div>
+  <section class="relative py-35 px-4 bg-gradient-to-r from-orange-500 via-amber-500 to-rose-500 text-white overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-br from-orange-600/20 via-amber-600/20 to-rose-600/20" style="border-radius: 20%; margin-top: 40px; width: fit-content;"></div>
 
     <div class="relative text-center">
-      <button id="openPositiveMessages" class="bg-white text-orange-600 px-12 py-6 rounded-full font-bold text-xl hover:bg-gray-100 transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:-translate-y-1">
+      <button id="openPositiveMessages" class="bg-gradient-to-r from-orange-500 via-amber-500 to-rose-500 text-white px-12 py-6 rounded-full font-bold text-xl hover:bg-gray-100 transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:-translate-y-1">
         If you're feeling down or just want a feel-good message use this!
       </button>
     </div>
@@ -119,8 +121,8 @@ import { withBase } from "../utils/helpers";
     <div class="mx-auto text-center" style="width:1000px;max-width:100%;">
       <div class="rounded-2xl p-8 bg-white/80 shadow-xl">
         <h2 class="text-3xl font-bold mb-4">Just for you...</h2>
-        <p id="messageBox" class="mt-4 text-lg min-h-[80px] transition-opacity duration-300 mx-auto">Click the button when you’re ready.</p>
-        <button id="generateBtn" class="mt-6 px-6 py-3 rounded-full bg-teal-500 text-white font-semibold hover:bg-teal-600 transition-transform duration-200 hover:scale-105">
+        <p id="messageBox" class="text-lg min-h-[80px] transition-opacity duration-300 mx-auto">Click the button when you’re ready.</p>
+        <button id="generateBtn" class="px-6 py-3 rounded-full bg-teal-500 text-white font-semibold hover:bg-teal-600 transition-transform duration-200 hover:scale-105">
           Generate Message
         </button>
       </div>
