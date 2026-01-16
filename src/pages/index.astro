@@ -2,7 +2,7 @@
 import MainLayout from "../layouts/MainLayout.astro";
 import siteConfig from "../site.config";
 import { withBase } from "../utils/helpers";
----
+--- 
 
 <MainLayout activePage="home" pageTitle={siteConfig.title}>
   <!-- Hero Section -->
@@ -106,24 +106,221 @@ import { withBase } from "../utils/helpers";
   </div>
 </section>
 
-<section id="autism-spectrum" class="spectrum-timeline" aria-label="Autism spectrum overview">
-  <h2 class="sr-only">Autism spectrum at a glance</h2>
+<!-- Replace your existing shapes section with this updated snippet.
+     The description card now has a fixed width so its size won't change layout. -->
+<section id="autism-shapes" class="shapes-section" aria-labelledby="shapes-heading">
+  <h2 id="shapes-heading" class="shapes-title">Autism Specturm</h2>
+  <p class="shapes-sub">Austism isn't a line from least to most severe... its many things which connect together in many different ways.</p>
 
-  <div class="timeline-track" role="list" aria-hidden="false">
-    <div class="track-line" aria-hidden="true"></div>
+  <div class="shapes-canvas" id="shapesCanvas" role="application" aria-describedby="shapes-desc">
+    <svg id="shapesLines" class="shapes-lines" aria-hidden="true"></svg>
 
-    <button class="node" data-key="level1" aria-describedby="tip" role="listitem">Level 1</button>
-    <button class="node" data-key="level2" aria-describedby="tip" role="listitem">Level 2</button>
-    <button class="node" data-key="level3" aria-describedby="tip" role="listitem">Level 3</button>
-    <button class="node" data-key="level4" aria-describedby="tip" role="listitem">Level 4</button>
-    <button class="node" data-key="level5" aria-describedby="tip" role="listitem">Level 5</button>
-    <button class="node" data-key="level6" aria-describedby="tip" role="listitem">Level 6</button>
+    <div class="shapes-grid" id="shapesGrid">
+      <button class="shape circle" data-id="social" aria-label="Social communication">Social communication</button>
+      <button class="shape triangle" data-id="sensory" aria-label="Sensory experience">Sensory experience</button>
+      <button class="shape square" data-id="routines" aria-label="Routines and change">Routines &amp; change</button>
+      <button class="shape blob" data-id="emotions" aria-label="Emotional regulation">Emotional regulation</button>
+      <button class="shape hexagon" data-id="focus" aria-label="Focus and interests">Focus &amp; interests</button>
+      <button class="shape diamond" data-id="executive" aria-label="Executive functioning">Executive functioning</button>
+    </div>
   </div>
 
-  <div id="tip" class="timeline-tip" role="status" aria-live="polite">
-    Hover, focus or tap a point to learn about that part of the spectrum.
+  <!-- Fixed-width description card (does not change layout when text changes) -->
+  <div id="shapeCard" class="shape-card" role="region" aria-live="polite" aria-hidden="true">
+    <div class="shape-card__inner">
+      <h3 id="cardTitle"></h3>
+      <p id="cardText"></p>
+    </div>
   </div>
 </section>
+
+<style>
+  .shapes-section { padding: 28px 16px; max-width: 980px; margin: 0 auto; color: #0b1220; }
+  .shapes-title { margin: 0 0 6px; font-size: 1.25rem; }
+  .shapes-sub { margin: 0 0 18px; color: #6b7280; font-size: .95rem; }
+
+  .shapes-canvas { position: relative; width: 100%; background: transparent; border-radius: 10px; }
+  .shapes-lines { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+
+  /* Grid of shapes (responsive) */
+  .shapes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 18px;
+    padding: 12px;
+  }
+
+  /* Generic shape styling */
+  .shape {
+    --size: 110px;
+    height: var(--size);
+    min-height: 84px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    box-sizing: border-box;
+    border: none;
+    cursor: pointer;
+    user-select: none;
+    transition: transform .16s ease, box-shadow .16s ease;
+    text-align: center;
+    font-weight: 700;
+    color: #071023;
+    line-height: 1.05;
+    font-size: clamp(12px, 1.6vw, 14px);
+    white-space: normal;
+    word-break: break-word;
+    border-radius: 14px;
+    background: #f8fafc;
+  }
+
+  .shape:focus { outline: 3px solid rgba(59,130,246,0.18); outline-offset: 4px; }
+  .shape.active { transform: translateY(-4px) scale(1.03); box-shadow: 0 10px 30px rgba(2,6,23,0.08); }
+
+  .circle { border-radius: 999px; background: #dbeafe; }
+  .triangle { background: #fef9c3; clip-path: polygon(50% 0%, 0% 100%, 100% 100%); }
+  .square { background: #dcfce7; border-radius: 12px; }
+  .blob { background: #fee2e2; border-radius: 28% 72% 60% 40% / 40% 30% 70% 60%; }
+  .hexagon { background: #ede9fe; clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%); }
+  .diamond { background: #ccfbf1; clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); }
+
+  /* Fixed-width card: set explicit width so text changes don't reflow page */
+  .shape-card {
+    width: 640px;                 /* fixed width */
+    max-width: calc(100% - 32px); /* responsive cap on very small screens */
+    margin: 18px auto 0;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid #e6e9ef;
+    background: #ffffff;
+    box-shadow: 0 8px 24px rgba(2,6,23,0.04);
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity .18s ease, transform .18s ease;
+    /* keep layout stable: reserve space even when hidden */
+    min-height: 72px;
+  }
+  .shape-card[aria-hidden="false"] { opacity: 1; transform: translateY(0); }
+
+  .shape-card__inner { max-width: 600px; margin: 0 auto; } /* inner content narrower for nicer measure */
+  .shape-card h3 { margin: 0 0 6px; font-size: 1rem; }
+  .shape-card p { margin: 0; color: #475569; font-size: .95rem; }
+
+  @media (max-width: 720px) {
+    .shape-card { width: 92%; }
+    .shape { --size: 84px; font-size: clamp(11px, 2.6vw, 13px); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .shape { transition: none; }
+    .shape-card { transition: none; }
+  }
+</style>
+
+<script is:inline>
+  const DATA = {
+    social: { title: "Social communication", text: "Preferring one-to-one chats, needing more time to respond, or using different nonverbal signals." },
+    sensory: { title: "Sensory experience", text: "Over- or under-sensitivity to sound, light, touch, smell, or taste." },
+    routines: { title: "Routines & change", text: "Routines feel safe; sudden changes can be stressful and need time to adjust." },
+    emotions: { title: "Emotional regulation", text: "Feelings can be intense; meltdowns or shutdowns may follow overload." },
+    focus: { title: "Focus & interests", text: "Deep interests and strong focus; switching tasks can be hard." },
+    executive: { title: "Executive functioning", text: "Planning, organising, starting tasks and time management can be challenging." }
+  };
+
+  const shapesGrid = document.getElementById('shapesGrid');
+  const shapes = Array.from(shapesGrid.querySelectorAll('.shape'));
+  const svg = document.getElementById('shapesLines');
+  const card = document.getElementById('shapeCard');
+  const cardTitle = document.getElementById('cardTitle');
+  const cardText = document.getElementById('cardText');
+  const selected = new Set();
+
+  function drawConnections() {
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+    const ids = Array.from(selected);
+    if (ids.length < 2) return;
+
+    const canvasRect = shapesGrid.getBoundingClientRect();
+    svg.setAttribute('width', canvasRect.width);
+    svg.setAttribute('height', canvasRect.height);
+    svg.style.width = canvasRect.width + 'px';
+    svg.style.height = canvasRect.height + 'px';
+
+    for (let i = 0; i < ids.length; i++) {
+      for (let j = i + 1; j < ids.length; j++) {
+        const a = document.querySelector(`[data-id="${ids[i]}"]`).getBoundingClientRect();
+        const b = document.querySelector(`[data-id="${ids[j]}"]`).getBoundingClientRect();
+
+        const x1 = a.left + a.width / 2 - canvasRect.left;
+        const y1 = a.top + a.height / 2 - canvasRect.top;
+        const x2 = b.left + b.width / 2 - canvasRect.left;
+        const y2 = b.top + b.height / 2 - canvasRect.top;
+
+        const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+        line.setAttribute('x1', x1);
+        line.setAttribute('y1', y1);
+        line.setAttribute('x2', x2);
+        line.setAttribute('y2', y2);
+        line.setAttribute('stroke', 'rgba(15,23,42,0.12)');
+        line.setAttribute('stroke-width', '2');
+        line.setAttribute('stroke-linecap', 'round');
+        svg.appendChild(line);
+      }
+    }
+  }
+
+  function showCard(id) {
+    const d = DATA[id];
+    if (!d) return;
+    cardTitle.textContent = d.title;
+    cardText.textContent = d.text;
+    card.setAttribute('aria-hidden', 'false');
+  }
+
+  function hideCard() {
+    card.setAttribute('aria-hidden', 'true');
+  }
+
+  shapes.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = btn.dataset.id;
+      if (!id) return;
+
+      if (selected.has(id)) {
+        selected.delete(id);
+        btn.classList.remove('active');
+        hideCard();
+      } else {
+        selected.add(id);
+        btn.classList.add('active');
+        showCard(id);
+      }
+
+      // keep visual active state for all selected
+      shapes.forEach(s => s.classList.toggle('active', selected.has(s.dataset.id)));
+      drawConnections();
+    });
+
+    btn.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        btn.click();
+      }
+    });
+  });
+
+  // initial draw and resize handling
+  function updateSvgOnResize() {
+    drawConnections();
+  }
+  window.addEventListener('resize', updateSvgOnResize);
+  window.addEventListener('load', drawConnections);
+</script>
+
+
+
+
 
 
 
@@ -343,6 +540,30 @@ import { withBase } from "../utils/helpers";
     if(e.key === 'ArrowLeft' || e.key === 'ArrowUp'){ var prev = nodes[(idx-1+nodes.length)%nodes.length]; prev.focus(); showTip(prev.getAttribute('data-key'), prev); e.preventDefault(); }
   });
 })();
+</script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const items = document.querySelectorAll('.spectrum-timeline__item');
+
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-visible');
+              observer.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.2 }
+      );
+
+      items.forEach((item) => observer.observe(item));
+    } else {
+      items.forEach((item) => item.classList.add('is-visible'));
+    }
+  });
 </script>
 
 
