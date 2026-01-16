@@ -1,0 +1,16 @@
+---
+import MainLayout from "../../layouts/MainLayout.astro";
+import siteConfig from "../../site.config";
+import { withBase } from "../../utils/helpers";
+---
+
+<MainLayout
+  activePage="game"
+  pageTitle={`${siteConfig.title} — Autumn Plains`}
+>
+  <iframe
+  src={withBase("/godot/autumnplains/index.html")}
+  style="border:none; width:100%; height:80vh;"
+  allow="fullscreen"
+></iframe>
+</MainLayout>

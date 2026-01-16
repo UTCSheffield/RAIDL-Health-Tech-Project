@@ -81,6 +81,10 @@ const siteConfig: SiteConfig = {
             text: 'Support Card',
             href: withBase('/support-card/')
         },
+                {
+            text: 'Game',
+            href: withBase('/game/')
+        },
         // {
         //     text: 'Help',
         //     href: withBase('/help/')

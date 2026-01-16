@@ -1,10 +1,10 @@
 ---
 title: "The Different Types of Autism"
 author: "Caring Hearts"
-description: "A clear, compassionate overview for young people about how autism can present and practical ways to support yourself and friends."
+description: "A overview for young people about how autism can present and practical ways to support yourself and friends."
 image:
   url: "./images/2.jpg"
-  alt: "Illustration: two friends sharing a quiet moment"
+  alt: "Autistic Kid smiling"
 pubDate: 2026-01-14
 tags:
   - autism
