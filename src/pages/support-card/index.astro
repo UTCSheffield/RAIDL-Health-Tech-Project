@@ -1,6 +1,9 @@
 ---
 import MainLayout from "../../layouts/MainLayout.astro";
 import siteConfig from "../../site.config";
+
+import { withBase } from "../../utils/helpers";
+const SITE_URL = JSON.stringify(siteConfig.website + withBase('/support-card/'));
 ---
 
 <MainLayout activePage="support-card" pageTitle={`${siteConfig.title} — Support Card`}>
@@ -22,40 +25,42 @@ import siteConfig from "../../site.config";
     .small{font-size:13px;color:var(--muted);margin-top:8px}
 
     /* PRINT: single A4 page with front (left) and back (right) */
-    @media print{
-      /* try to set page margins small; browsers may still apply user margins */
-      @page { size: A4 portrait; margin: 6mm; }
-      html,body{height:100%;margin:0;padding:0}
-      /* Force the browser to center the printable container in print preview */
-      body{display:flex;justify-content:center;align-items:flex-start;background:#fff}
-      /* sheet is exactly A4 width minus page margins; center it with margin:auto */
-      .sheet {
-        width: calc(210mm - 12mm); /* A4 width minus @page margins */
-        max-width:210mm;
-        margin: 0 auto;
-        display:flex;
-        flex-wrap:nowrap;
-        gap:8mm;
-        padding:0;
-        box-sizing:border-box;
-        justify-content:center;
-      }
-      .panel-card{ width: calc(50% - 4mm); box-sizing:border-box; padding:6mm; min-height:85mm; }
-      .wallet-area{ width:85mm; height:55mm; margin:6mm auto; position:relative; box-sizing:border-box; background:#fff }
-      .cut-mark{ position:absolute; width:8mm; height:8mm }
-      .cut-mark.tl{ left:-5mm; top:-5mm; border-top:2px solid #000; border-left:2px solid #000 }
-      .cut-mark.tr{ right:-5mm; top:-5mm; border-top:2px solid #000; border-right:2px solid #000 }
-      .cut-mark.bl{ left:-5mm; bottom:-5mm; border-bottom:2px solid #000; border-left:2px solid #000 }
-      .cut-mark.br{ right:-5mm; bottom:-5mm; border-bottom:2px solid #000; border-right:2px solid #000 }
-      .fold-line{ position:absolute; left:50%; top:6mm; bottom:6mm; width:0; border-left:1px dotted #333; transform:translateX(-50%) }
-      .scissor{ position:absolute; left:50%; top:2mm; transform:translateX(-50%); font-size:8px; color:#333 }
-      .wallet-title{ font-weight:800; font-size:14px; margin-bottom:6px }
-      .wallet-line{ font-size:12px; margin:4px 0 }
-      /* ensure the printable sheet is not pushed left by any residual body padding */
-      body, .wrap { padding-left: 0 !important; padding-right: 0 !important; }
-      /* avoid page breaks inside the sheet */
-      .sheet{ page-break-after:avoid }
-    }
+ /* PRINT: single A4 page with front (left) and back (right) */
+@media print{
+  @page { size: A4 portrait; margin: 6mm; }
+  html,body{height:100%;margin:0;padding:0}
+  body{display:flex;justify-content:center;align-items:flex-start;background:#fff}
+  .sheet {
+    width: calc(210mm - 12mm);
+    max-width:210mm;
+    margin: 0 auto;
+    display:flex;
+    flex-wrap:nowrap;
+    gap:8mm;
+    padding:0;
+    box-sizing:border-box;
+    justify-content:center;
+  }
+  .panel-card{ width: calc(50% - 4mm); box-sizing:border-box; padding:6mm; min-height:85mm; }
+  .wallet-area{ width:85mm; height:55mm; margin:6mm auto; position:relative; box-sizing:border-box; background:#fff }
+  .cut-mark{ position:absolute; width:8mm; height:8mm }
+  .cut-mark.tl{ left:-5mm; top:-5mm; border-top:2px solid #000; border-left:2px solid #000 }
+  .cut-mark.tr{ right:-5mm; top:-5mm; border-top:2px solid #000; border-right:2px solid #000 }
+  .cut-mark.bl{ left:-5mm; bottom:-5mm; border-bottom:2px solid #000; border-left:2px solid #000 }
+  .cut-mark.br{ right:-5mm; bottom:-5mm; border-bottom:2px solid #000; border-right:2px solid #000 }
+
+  /* removed center fold-line + scissor (no centre guide) */
+
+  .wallet-title{ font-weight:800; font-size:14px; margin-bottom:6px }
+  .wallet-line{ font-size:12px; margin:4px 0 }
+
+  /* QR label + QR image (small, bottom-right) */
+  .qr-label{ position:absolute; right:4mm; bottom:16mm; font-size:8px; color:#333; text-align:right; font-weight:600; }
+  .qr{ position:absolute; right:4mm; bottom:4mm; width:12mm; height:12mm; display:block; }
+
+  body, .wrap { padding-left: 0 !important; padding-right: 0 !important; }
+  .sheet{ page-break-after:avoid }
+}
 
     @media (max-width:1200px){ .wrap{ grid-template-columns:1fr } }
   </style>
@@ -92,7 +97,7 @@ import siteConfig from "../../site.config";
       <input id="contact" type="text" placeholder="Alex - 07123 456789" />
 
       <div class="controls" role="group" aria-label="controls">
-        <button id="print">Print / Download</button>
+        <button id="printBtn">Print / Download</button>
         <button id="clear" class="muted-btn" style="color:black; width: 100px; font-weight: 500;">Clear</button>
       </div>
 
@@ -113,128 +118,205 @@ import siteConfig from "../../site.config";
     </div>
   </div>
 
-  <script>
-    // Classic JS for broad compatibility
-    var $ = function(id){ return document.getElementById(id); };
-    var fields = ['name','how','sensory','helps','health','confident','contact'];
-
+<script>
+// @ts-nocheck
+(function () {
+  // initialise whether DOMContentLoaded has already fired or not
+  function init() {
     try {
-      var saved = JSON.parse(localStorage.getItem('supportCard') || '{}');
-      for (var i = 0; i < fields.length; i++) {
-        var f = fields[i];
-        if (saved[f]) { $(f).value = saved[f]; }
-      }
-    } catch (e) {}
+      // helper + fields
+      var $ = function(id){ return document.getElementById(id); };
+      var fields = ['name','how','sensory','helps','health','confident','contact'];
 
-    function updatePreview(){
-      for (var i = 0; i < fields.length; i++) {
-        var f = fields[i];
-        var v = ($(f).value || '').toString().trim();
-        var el = $('p-' + f);
-        if (el) { el.textContent = v || '—'; }
-      }
+      // Restore saved values (safe)
       try {
-        var obj = {};
-        for (var j = 0; j < fields.length; j++) { obj[fields[j]] = $(fields[j]).value; }
-        localStorage.setItem('supportCard', JSON.stringify(obj));
-      } catch (e) {}
-    }
-
-    updatePreview();
-
-    $('clear').addEventListener('click', function(){
-      for (var i = 0; i < fields.length; i++) { $(fields[i]).value = ''; }
-      updatePreview();
-      localStorage.removeItem('supportCard');
-    });
-
-    var debounceTimer;
-    for (var k = 0; k < fields.length; k++) {
-      (function(field){
-        $(field).addEventListener('input', function(){
-          clearTimeout(debounceTimer);
-          debounceTimer = setTimeout(updatePreview, 180);
-        });
-      })(fields[k]);
-    }
-
-    function esc(s){
-      if (!s) return '';
-      return s.toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-    }
-
-    // Print: single A4 page with front (left) and back (right) side-by-side
-    $('print').addEventListener('click', function(){
-      updatePreview();
-      var data = {};
-      for (var i = 0; i < fields.length; i++) { data[fields[i]] = $(fields[i]).value ? $(fields[i]).value.toString().trim() : '—'; }
-
-      var html = '<!doctype html><html><head><meta charset="utf-8"><title>Support Card Print</title><style>';
-      html += '@page{size:A4;margin:6mm} body{font-family:Arial,Helvetica,sans-serif;margin:0;padding:0;color:#111}';
-      html += 'body{display:flex;justify-content:center;align-items:flex-start;background:#fff}';
-      html += '.sheet{width:calc(210mm - 12mm);max-width:210mm;margin:0 auto;display:flex;flex-wrap:nowrap;gap:8mm;padding:0;box-sizing:border-box;justify-content:center}';
-      html += '.panel-card{width:calc(50% - 4mm);box-sizing:border-box;padding:6mm;min-height:85mm}';
-      html += '.wallet-area{width:85mm;height:55mm;margin:6mm auto;position:relative;box-sizing:border-box;background:#fff}';
-      html += '.cut-mark{position:absolute;width:8mm;height:8mm}';
-      html += '.cut-mark.tl{left:-5mm;top:-5mm;border-top:2px solid #000;border-left:2px solid #000}';
-      html += '.cut-mark.tr{right:-5mm;top:-5mm;border-top:2px solid #000;border-right:2px solid #000}';
-      html += '.cut-mark.bl{left:-5mm;bottom:-5mm;border-bottom:2px solid #000;border-left:2px solid #000}';
-      html += '.cut-mark.br{right:-5mm;bottom:-5mm;border-bottom:2px solid #000;border-right:2px solid #000}';
-      html += '.fold-line{position:absolute;left:50%;top:6mm;bottom:6mm;width:0;border-left:1px dotted #333;transform:translateX(-50%)}';
-      html += '.scissor{position:absolute;left:50%;top:2mm;transform:translateX(-50%);font-size:8px;color:#333}';
-      html += '.wallet-title{font-weight:800;font-size:14px;margin-bottom:6px}';
-      html += '.wallet-line{font-size:12px;margin:4px 0}';
-      html += '.sheet{page-break-after:avoid}';
-      html += '.print-note{font-size:10px;color:#333;margin-top:6px}';
-      html += '</style></head><body>';
-
-      html += '<div class="sheet" role="main">';
-      // LEFT: FRONT
-      html += '<div class="panel-card" aria-label="Front">';
-      html += '<div class="wallet-area">';
-      html += '<div class="cut-mark tl"></div><div class="cut-mark tr"></div><div class="cut-mark bl"></div><div class="cut-mark br"></div>';
-      html += '<div class="fold-line"></div><div class="scissor">✂</div>';
-      html += '<div class="wallet-title">My Support Card</div>';
-      html += '<div class="wallet-line"><strong>Name:</strong> ' + esc(data.name) + '</div>';
-      html += '<div class="wallet-line"><strong>How I like to be told things:</strong> ' + esc(data.how) + '</div>';
-      html += '<div class="wallet-line"><strong>What helps me:</strong> ' + esc(data.helps) + '</div>';
-      html += '<div class="wallet-line"><strong>Health note:</strong> ' + esc(data.health) + '</div>';
-      html += '<div class="wallet-line"><strong>Emergency:</strong> ' + esc(data.contact) + '</div>';
-      html += '</div>';
-      html += '<div class="print-note">Cut on the corner marks. Fold on the dotted line to double thickness before laminating.</div>';
-      html += '</div>';
-
-      // RIGHT: BACK
-      html += '<div class="panel-card" aria-label="Back">';
-      html += '<div class="wallet-area">';
-      html += '<div class="cut-mark tl"></div><div class="cut-mark tr"></div><div class="cut-mark bl"></div><div class="cut-mark br"></div>';
-      html += '<div class="fold-line"></div><div class="scissor">✂</div>';
-      html += '<div class="wallet-title">Emergency Info</div>';
-      html += '<div class="wallet-line"><strong>Sensory triggers:</strong> ' + esc(data.sensory) + '</div>';
-      html += '<div class="wallet-line"><strong>Confidence tip:</strong> ' + esc(data.confident) + '</div>';
-      
-      html += '</div>';
-      
-      html += '</div>';
-
-      html += '</div>'; // sheet
-
-     
-      html += '<script>function tryPrint(){try{window.focus();window.print();}catch(e){console.error(e);}}window.onload=function(){setTimeout(tryPrint,300);};setTimeout(tryPrint,800);<\/script>';
-      html += '</body></html>';
-
-      var w = window.open('', '_blank');
-      if (!w) {
-        var blob = new Blob([html], {type: 'text/html'});
-        var url = URL.createObjectURL(blob);
-        window.location.href = url;
-        return;
+        var saved = JSON.parse(localStorage.getItem('supportCard') || '{}');
+        for (var i = 0; i < fields.length; i++) {
+          var f = fields[i];
+          if (saved[f] && $(f)) { $(f).value = saved[f]; }
+        }
+      } catch (e) {
+        console.warn('Failed to read localStorage for supportCard', e);
       }
-      w.document.open();
-      w.document.write(html);
-      w.document.close();
-      try { w.focus(); } catch (e) {}
-      setTimeout(function(){ try { w.print(); } catch (e) {} }, 600);
-    });
-  </script>
+
+      // update preview & persist
+      function updatePreview(){
+        for (var i = 0; i < fields.length; i++) {
+          var f = fields[i];
+          var v = ($(f) && $(f).value ? $(f).value.toString().trim() : '');
+          var el = $('p-' + f);
+          if (el) { el.textContent = v || '—'; }
+        }
+        try {
+          var obj = {};
+          for (var j = 0; j < fields.length; j++) { obj[fields[j]] = ($(fields[j]) ? $(fields[j]).value : ''); }
+          localStorage.setItem('supportCard', JSON.stringify(obj));
+        } catch (e) {
+          console.warn('Failed to save supportCard to localStorage', e);
+        }
+      }
+
+      updatePreview();
+
+      // clear button
+      if ($('clear')) {
+        $('clear').addEventListener('click', function(){
+          for (var i = 0; i < fields.length; i++) { if ($(fields[i])) $(fields[i]).value = ''; }
+          updatePreview();
+          try { localStorage.removeItem('supportCard'); } catch(e) {}
+        });
+      }
+
+      // debounce inputs
+      var debounceTimer;
+      for (var k = 0; k < fields.length; k++) {
+        (function(field){
+          var el = $(field);
+          if (!el) return;
+          el.addEventListener('input', function(){
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(updatePreview, 180);
+          });
+        })(fields[k]);
+      }
+
+      function esc(s){
+        if (!s) return '';
+        return s.toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+      }
+
+      // Print handler (safe)
+      if ($('printBtn')) {
+        $('printBtn').addEventListener('click', function (ev) {
+          // keep this as a user-gesture handler; avoid async breaks before print call
+          try {
+            updatePreview();
+            var data = {};
+            for (var i = 0; i < fields.length; i++) {
+              data[fields[i]] = ($(fields[i]) && $(fields[i]).value) ? $(fields[i]).value.toString().trim() : '—';
+            }
+
+            // determine siteUrl (meta tag fallback)
+            var meta = document.querySelector('meta[name="site-url"]');
+            var siteUrl = (meta && meta.getAttribute) ? meta.getAttribute('content') : window.location.origin + '/support-card/';
+            console.log('support-card: using siteUrl =', siteUrl);
+            var qrSrc = 'https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=' + encodeURIComponent(siteUrl);
+
+            // build print HTML
+            var html = '<!doctype html><html><head><meta charset="utf-8"><title>Support Card Print</title><style>';
+            html += '@page{size:A4;margin:6mm}';
+            html += 'body{font-family:Arial,Helvetica,sans-serif;margin:0;padding:0;color:#111;background:#fff}';
+            html += '.sheet{width:calc(210mm - 12mm);max-width:210mm;margin:0 auto;display:flex;flex-wrap:nowrap;gap:8mm;padding:0;box-sizing:border-box;justify-content:center}';
+            html += '.panel-card{width:calc(50% - 4mm);box-sizing:border-box;padding:6mm;min-height:85mm;position:relative}';
+            html += '.wallet-area{width:85mm;height:55mm;margin:6mm auto;position:relative;box-sizing:border-box;background:#fff}';
+            html += '.cut-mark{position:absolute;width:8mm;height:8mm}';
+            html += '.cut-mark.tl{left:-5mm;top:-5mm;border-top:2px solid #000;border-left:2px solid #000}';
+            html += '.cut-mark.tr{right:-5mm;top:-5mm;border-top:2px solid #000;border-right:2px solid #000}';
+            html += '.cut-mark.bl{left:-5mm;bottom:-5mm;border-bottom:2px solid #000;border-left:2px solid #000}';
+            html += '.cut-mark.br{right:-5mm;bottom:-5mm;border-bottom:2px solid #000;border-right:2px solid #000}';
+            html += '.wallet-title{font-weight:800;font-size:14px;margin-bottom:6px}';
+            html += '.wallet-line{font-size:12px;margin:4px 0}';
+            html += '.qr-label{position:absolute;right:4mm;bottom:16mm;font-size:8px;color:#333;text-align:right;font-weight:600;}';
+            html += '.qr{position:absolute;right:4mm;bottom:4mm;width:12mm;height:12mm;display:block;}';
+            html += '.print-note{font-size:10px;color:#333;margin-top:6px}';
+            html += '.sheet{page-break-after:avoid}';
+            html += '</style></head><body>';
+            html += '<div class="sheet" role="main">';
+
+            // FRONT
+            html += '<div class="panel-card" aria-label="Front">';
+            html += '<div class="wallet-area">';
+            html += '<div class="cut-mark tl"></div><div class="cut-mark tr"></div><div class="cut-mark bl"></div><div class="cut-mark br"></div>';
+            html += '<div class="wallet-title">My Support Card</div>';
+            html += '<div class="wallet-line"><strong>Name:</strong> ' + esc(data.name) + '</div>';
+            html += '<div class="wallet-line"><strong>How I like to be told things:</strong> ' + esc(data.how) + '</div>';
+            html += '<div class="wallet-line"><strong>What helps me:</strong> ' + esc(data.helps) + '</div>';
+            html += '<div class="wallet-line"><strong>Health note:</strong> ' + esc(data.health) + '</div>';
+            html += '<div class="wallet-line"><strong>Emergency:</strong> ' + esc(data.contact) + '</div>';
+            html += '<div class="qr-label">Scan me to learn more!</div>';
+            html += '<img class="qr" src="' + qrSrc + '" alt="QR linking to site" />';
+            html += '</div>';
+            html += '<div class="print-note">Cut on the corner marks</div>';
+            html += '</div>';
+
+            // BACK
+            html += '<div class="panel-card" aria-label="Back">';
+            html += '<div class="wallet-area">';
+            html += '<div class="cut-mark tl"></div><div class="cut-mark tr"></div><div class="cut-mark bl"></div><div class="cut-mark br"></div>';
+            html += '<div class="wallet-title">Emergency Info</div>';
+            html += '<div class="wallet-line"><strong>Sensory triggers:</strong> ' + esc(data.sensory) + '</div>';
+            html += '<div class="wallet-line"><strong>Confidence tip:</strong> ' + esc(data.confident) + '</div>';
+            html += '</div>';
+            html += '</div>';
+
+            html += '</div>'; // sheet
+            html += '</body></html>';
+
+            // open new window and attempt immediate print (keeps user gesture)
+            var w = null;
+            try {
+              w = window.open('', '_blank');
+            } catch (openErr) {
+              console.warn('Popup open failed', openErr);
+            }
+
+            if (!w) {
+              // popup blocked: navigate current window to blob URL as fallback (user will need to print manually)
+              var blob = new Blob([html], {type: 'text/html'});
+              var url = URL.createObjectURL(blob);
+              window.location.href = url;
+              return;
+            }
+
+            // write content
+            try {
+              w.document.open();
+              w.document.write(html);
+              w.document.close();
+
+              try { w.focus(); } catch (e) {}
+
+              // Try immediate print() while still inside user gesture chain.
+              // This works in most browsers; if it throws, attach an onload fallback.
+              try {
+                if (typeof w.print === 'function') {
+                  w.print();
+                } else {
+                  // fallback: call print on load
+                  w.onload = function () {
+                    try { w.print(); } catch (err2) { console.error('child.print failed (onload)', err2); }
+                  };
+                }
+              } catch (printErr) {
+                console.error('Immediate print() threw, attaching onload fallback', printErr);
+                w.onload = function () {
+                  try { w.print(); } catch (err3) { console.error('child.print failed (onload)', err3); }
+                };
+              }
+            } catch (writeErr) {
+              console.error('Failed to write child window HTML', writeErr);
+              alert('Sorry — could not open the print preview. Check console for details.');
+            }
+          } catch (err) {
+            console.error('Print handler error', err);
+            alert('Sorry — an error occurred while preparing the print page. Check the console for details.');
+          }
+        });
+      }
+
+    } catch (outerErr) {
+      console.error('Support card init error', outerErr);
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    // already ready — run immediately
+    init();
+  }
+})();
+</script>
+
+
 </MainLayout>

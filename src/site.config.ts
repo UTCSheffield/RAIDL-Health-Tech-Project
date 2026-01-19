@@ -43,6 +43,7 @@ export type ContactInfo = {
 };
 
 export type SiteConfig = {
+url: string;
     website: string;
     logo?: Image;
     title: string;
@@ -61,13 +62,14 @@ export type SiteConfig = {
 };
 
 const siteConfig: SiteConfig = {
-    website: 'https://example.com',
+    website: 'https://health-tech-project.up.railway.app',
     title: 'RAIDL',
     description: 'Care for children who think differently',
     image: {
         src: '/caring-hearts-preview.jpeg',
         alt: 'RAIDL - Care for children who think differently'
     },
+    
     headerNavLinks: [
         {
             text: 'Home',
@@ -81,7 +83,7 @@ const siteConfig: SiteConfig = {
             text: 'Support Card',
             href: withBase('/support-card/')
         },
-                {
+        {
             text: 'Game',
             href: withBase('/game/')
         },
@@ -174,7 +176,8 @@ const siteConfig: SiteConfig = {
         description: "Learn more about Neurodivergence and how it effects people, and how we can lend a helping hand."
     },
     postsPerPage: 2,
-    recentPostLimit: 3
+    recentPostLimit: 3,
+    url: ""
 };
 
 export default siteConfig;
