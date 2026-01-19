@@ -116,12 +116,14 @@ import { withBase } from "../utils/helpers";
     <svg id="shapesLines" class="shapes-lines" aria-hidden="true"></svg>
 
     <div class="shapes-grid" id="shapesGrid">
-      <button class="shape circle" data-id="social" aria-label="Social communication">Social communication</button>
-      <button class="shape triangle" data-id="sensory" aria-label="Sensory experience">Sensory experience</button>
-      <button class="shape square" data-id="routines" aria-label="Routines and change">Routines &amp; change</button>
-      <button class="shape blob" data-id="emotions" aria-label="Emotional regulation">Emotional regulation</button>
+      <button class="shape circle" data-id="social" aria-label="Social communication">Talking and understanding</button>
+     <button class="shape triangle" data-id="sensory" aria-label="Sensory experience">
+  <span class="shape-text">Different<br>senses</span>
+</button>
+      <button class="shape square" data-id="routines" aria-label="Routines and change">Habits &amp; change</button>
+      <button class="shape blob" data-id="emotions" aria-label="Emotional regulation">Managing emotions</button>
       <button class="shape hexagon" data-id="focus" aria-label="Focus and interests">Focus &amp; interests</button>
-      <button class="shape diamond" data-id="executive" aria-label="Executive functioning">Executive functioning</button>
+      <button class="shape diamond" data-id="executive" aria-label="Executive functioning">Thinking skills</button>
     </div>
   </div>
 
@@ -179,7 +181,24 @@ import { withBase } from "../utils/helpers";
   .shape.active { transform: translateY(-4px) scale(1.03); box-shadow: 0 10px 30px rgba(2,6,23,0.08); }
 
   .circle { border-radius: 999px; background: #dbeafe; }
-  .triangle { background: #fef9c3; clip-path: polygon(50% 0%, 0% 100%, 100% 100%); }
+  .triangle {
+  background: #fef9c3;
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+  padding: 6px 8px;        /* reduce padding so text sits lower in triangle */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.triangle .shape-text {
+  display: inline-block;
+  text-align: center;
+  font-size: clamp(10px, 1.1vw, 12px); /* smaller / responsive */
+  line-height: 1.05;
+  white-space: normal;
+  word-break: break-word;
+  margin-top: 6px; /* nudge down into the wider part of the triangle */
+}
   .square { background: #dcfce7; border-radius: 12px; }
   .blob { background: #fee2e2; border-radius: 28% 72% 60% 40% / 40% 30% 70% 60%; }
   .hexagon { background: #ede9fe; clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%); }
@@ -220,13 +239,32 @@ import { withBase } from "../utils/helpers";
 
 <script is:inline>
   const DATA = {
-    social: { title: "Social communication", text: "Preferring one-to-one chats, needing more time to respond, or using different nonverbal signals." },
-    sensory: { title: "Sensory experience", text: "Over- or under-sensitivity to sound, light, touch, smell, or taste." },
-    routines: { title: "Routines & change", text: "Routines feel safe; sudden changes can be stressful and need time to adjust." },
-    emotions: { title: "Emotional regulation", text: "Feelings can be intense; meltdowns or shutdowns may follow overload." },
-    focus: { title: "Focus & interests", text: "Deep interests and strong focus; switching tasks can be hard." },
-    executive: { title: "Executive functioning", text: "Planning, organising, starting tasks and time management can be challenging." }
-  };
+  social: {
+    title: "Talking and understanding",
+    text: "How someone talks and listens. They may need extra time to answer or use different body language to show how they feel."
+  },
+  sensory: {
+    title: "Different senses",
+    text: "Sounds, lights, touch, smell or taste can feel too strong or not strong enough. Small changes like headphones or dim lights can help."
+  },
+  routines: {
+    title: "Habits & change",
+    text: "Routines help people feel safe. Sudden changes can be hard; a warning and a little time to adjust usually helps."
+  },
+  emotions: {
+    title: "Managing emotions",
+    text: "Feelings can become very big. The person might need help to calm down, take a break, or use a quiet space."
+  },
+  focus: {
+    title: "Focus & interests",
+    text: "Strong interests and deep focus are common. It can be hard to switch tasks or stop a task once started."
+  },
+  executive: {
+    title: "Thinking skills",
+    text: "Planning, starting tasks and managing time can be tricky. Breaking tasks into small steps and using a timer can help."
+  }
+};
+
 
   const shapesGrid = document.getElementById('shapesGrid');
   const shapes = Array.from(shapesGrid.querySelectorAll('.shape'));
