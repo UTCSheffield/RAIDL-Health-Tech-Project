@@ -36,12 +36,17 @@ const SITE_URL = JSON.stringify(siteConfig.website + withBase('/support-card/'))
     margin: 0 auto;
     display:flex;
     flex-wrap:nowrap;
-    gap:8mm;
+    gap:0mm;
     padding:0;
     box-sizing:border-box;
     justify-content:center;
   }
-  .panel-card{ width: calc(50% - 4mm); box-sizing:border-box; padding:6mm; min-height:85mm; }
+  
+  .panel-card{ width: 50%; box-sizing:border-box; padding:6mm; min-height:85mm; }
+  .panel-card:first-child{
+  border-right: 0.25mm dashed #bbb;
+}
+
   .wallet-area{ width:85mm; height:55mm; margin:6mm auto; position:relative; box-sizing:border-box; background:#fff }
   .cut-mark{ position:absolute; width:8mm; height:8mm }
   .cut-mark.tl{ left:-5mm; top:-5mm; border-top:2px solid #000; border-left:2px solid #000 }
@@ -206,7 +211,8 @@ const SITE_URL = JSON.stringify(siteConfig.website + withBase('/support-card/'))
             var html = '<!doctype html><html><head><meta charset="utf-8"><title>Support Card Print</title><style>';
             html += '@page{size:A4;margin:6mm}';
             html += 'body{font-family:Arial,Helvetica,sans-serif;margin:0;padding:0;color:#111;background:#fff}';
-            html += '.sheet{width:calc(210mm - 12mm);max-width:210mm;margin:0 auto;display:flex;flex-wrap:nowrap;gap:8mm;padding:0;box-sizing:border-box;justify-content:center}';
+            html += '.sheet{width:calc(210mm - 12mm);max-width:210mm;margin:0 auto;display:flex;flex-wrap:nowrap;gap:0;padding:0;box-sizing:border-box}';
+
             html += '.panel-card{width:calc(50% - 4mm);box-sizing:border-box;padding:6mm;min-height:85mm;position:relative}';
             html += '.wallet-area{width:85mm;height:55mm;margin:6mm auto;position:relative;box-sizing:border-box;background:#fff}';
             html += '.cut-mark{position:absolute;width:8mm;height:8mm}';
@@ -236,7 +242,7 @@ const SITE_URL = JSON.stringify(siteConfig.website + withBase('/support-card/'))
             html += '<div class="qr-label">Scan me to learn more!</div>';
             html += '<img class="qr" src="' + qrSrc + '" alt="QR linking to site" />';
             html += '</div>';
-            html += '<div class="print-note">Cut on the corner marks</div>';
+            html += '<div class="print-note">Cut both of the cards out, and fold accross the middle; glueing both of the cards together.</div>';
             html += '</div>';
 
             // BACK
