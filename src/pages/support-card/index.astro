@@ -6,7 +6,7 @@ import { withBase } from "../../utils/helpers";
 const SITE_URL = JSON.stringify(siteConfig.website + withBase('/support-card/'));
 ---
 
-<MainLayout activePage="support-card" pageTitle={`${siteConfig.title} — Support Card`}>
+<MainLayout activePage="support-card" pageTitle={`${siteConfig.title} - Support Card`}>
   <style>
     :root{--text:#111;--muted:#555;--accent:#0b5;}
     body{font-family:Inter,system-ui,Arial,Helvetica,sans-serif;margin:18px;background:#f6f6f6;color:var(--text)}
@@ -34,11 +34,14 @@ const SITE_URL = JSON.stringify(siteConfig.website + withBase('/support-card/'))
 .sheet{
   position:relative;
   width:calc(210mm - 12mm);
-  height:calc(297mm - 12mm);
+  height:calc(290mm - 12mm);
   margin:0 auto;
   padding:0;
   box-sizing:border-box;
   overflow:visible;
+   max-height: 290mm;
+     page-break-after: avoid;
+  page-break-inside: avoid;
 }
 .print-note{
   position:absolute;
@@ -49,20 +52,23 @@ const SITE_URL = JSON.stringify(siteConfig.website + withBase('/support-card/'))
   font-size:10px;
   color:#111;
   font-weight:600;
+  
 }
  .sheet::before{
   content:"";
   position:absolute;
-  left:50%
+  left:50%;
   top:50%;
   height:54mm;              /* match wallet height */
   transform:translate(-0.125mm, -50%);
   width:0;
-  border-left:0.25mm dashed black;
+  border-left:0.5mm dashed black;
   pointer-events:none;
     z-index:5;
 }
-
+#form-title{
+  font-family:"Caveat Brush", cursive;
+}
 .panel-card{
   position:absolute;
   top:50%;
@@ -82,6 +88,7 @@ const SITE_URL = JSON.stringify(siteConfig.website + withBase('/support-card/'))
 }
   /* wallet card exact size */
   .wallet-area{
+border:0.5mm solid #000;
     width:85mm;
     height:54mm;
     box-sizing:border-box;
@@ -91,52 +98,16 @@ const SITE_URL = JSON.stringify(siteConfig.website + withBase('/support-card/'))
     position:relative;
     z-index:4; 
     display:block;
+  
   }
-
-
-.wallet-area .cut-mark{
-  position:absolute;
-  width:8mm;
-  height:8mm;
-  z-index:10;
+.panel-card.front .wallet-area::after{
+  border-right:none;
 }
 
-.wallet-area .cut-mark.tl{
-  top:-4mm;
-  left:-4mm;
-  border-top:1mm solid #000;
-  border-left:1mm solid #000;
+.panel-card.back .wallet-area::after{
+  border-left:none;
 }
 
-.wallet-area .cut-mark.tr{
-  top:-4mm;
-  right:-4mm;
-  border-top:1mm solid #000;
-  border-right:1mm solid #000;
-}
-
-.wallet-area .cut-mark.bl{
-  bottom:-4mm;
-  left:-4mm;
-  border-bottom:1mm solid #000;
-  border-left:1mm solid #000;
-}
-
-.wallet-area .cut-mark.br{
-  bottom:-4mm;
-  right:-4mm;
-  border-bottom:1mm solid #000;
-  border-right:1mm solid #000;
-}
-.panel-card.front .cut-mark.tr,
-.panel-card.front .cut-mark.br{
-  display:none;
-}
-
-.panel-card.back .cut-mark.tl,
-.panel-card.back .cut-mark.bl{
-  display:none;
-}
 
   .wallet-title{ font-weight:800; font-size:14px; margin-bottom:6px }
   .wallet-line{ font-size:12px; margin:4px 0 }
@@ -293,16 +264,15 @@ const SITE_URL = JSON.stringify(siteConfig.website + withBase('/support-card/'))
             var html = '<!doctype html><html><head><meta charset="utf-8"><title>Support Card Print</title><style>';
             html += '@page{size:A4;margin:6mm}';
             html += 'body{font-family:Arial,Helvetica,sans-serif;margin:0;padding:0;color:#111;background:#fff}';
-            html += '.sheet{position:relative;width:calc(210mm - 12mm);height:calc(297mm - 12mm);margin:0;padding:0;box-sizing:border-box}';
+            html += '.sheet{position:relative;width:calc(210mm - 12mm);height:calc(297mm - 12mm); max-height: 290mm;  page-break-after: avoid;page-break-inside: avoid;margin:0;padding:0;box-sizing:border-box}';
 
             // centre dashed line
-           html += '.sheet::before{content:"";position:absolute;left:50%;top:50%;height:60mm;transform:translate(-0.125mm,-50%);width:0;border-left:0.25mm dashed black;pointer-events:none;z-index:3;}';
+           html += '.sheet::before{content:"";position:absolute;left:50%;top:50%;height:60mm;transform:translate(-0.125mm,-50%);width:0;border-left:0.5mm dashed black;pointer-events:none;z-index:3;}';
 
 
 html += '.panel-card{position:absolute;top:50%;width:85mm;height:54mm;display:block;transform:translateY(-50%)}';
 html += '.panel-card.front{left:50%;transform:translate(-100%,-50%)}';
 html += '.panel-card.back{left:50%;transform:translate(0,-50%)}';
-
 
 html += '.wallet-area{'
 html += 'width:85mm;'
@@ -312,11 +282,20 @@ html += 'padding:4mm 18mm 4mm 6mm;'
 html += 'background:#fff;'
 html += 'position:relative;'
 html += '}';
-html += '.wallet-area .cut-mark{position:absolute;width:8mm;height:8mm;z-index:10}';
-html += '.wallet-area .cut-mark.tl{top:-4mm;left:-4mm;border-top:1mm solid #000;border-left:1mm solid #000}';
-html += '.wallet-area .cut-mark.tr{top:-4mm;right:-4mm;border-top:1mm solid #000;border-right:1mm solid #000}';
-html += '.wallet-area .cut-mark.bl{bottom:-4mm;left:-4mm;border-bottom:1mm solid #000;border-left:1mm solid #000}';
-html += '.wallet-area .cut-mark.br{bottom:-4mm;right:-4mm;border-bottom:1mm solid #000;border-right:1mm solid #000}';
+
+html += '.wallet-area::after{'
+html += 'content:"";'
+html += 'position:absolute;'
+html += 'inset:0;'
+html += 'pointer-events:none;'
+html += 'border:0.5mm solid #000;'
+html += 'box-sizing:border-box;'
+html += '}';
+
+html += '.panel-card.front .wallet-area::after{border-right:none;}';
+html += '.panel-card.back .wallet-area::after{border-left:none;}';
+
+
 
 
 
@@ -333,7 +312,7 @@ html += '.wallet-area .cut-mark.br{bottom:-4mm;right:-4mm;border-bottom:1mm soli
             // FRONT
             html += '<div class="panel-card front" aria-label="Front">';
             html += '<div class="wallet-area">';
-            html += '<div class="cut-mark tl"></div><div class="cut-mark bl"></div>';
+
             html += '<div class="wallet-title">My Support Card</div>';
             html += '<div class="wallet-line"><strong>Name:</strong> ' + esc(data.name) + '</div>';
             html += '<div class="wallet-line"><strong>How I like to be told things:</strong> ' + esc(data.how) + '</div>';
@@ -348,7 +327,7 @@ html += '.wallet-area .cut-mark.br{bottom:-4mm;right:-4mm;border-bottom:1mm soli
             // BACK
             html += '<div class="panel-card back" aria-label="Back">';
             html += '<div class="wallet-area">';
-            html += '<div class="cut-mark tr"></div><div class="cut-mark br"></div>';
+
             html += '<div class="wallet-title">Emergency Info</div>';
             html += '<div class="wallet-line"><strong>Sensory triggers:</strong> ' + esc(data.sensory) + '</div>';
             html += '<div class="wallet-line"><strong>Confidence tip:</strong> ' + esc(data.confident) + '</div>';
