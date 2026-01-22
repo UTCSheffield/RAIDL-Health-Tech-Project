@@ -17,7 +17,7 @@ const SITE_URL = JSON.stringify(siteConfig.website + withBase('/support-card/'))
     .controls{display:flex;gap:8px;margin-top:12px}
     button{background:var(--accent);color:#fff;border:none;padding:10px 12px;border-radius:8px;cursor:pointer;font-weight:700}
     .muted-btn{background:transparent;border:1px solid #d0d0d0;padding:8px 10px;border-radius:8px}
-    .preview{border-radius:10px;padding:18px;min-height:320px;display:flex;align-items:center;justify-content:center;background:#fff}
+    .preview{border-radius:10px;padding:18px;display:flex;align-items:center;justify-content:center;background:#fff}
     .card-screen{width:360px;border-radius:8px;padding:14px;background:#fff;border:1px solid #e6e6e6}
     .card-title{font-size:20px;font-weight:800;margin-bottom:8px}
     .card-line{margin:8px 0;font-size:16px}
@@ -25,48 +25,128 @@ const SITE_URL = JSON.stringify(siteConfig.website + withBase('/support-card/'))
     .small{font-size:13px;color:var(--muted);margin-top:8px}
 
     /* PRINT: single A4 page with front (left) and back (right) */
- /* PRINT: single A4 page with front (left) and back (right) */
-@media print{
+@media print {
   @page { size: A4 portrait; margin: 6mm; }
   html,body{height:100%;margin:0;padding:0}
-  body{display:flex;justify-content:center;align-items:flex-start;background:#fff}
-  .sheet {
-    width: calc(210mm - 12mm);
-    max-width:210mm;
-    margin: 0 auto;
-    display:flex;
-    flex-wrap:nowrap;
-    gap:0mm;
-    padding:0;
-    box-sizing:border-box;
-    justify-content:center;
-  }
-  
-  .panel-card{ width: 50%; box-sizing:border-box; padding:6mm; min-height:85mm; }
-  .panel-card:first-child{
-  border-right: 0.25mm dashed #bbb;
+  body{font-family:Arial,Helvetica,sans-serif;background:#fff;color:#111}
+
+  /* sheet: full printable area (no gaps) */
+.sheet{
+  position:relative;
+  width:calc(210mm - 12mm);
+  height:calc(297mm - 12mm);
+  margin:0 auto;
+  padding:0;
+  box-sizing:border-box;
+  overflow:visible;
+}
+.print-note{
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:6mm;
+  text-align:center;
+  font-size:10px;
+  color:#111;
+  font-weight:600;
+}
+ .sheet::before{
+  content:"";
+  position:absolute;
+  left:50%
+  top:50%;
+  height:54mm;              /* match wallet height */
+  transform:translate(-0.125mm, -50%);
+  width:0;
+  border-left:0.25mm dashed black;
+  pointer-events:none;
+    z-index:5;
 }
 
-  .wallet-area{   width: 85mm;
-  height: 54mm;
-  box-sizing: border-box;  background:#fff }
-  .cut-mark{ position:absolute; width:8mm; height:8mm }
-  .cut-mark.tl{ left:-5mm; top:-5mm; border-top:2px solid #000; border-left:2px solid #000 }
-  .cut-mark.tr{ right:-5mm; top:-5mm; border-top:2px solid #000; border-right:2px solid #000 }
-  .cut-mark.bl{ left:-5mm; bottom:-5mm; border-bottom:2px solid #000; border-left:2px solid #000 }
-  .cut-mark.br{ right:-5mm; bottom:-5mm; border-bottom:2px solid #000; border-right:2px solid #000 }
+.panel-card{
+  position:absolute;
+  top:50%;
+  width:85mm;
+  height:54mm;
+  transform:translateY(-50%);
+}
 
-  /* removed center fold-line + scissor (no centre guide) */
+.panel-card.front{
+  left:50%;
+  transform:translate(-85mm,-50%);
+}
+
+.panel-card.back{
+  left:50%;
+  transform:translate(0,-50%);
+}
+  /* wallet card exact size */
+  .wallet-area{
+    width:85mm;
+    height:54mm;
+    box-sizing:border-box;
+  padding:4mm 6mm;
+  padding-right:22mm;
+    background:#fff;
+    position:relative;
+    z-index:4; 
+    display:block;
+  }
+
+
+.wallet-area .cut-mark{
+  position:absolute;
+  width:8mm;
+  height:8mm;
+  z-index:10;
+}
+
+.wallet-area .cut-mark.tl{
+  top:-4mm;
+  left:-4mm;
+  border-top:1mm solid #000;
+  border-left:1mm solid #000;
+}
+
+.wallet-area .cut-mark.tr{
+  top:-4mm;
+  right:-4mm;
+  border-top:1mm solid #000;
+  border-right:1mm solid #000;
+}
+
+.wallet-area .cut-mark.bl{
+  bottom:-4mm;
+  left:-4mm;
+  border-bottom:1mm solid #000;
+  border-left:1mm solid #000;
+}
+
+.wallet-area .cut-mark.br{
+  bottom:-4mm;
+  right:-4mm;
+  border-bottom:1mm solid #000;
+  border-right:1mm solid #000;
+}
+.panel-card.front .cut-mark.tr,
+.panel-card.front .cut-mark.br{
+  display:none;
+}
+
+.panel-card.back .cut-mark.tl,
+.panel-card.back .cut-mark.bl{
+  display:none;
+}
 
   .wallet-title{ font-weight:800; font-size:14px; margin-bottom:6px }
   .wallet-line{ font-size:12px; margin:4px 0 }
+  .qr-label{ position:absolute; right:5mm; bottom:18mm; font-size:8px; color:#333; text-align:right; font-weight:600 }
+  .qr{ position:absolute; right:5mm; bottom:5mm; width:11mm; height:11mm; display:block; object-fit:contain }
 
-  /* QR label + QR image (small, bottom-right) */
-  .qr-label{ position:absolute; right:4mm; bottom:16mm; font-size:8px; color:#333; text-align:right; font-weight:600; }
-  .qr{ position:absolute; right:4mm; bottom:4mm; width:12mm; height:12mm; display:block; }
+  /* print note: placed outside the sheet so it cannot overlay the wallets */
+  .print-note{ display:block; width:100%; text-align:center; font-size:10px; color:#333; margin-top:6mm }
 
-  body, .wrap { padding-left: 0 !important; padding-right: 0 !important; }
-  .sheet{ page-break-after:avoid }
+  body, .wrap { padding-left:0 !important; padding-right:0 !important }
 }
 
     @media (max-width:1200px){ .wrap{ grid-template-columns:1fr } }
@@ -213,30 +293,47 @@ const SITE_URL = JSON.stringify(siteConfig.website + withBase('/support-card/'))
             var html = '<!doctype html><html><head><meta charset="utf-8"><title>Support Card Print</title><style>';
             html += '@page{size:A4;margin:6mm}';
             html += 'body{font-family:Arial,Helvetica,sans-serif;margin:0;padding:0;color:#111;background:#fff}';
-            html += '.sheet{width:calc(210mm - 12mm);max-width:210mm;margin:0 auto;display:flex;flex-wrap:nowrap;gap:0;padding:0;box-sizing:border-box}';
+            html += '.sheet{position:relative;width:calc(210mm - 12mm);height:calc(297mm - 12mm);margin:0;padding:0;box-sizing:border-box}';
 
-            html += '.panel-card{width:50%;box-sizing:border-box;padding:0;position:relative}';
+            // centre dashed line
+           html += '.sheet::before{content:"";position:absolute;left:50%;top:50%;height:60mm;transform:translate(-0.125mm,-50%);width:0;border-left:0.25mm dashed black;pointer-events:none;z-index:3;}';
 
-            html += '.wallet-area{width:85mm;height:54mm;min-width:85mm;max-width:85mm;min-height:54mm;max-height:54mm;padding:4mm;box-sizing:border-box;position:relative;background:#fff;margin:0 auto}';
 
-            html += '.cut-mark{position:absolute;width:8mm;height:8mm}';
-            html += '.cut-mark.tl{left:-5mm;top:-5mm;border-top:2px solid #000;border-left:2px solid #000}';
-            html += '.cut-mark.tr{right:-5mm;top:-5mm;border-top:2px solid #000;border-right:2px solid #000}';
-            html += '.cut-mark.bl{left:-5mm;bottom:-5mm;border-bottom:2px solid #000;border-left:2px solid #000}';
-            html += '.cut-mark.br{right:-5mm;bottom:-5mm;border-bottom:2px solid #000;border-right:2px solid #000}';
+html += '.panel-card{position:absolute;top:50%;width:85mm;height:54mm;display:block;transform:translateY(-50%)}';
+html += '.panel-card.front{left:50%;transform:translate(-100%,-50%)}';
+html += '.panel-card.back{left:50%;transform:translate(0,-50%)}';
+
+
+html += '.wallet-area{'
+html += 'width:85mm;'
+html += 'height:54mm;'
+html += 'box-sizing:border-box;'
+html += 'padding:4mm 18mm 4mm 6mm;'
+html += 'background:#fff;'
+html += 'position:relative;'
+html += '}';
+html += '.wallet-area .cut-mark{position:absolute;width:8mm;height:8mm;z-index:10}';
+html += '.wallet-area .cut-mark.tl{top:-4mm;left:-4mm;border-top:1mm solid #000;border-left:1mm solid #000}';
+html += '.wallet-area .cut-mark.tr{top:-4mm;right:-4mm;border-top:1mm solid #000;border-right:1mm solid #000}';
+html += '.wallet-area .cut-mark.bl{bottom:-4mm;left:-4mm;border-bottom:1mm solid #000;border-left:1mm solid #000}';
+html += '.wallet-area .cut-mark.br{bottom:-4mm;right:-4mm;border-bottom:1mm solid #000;border-right:1mm solid #000}';
+
+
+
             html += '.wallet-title{font-weight:800;font-size:14px;margin-bottom:6px}';
             html += '.wallet-line{font-size:12px;margin:4px 0}';
-            html += '.qr-label{position:absolute;right:4mm;bottom:16mm;font-size:8px;color:#333;text-align:right;font-weight:600;}';
-            html += '.qr{position:absolute;right:4mm;bottom:4mm;width:12mm;height:12mm;display:block;}';
-            html += '.print-note{font-size:10px;color:#333;margin-top:6px}';
+            html += '.qr-label{position:absolute;right:4mm;bottom:16mm;font-size:8px;color:#333;text-align:right;font-weight:600}';
+            html += '.qr{position:absolute;right:4mm;bottom:4mm;width:12mm;height:12mm;display:block}';
+            html += '.print-note{display:block;width:100%;text-align:center;font-size:10px;color:#333;margin-top:6mm}';
             html += '.sheet{page-break-after:avoid}';
             html += '</style></head><body>';
+
             html += '<div class="sheet" role="main">';
 
             // FRONT
-            html += '<div class="panel-card" aria-label="Front">';
+            html += '<div class="panel-card front" aria-label="Front">';
             html += '<div class="wallet-area">';
-            html += '<div class="cut-mark tl"></div><div class="cut-mark tr"></div><div class="cut-mark bl"></div><div class="cut-mark br"></div>';
+            html += '<div class="cut-mark tl"></div><div class="cut-mark bl"></div>';
             html += '<div class="wallet-title">My Support Card</div>';
             html += '<div class="wallet-line"><strong>Name:</strong> ' + esc(data.name) + '</div>';
             html += '<div class="wallet-line"><strong>How I like to be told things:</strong> ' + esc(data.how) + '</div>';
@@ -245,21 +342,25 @@ const SITE_URL = JSON.stringify(siteConfig.website + withBase('/support-card/'))
             html += '<div class="wallet-line"><strong>Emergency:</strong> ' + esc(data.contact) + '</div>';
             html += '<div class="qr-label">Scan me to learn more!</div>';
             html += '<img class="qr" src="' + qrSrc + '" alt="QR linking to site" />';
-            html += '</div>';
-            html += '<div class="print-note">Cut both of the cards out, and fold accross the middle; glueing both of the cards together.</div>';
-            html += '</div>';
-
+            html += '</div>'; // wallet-area
+            html += '</div>'; // panel-card
+               
             // BACK
-            html += '<div class="panel-card" aria-label="Back">';
+            html += '<div class="panel-card back" aria-label="Back">';
             html += '<div class="wallet-area">';
-            html += '<div class="cut-mark tl"></div><div class="cut-mark tr"></div><div class="cut-mark bl"></div><div class="cut-mark br"></div>';
+            html += '<div class="cut-mark tr"></div><div class="cut-mark br"></div>';
             html += '<div class="wallet-title">Emergency Info</div>';
             html += '<div class="wallet-line"><strong>Sensory triggers:</strong> ' + esc(data.sensory) + '</div>';
             html += '<div class="wallet-line"><strong>Confidence tip:</strong> ' + esc(data.confident) + '</div>';
-            html += '</div>';
-            html += '</div>';
-
+            html += '</div>'; // wallet-area
+            
+            html += '</div>'; // panel-card
+html += '<div class="print-note">Cut around the cards using </div>';
             html += '</div>'; // sheet
+
+            // move print note outside the sheet so it cannot overlay the wallet
+           
+
             html += '</body></html>';
 
             // open new window and attempt immediate print (keeps user gesture)
