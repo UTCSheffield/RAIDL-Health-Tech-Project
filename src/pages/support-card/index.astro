@@ -215,8 +215,10 @@ const SITE_URL = JSON.stringify(siteConfig.website + withBase('/support-card/'))
             html += 'body{font-family:Arial,Helvetica,sans-serif;margin:0;padding:0;color:#111;background:#fff}';
             html += '.sheet{width:calc(210mm - 12mm);max-width:210mm;margin:0 auto;display:flex;flex-wrap:nowrap;gap:0;padding:0;box-sizing:border-box}';
 
-            html += '.panel-card{width:calc(50% - 4mm);box-sizing:border-box;padding:6mm;min-height:85mm;position:relative}';
-            html += '.wallet-area{width:85mm;height:55mm;margin:6mm auto;position:relative;box-sizing:border-box;background:#fff}';
+            html += '.panel-card{width:50%;box-sizing:border-box;padding:0;position:relative}';
+
+            html += '.wallet-area{width:85mm;height:54mm;min-width:85mm;max-width:85mm;min-height:54mm;max-height:54mm;padding:4mm;box-sizing:border-box;position:relative;background:#fff;margin:0 auto}';
+
             html += '.cut-mark{position:absolute;width:8mm;height:8mm}';
             html += '.cut-mark.tl{left:-5mm;top:-5mm;border-top:2px solid #000;border-left:2px solid #000}';
             html += '.cut-mark.tr{right:-5mm;top:-5mm;border-top:2px solid #000;border-right:2px solid #000}';
