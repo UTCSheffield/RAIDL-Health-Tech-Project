@@ -4,6 +4,7 @@ import siteConfig from "../../site.config";
 
 import { withBase } from "../../utils/helpers";
 const SITE_URL = JSON.stringify(siteConfig.website + withBase('/support-card/'));
+import "../../styles/global.css";
 ---
 
 <MainLayout activePage="support-card" pageTitle={`${siteConfig.title} - Support Card`}>
@@ -26,99 +27,100 @@ const SITE_URL = JSON.stringify(siteConfig.website + withBase('/support-card/'))
 
     /* PRINT: single A4 page with front (left) and back (right) */
 @media print {
-  @page { size: A4 portrait; margin: 6mm; }
-  html,body{height:100%;margin:0;padding:0}
-  body{font-family:Arial,Helvetica,sans-serif;background:#fff;color:#111}
+  /* Make the page exactly A4 and remove browser margins so our math is exact.
+     If you prefer browser margins, use margin:6mm and adjust .sheet height accordingly. */
+  @page { size: A4 portrait; margin: 0; }
 
-  /* sheet: full printable area (no gaps) */
-.sheet{
-  position:relative;
-  width:calc(210mm - 12mm);
-  height:calc(290mm - 12mm);
-  margin:0 auto;
-  padding:0;
-  box-sizing:border-box;
-  overflow:visible;
-   max-height: 290mm;
-     page-break-after: avoid;
-  page-break-inside: avoid;
-}
-.print-note{
-  position:absolute;
-  left:0;
-  right:0;
-  bottom:6mm;
-  text-align:center;
-  font-size:10px;
-  color:#111;
-  font-weight:600;
-  
-}
- .sheet::before{
-  content:"";
-  position:absolute;
-  left:50%;
-  top:50%;
-  height:54mm;              /* match wallet height */
-  transform:translate(-0.125mm, -50%);
-  width:0;
-  border-left:0.5mm dashed black;
-  pointer-events:none;
-    z-index:5;
-}
-#form-title{
-  font-family:"Caveat Brush", cursive;
-}
-.panel-card{
-  position:absolute;
-  top:50%;
-  width:85mm;
-  height:54mm;
-  transform:translateY(-50%);
-}
-
-.panel-card.front{
-  left:50%;
-  transform:translate(-85mm,-50%);
-}
-
-.panel-card.back{
-  left:50%;
-  transform:translate(0,-50%);
-}
-  /* wallet card exact size */
-  .wallet-area{
-border:0.5mm solid #000;
-    width:85mm;
-    height:54mm;
-    box-sizing:border-box;
-  padding:4mm 6mm;
-  padding-right:22mm;
-    background:#fff;
-    position:relative;
-    z-index:4; 
-    display:block;
-  
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 297mm;     /* full A4 height */
+    box-sizing: border-box;
+    background: #fff;
+    color: #111;
+    overflow: hidden;   /* prevent accidental overflow to another page */
+    font-family: Arial, Helvetica, sans-serif;
   }
-.panel-card.front .wallet-area::after{
-  border-right:none;
+
+  /* sheet: full printable area (we add our own inner padding so print layout is exact) */
+  .sheet {
+    position: relative;
+    width: 210mm;               /* full A4 width */
+    height: 297mm;              /* full A4 height */
+    padding: 6mm;               /* acts like page margin */
+    box-sizing: border-box;
+    overflow: hidden;           /* important: prevents tiny overflow */
+    page-break-after: avoid;
+    page-break-inside: avoid;
+  }
+
+  /* dashed center fold */
+  .sheet::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    height: 53mm; /* fold line length */
+    transform: translate(-0.125mm, -50%);
+    width: 0;
+    border-left: 1mm dashed black;
+    pointer-events: none;
+    z-index: 3;
+  }
+
+  .panel-card {
+    position: absolute;
+    top: 50%;
+    width: 85mm;
+    height: 54mm;
+    transform: translateY(-50%);
+    box-sizing: border-box;
+  }
+
+  /* place left and right cards exactly */
+  .panel-card.front { left: calc(50% - 85mm); } /* left card placed so gap matches fold */
+  .panel-card.back  { left: 50%; }
+
+  .wallet-area {
+    width: 85mm;
+    height: 54mm;
+    padding: 4mm 6mm; /* inner padding */
+    box-sizing: border-box;
+    background: #fff;
+    position: relative;
+  }
+
+  .wallet-area::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    border: 0.5mm solid #000;
+    box-sizing: border-box;
+  }
+
+  .wallet-title { font-weight:800; font-size:14px; margin-bottom:6px; font-family: "Rubik", sans-serif; }
+  .wallet-line  { font-size:12px; margin:4px 0 }
+  .qr-label     { position:absolute; right:4mm; bottom:16mm; font-size:8px; color:#333; font-weight:600; text-align:right }
+  .qr           { position:absolute; right:4mm; bottom:4mm; width:12mm; height:12mm; display:block; object-fit:contain }
+
+:root { --card-half: 27mm; --gap: 6mm; }
+
+.print-note{
+  position: absolute;
+  left: 50%;
+  top: calc(50% + var(--card-half) + var(--gap)); /* 50% centre + half card + gap */
+  transform: translateX(-50%);
+  width: 160mm;
+  max-width: calc(210mm - 24mm);
+  text-align: center;
+  font-size: 10px;
+  color: #333;
+  z-index: 20;
+  box-sizing: border-box;
+}
 }
 
-.panel-card.back .wallet-area::after{
-  border-left:none;
-}
-
-
-  .wallet-title{ font-weight:800; font-size:14px; margin-bottom:6px }
-  .wallet-line{ font-size:12px; margin:4px 0 }
-  .qr-label{ position:absolute; right:5mm; bottom:18mm; font-size:8px; color:#333; text-align:right; font-weight:600 }
-  .qr{ position:absolute; right:5mm; bottom:5mm; width:11mm; height:11mm; display:block; object-fit:contain }
-
-  /* print note: placed outside the sheet so it cannot overlay the wallets */
-  .print-note{ display:block; width:100%; text-align:center; font-size:10px; color:#333; margin-top:6mm }
-
-  body, .wrap { padding-left:0 !important; padding-right:0 !important }
-}
 
     @media (max-width:1200px){ .wrap{ grid-template-columns:1fr } }
   </style>
@@ -142,16 +144,16 @@ border:0.5mm solid #000;
       <label for="sensory">Sensory triggers (short)</label>
       <input id="sensory" type="text" placeholder="loud noises, bright lights" />
 
-      <label for="helps">What helps me (2 things)</label>
+      <label for="helps">What helps me</label>
       <input id="helps" type="text" placeholder="Quiet space; a timer" />
 
-      <label for="health">Health note (meds/time or 'none')</label>
+      <label for="health">Health note</label>
       <input id="health" type="text" placeholder="Meds at 8:00 - methylphenidate" />
 
-      <label for="confident">What builds my confidence (one short sentence)</label>
+      <label for="confident">What builds my confidence</label>
       <input id="confident" type="text" placeholder="Praise when I finish a step" />
 
-      <label for="contact">Emergency contact (name + phone)</label>
+      <label for="contact">Emergency contact</label>
       <input id="contact" type="text" placeholder="Alex - 07123 456789" />
 
       <div class="controls" role="group" aria-label="controls">
@@ -171,7 +173,7 @@ border:0.5mm solid #000;
         <div class="card-line"><span class="card-label">What helps me:</span><span id="p-helps">—</span></div>
         <div class="card-line"><span class="card-label">Health note:</span><span id="p-health">—</span></div>
         <div class="card-line"><span class="card-label">Emergency contact:</span><span id="p-contact">—</span></div>
-        <div class="card-line small"><strong>How to use:</strong> Give this card to my teacher, carer or doctor.</div>
+        <div class="card-line small"><strong>How to use:</strong> Show this card to a adult to help them understand what you need.</div>
       </div>
     </div>
   </div>
@@ -264,10 +266,10 @@ border:0.5mm solid #000;
             var html = '<!doctype html><html><head><meta charset="utf-8"><title>Support Card Print</title><style>';
             html += '@page{size:A4;margin:6mm}';
             html += 'body{font-family:Arial,Helvetica,sans-serif;margin:0;padding:0;color:#111;background:#fff}';
-            html += '.sheet{position:relative;width:calc(210mm - 12mm);height:calc(297mm - 12mm); max-height: 290mm;  page-break-after: avoid;page-break-inside: avoid;margin:0;padding:0;box-sizing:border-box}';
+            html += '.sheet{position:relative;width:calc(210mm - 12mm);height:calc(270mm - 12mm); max-height: 270mm;  page-break-after: avoid;page-break-inside: avoid;margin:0;padding:0;box-sizing:border-box}';
 
             // centre dashed line
-           html += '.sheet::before{content:"";position:absolute;left:50%;top:50%;height:60mm;transform:translate(-0.125mm,-50%);width:0;border-left:0.5mm dashed black;pointer-events:none;z-index:3;}';
+           html += '.sheet::before{content:"";position:absolute;left:50%;top:50%;height:53mm;transform:translate(-0.125mm,-50%);width:0;border-left:0.7mm dashed black;pointer-events:none;z-index:3;}';
 
 
 html += '.panel-card{position:absolute;top:50%;width:85mm;height:54mm;display:block;transform:translateY(-50%)}';
@@ -299,11 +301,11 @@ html += '.panel-card.back .wallet-area::after{border-left:none;}';
 
 
 
-            html += '.wallet-title{font-weight:800;font-size:14px;margin-bottom:6px}';
+            html += '.wallet-title{font-weight:800;font-size:14px;margin-bottom:6px; }';
             html += '.wallet-line{font-size:12px;margin:4px 0}';
             html += '.qr-label{position:absolute;right:4mm;bottom:16mm;font-size:8px;color:#333;text-align:right;font-weight:600}';
             html += '.qr{position:absolute;right:4mm;bottom:4mm;width:12mm;height:12mm;display:block}';
-            html += '.print-note{display:block;width:100%;text-align:center;font-size:10px;color:#333;margin-top:6mm}';
+
             html += '.sheet{page-break-after:avoid}';
             html += '</style></head><body>';
 
@@ -325,17 +327,21 @@ html += '.panel-card.back .wallet-area::after{border-left:none;}';
             html += '</div>'; // panel-card
                
             // BACK
-            html += '<div class="panel-card back" aria-label="Back">';
-            html += '<div class="wallet-area">';
+           html += '<div class="panel-card back" aria-label="Back">';
+html += '  <div class="wallet-area">';
+html += '    <div class="wallet-title">Additional Info</div>';
+html += '    <div class="wallet-line"><strong>Sensory triggers:</strong> ' + esc(data.sensory) + '</div>';
+html += '    <div class="wallet-line"><strong>Confidence tip:</strong> ' + esc(data.confident) + '</div>';
+html += '  </div>'; // close .wallet-area
+html += '</div>'; // <-- important: close .panel-card.back
 
-            html += '<div class="wallet-title">Emergency Info</div>';
-            html += '<div class="wallet-line"><strong>Sensory triggers:</strong> ' + esc(data.sensory) + '</div>';
-            html += '<div class="wallet-line"><strong>Confidence tip:</strong> ' + esc(data.confident) + '</div>';
-            html += '</div>'; // wallet-area
-            
-            html += '</div>'; // panel-card
-html += '<div class="print-note">Cut around the cards using </div>';
-            html += '</div>'; // sheet
+// now add the print-note *outside* the card containers so it centers across the sheet
+html += '<div class="print-note" style="bottom: 32%; margin-left:4%; position: absolute;">Cut around the cards using scissors, making sure not to cut over the dotted line. Afterwards, fold the cutout in half across the dotted line, and glue together.</div>';
+
+html += '</div>';
+
+// print-note outside the sheet so it can't cause overflow
+
 
             // move print note outside the sheet so it cannot overlay the wallet
            
