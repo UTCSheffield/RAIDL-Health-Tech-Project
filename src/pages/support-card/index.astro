@@ -258,7 +258,7 @@ import "../../styles/global.css";
 
             // determine siteUrl (meta tag fallback)
             var meta = document.querySelector('meta[name="site-url"]');
-            var siteUrl = (meta && meta.getAttribute) ? meta.getAttribute('content') : window.location.origin + '/support-card/';
+            var siteUrl = (meta && meta.getAttribute) ? meta.getAttribute('content') : window.location.origin + '/';
             console.log('support-card: using siteUrl =', siteUrl);
             var qrSrc = 'https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=' + encodeURIComponent(siteUrl);
 
