@@ -179,14 +179,12 @@ import "../../styles/global.css";
   </div>
 
 <script>
-
 // @ts-nocheck
 (function () {
-  // initialise whether DOMContentLoaded has already fired or not
   function init() {
     try {
       // helper + fields
-      var $ = function(id){ return document.getElementById(id); };
+      var $ = function (id) { return document.getElementById(id); };
       var fields = ['name','how','sensory','helps','health','confident','contact'];
 
       // Restore saved values (safe)
@@ -201,7 +199,7 @@ import "../../styles/global.css";
       }
 
       // update preview & persist
-      function updatePreview(){
+      function updatePreview() {
         for (var i = 0; i < fields.length; i++) {
           var f = fields[i];
           var v = ($(f) && $(f).value ? $(f).value.toString().trim() : '');
@@ -210,7 +208,9 @@ import "../../styles/global.css";
         }
         try {
           var obj = {};
-          for (var j = 0; j < fields.length; j++) { obj[fields[j]] = ($(fields[j]) ? $(fields[j]).value : ''); }
+          for (var j = 0; j < fields.length; j++) {
+            obj[fields[j]] = ($(fields[j]) ? $(fields[j]).value : '');
+          }
           localStorage.setItem('supportCard', JSON.stringify(obj));
         } catch (e) {
           console.warn('Failed to save supportCard to localStorage', e);
@@ -221,29 +221,35 @@ import "../../styles/global.css";
 
       // clear button
       if ($('clear')) {
-        $('clear').addEventListener('click', function(){
-          for (var i = 0; i < fields.length; i++) { if ($(fields[i])) $(fields[i]).value = ''; }
+        $('clear').addEventListener('click', function () {
+          for (var i = 0; i < fields.length; i++) {
+            if ($(fields[i])) $(fields[i]).value = '';
+          }
           updatePreview();
-          try { localStorage.removeItem('supportCard'); } catch(e) {}
+          try { localStorage.removeItem('supportCard'); } catch (e) {}
         });
       }
 
       // debounce inputs
       var debounceTimer;
       for (var k = 0; k < fields.length; k++) {
-        (function(field){
+        (function (field) {
           var el = $(field);
           if (!el) return;
-          el.addEventListener('input', function(){
+          el.addEventListener('input', function () {
             clearTimeout(debounceTimer);
             debounceTimer = setTimeout(updatePreview, 180);
           });
         })(fields[k]);
       }
 
-      function esc(s){
+      function esc(s) {
         if (!s) return '';
-        return s.toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        return s.toString()
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
       }
 
       // Print handler (safe)
@@ -252,60 +258,51 @@ import "../../styles/global.css";
           // keep this as a user-gesture handler; avoid async breaks before print call
           try {
             updatePreview();
+
+            // Collect form data safely, with '—' fallback for empty
             var data = {};
             for (var i = 0; i < fields.length; i++) {
-              data[fields[i]] = ($(fields[i]) && $(fields[i]).value) ? $(fields[i]).value.toString().trim() : '—';
+              data[fields[i]] = ($(fields[i]) && $(fields[i]).value)
+                ? $(fields[i]).value.toString().trim()
+                : '—';
             }
 
-            // determine siteUrl (meta tag fallback)
-            var meta = document.querySelector('meta[name="site-url"]');
-            var siteUrl = (meta && meta.getAttribute) ? meta.getAttribute('content') : window.location.origin + '/';
-            console.log('support-card: using siteUrl =', siteUrl);
+            // Hard-coded site URL for QR (as requested)
+            var siteUrl = "https://raidl.up.railway.app/#about-us";
             var qrSrc = 'https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=' + encodeURIComponent(siteUrl);
 
-            // build print HTML
+            // (Optional) pre-warm the QR in parent to speed up first render
+            try { var pre = new Image(); pre.src = qrSrc; } catch (e) {}
+
+            // Build print HTML
             var html = '<!doctype html><html><head><meta charset="utf-8"><title>Support Card Print</title><style>';
             html += '@page{size:A4;margin:6mm}';
             html += 'body{font-family:Arial,Helvetica,sans-serif;margin:0;padding:0;color:#111;background:#fff}';
-            html += '.sheet{position:relative;width:calc(210mm - 12mm);height:calc(270mm - 12mm); max-height: 270mm;  page-break-after: avoid;page-break-inside: avoid;margin:0;padding:0;box-sizing:border-box}';
+            html += '.sheet{position:relative;width:calc(210mm - 12mm);height:calc(270mm - 12mm);max-height:270mm;page-break-after:avoid;page-break-inside:avoid;margin:0;padding:0;box-sizing:border-box}';
 
             // centre dashed line
-           html += '.sheet::before{content:"";position:absolute;left:50%;top:50%;height:53mm;transform:translate(-0.125mm,-50%);width:0;border-left:0.7mm dashed black;pointer-events:none;z-index:3;}';
+            html += '.sheet::before{content:"";position:absolute;left:50%;top:50%;height:53mm;transform:translate(-0.125mm,-50%);width:0;border-left:0.7mm dashed black;pointer-events:none;z-index:3;}';
 
+            html += '.panel-card{position:absolute;top:50%;width:85mm;height:54mm;display:block;transform:translateY(-50%)}';
+            html += '.panel-card.front{left:50%;transform:translate(-100%,-50%)}';
+            html += '.panel-card.back{left:50%;transform:translate(0,-50%)}';
 
-html += '.panel-card{position:absolute;top:50%;width:85mm;height:54mm;display:block;transform:translateY(-50%)}';
-html += '.panel-card.front{left:50%;transform:translate(-100%,-50%)}';
-html += '.panel-card.back{left:50%;transform:translate(0,-50%)}';
+            html += '.wallet-area{width:85mm;height:54mm;box-sizing:border-box;padding:4mm 18mm 4mm 6mm;background:#fff;position:relative;}';
+            html += '.wallet-area::after{content:"";position:absolute;inset:0;pointer-events:none;border:0.5mm solid #000;box-sizing:border-box;}';
+            html += '.panel-card.front .wallet-area::after{border-right:none;}';
+            html += '.panel-card.back .wallet-area::after{border-left:none;}';
 
-html += '.wallet-area{'
-html += 'width:85mm;'
-html += 'height:54mm;'
-html += 'box-sizing:border-box;'
-html += 'padding:4mm 18mm 4mm 6mm;'
-html += 'background:#fff;'
-html += 'position:relative;'
-html += '}';
-
-html += '.wallet-area::after{'
-html += 'content:"";'
-html += 'position:absolute;'
-html += 'inset:0;'
-html += 'pointer-events:none;'
-html += 'border:0.5mm solid #000;'
-html += 'box-sizing:border-box;'
-html += '}';
-
-html += '.panel-card.front .wallet-area::after{border-right:none;}';
-html += '.panel-card.back .wallet-area::after{border-left:none;}';
-
-
-
-
-
-            html += '.wallet-title{font-weight:800;font-size:14px;margin-bottom:6px; }';
+            html += '.wallet-title{font-weight:800;font-size:14px;margin-bottom:6px;}';
             html += '.wallet-line{font-size:12px;margin:4px 0}';
             html += '.qr-label{position:absolute;right:4mm;bottom:16mm;font-size:8px;color:#333;text-align:right;font-weight:600}';
-            html += '.qr{position:absolute;right:4mm;bottom:4mm;width:12mm;height:12mm;display:block}';
+            html += '.qr{position:absolute;right:4mm;bottom:4mm;width:12mm;height:12mm;display:block;object-fit:contain}';
+              
+html += '.qr-label{position:absolute;';
+html += 'right:calc(6mm + 9mm + 3mm);'; // label sits 3mm left of the QR (QR is 16mm wide)
+html += 'bottom:6mm;';                   // align to the same bottom offset as the QR
+html += 'max-width:28mm;';               // limit width so it doesn’t run into main text
+html += 'text-align:right;';             // looks nice when next to the QR
+html += 'font-size:8.5px;line-height:1.2;font-weight:600;color:#333;}';
 
             html += '.sheet{page-break-after:avoid}';
             html += '</style></head><body>';
@@ -314,42 +311,34 @@ html += '.panel-card.back .wallet-area::after{border-left:none;}';
 
             // FRONT
             html += '<div class="panel-card front" aria-label="Front">';
-            html += '<div class="wallet-area">';
+            html += '  <div class="wallet-area">';
+            html += '    <div class="wallet-title">My Support Card</div>';
+            html += '    <div class="wallet-line"><strong>Name:</strong> ' + esc(data.name) + '</div>';
+            html += '    <div class="wallet-line"><strong>How I like to be told things:</strong> ' + esc(data.how) + '</div>';
+            html += '    <div class="wallet-line"><strong>What helps me:</strong> ' + esc(data.helps) + '</div>';
+            html += '    <div class="wallet-line"><strong>Health note:</strong> ' + esc(data.health) + '</div>';
+            html += '    <div class="wallet-line"><strong>Emergency:</strong> ' + esc(data.contact) + '</div>';
+            html += '    <div class="qr-label">Scan me to learn more!</div>';
+            html += '    <img class="qr" src="' + qrSrc + '" alt="QR linking to site">';
+            html += '  </div>';
+            html += '</div>';
 
-            html += '<div class="wallet-title">My Support Card</div>';
-            html += '<div class="wallet-line"><strong>Name:</strong> ' + esc(data.name) + '</div>';
-            html += '<div class="wallet-line"><strong>How I like to be told things:</strong> ' + esc(data.how) + '</div>';
-            html += '<div class="wallet-line"><strong>What helps me:</strong> ' + esc(data.helps) + '</div>';
-            html += '<div class="wallet-line"><strong>Health note:</strong> ' + esc(data.health) + '</div>';
-            html += '<div class="wallet-line"><strong>Emergency:</strong> ' + esc(data.contact) + '</div>';
-            html += '<div class="qr-label">Scan me to learn more!</div>';
-            html += '<img class="qr" src="' + qrSrc + '" alt="QR linking to site" />';
-            html += '</div>'; // wallet-area
-            html += '</div>'; // panel-card
-               
             // BACK
-           html += '<div class="panel-card back" aria-label="Back">';
-html += '  <div class="wallet-area">';
-html += '    <div class="wallet-title">Additional Info</div>';
-html += '    <div class="wallet-line"><strong>Sensory triggers:</strong> ' + esc(data.sensory) + '</div>';
-html += '    <div class="wallet-line"><strong>Confidence tip:</strong> ' + esc(data.confident) + '</div>';
-html += '  </div>'; // close .wallet-area
-html += '</div>'; // <-- important: close .panel-card.back
+            html += '<div class="panel-card back" aria-label="Back">';
+            html += '  <div class="wallet-area">';
+            html += '    <div class="wallet-title">Additional Info</div>';
+            html += '    <div class="wallet-line"><strong>Sensory triggers:</strong> ' + esc(data.sensory) + '</div>';
+            html += '    <div class="wallet-line"><strong>Confidence tip:</strong> ' + esc(data.confident) + '</div>';
+            html += '  </div>';
+            html += '</div>';
 
-// now add the print-note *outside* the card containers so it centers across the sheet
-html += '<div class="print-note" style="bottom: 32%; margin-left:4%; position: absolute;">Cut around the cards using scissors, making sure not to cut over the dotted line. Afterwards, fold the cutout in half across the dotted line, and glue together.</div>';
+            // note (outside cards)
+            html += '<div class="print-note" style="bottom:32%;margin-left:4%;position:absolute;">Cut around the cards using scissors, making sure not to cut over the dotted line. Afterwards, fold the cutout in half across the dotted line, and glue together.</div>';
 
-html += '</div>';
-
-// print-note outside the sheet so it can't cause overflow
-
-
-            // move print note outside the sheet so it cannot overlay the wallet
-           
-
+            html += '</div>'; // .sheet
             html += '</body></html>';
 
-            // open new window and attempt immediate print (keeps user gesture)
+            // Open new window
             var w = null;
             try {
               w = window.open('', '_blank');
@@ -358,38 +347,53 @@ html += '</div>';
             }
 
             if (!w) {
-              // popup blocked: navigate current window to blob URL as fallback (user will need to print manually)
-              var blob = new Blob([html], {type: 'text/html'});
+              // popup blocked fallback
+              var blob = new Blob([html], { type: 'text/html' });
               var url = URL.createObjectURL(blob);
               window.location.href = url;
               return;
             }
 
-            // write content
+            // Write content and print AFTER QR loads
             try {
               w.document.open();
               w.document.write(html);
               w.document.close();
 
-              try { w.focus(); } catch (e) {}
+              w.onload = function () {
+                try { w.focus(); } catch (e) {}
 
-              // Try immediate print() while still inside user gesture chain.
-              // This works in most browsers; if it throws, attach an onload fallback.
-              try {
-                if (typeof w.print === 'function') {
+                var qr = w.document.querySelector('img.qr');
+                if (!qr) {
                   w.print();
-                } else {
-                  // fallback: call print on load
-                  w.onload = function () {
-                    try { w.print(); } catch (err2) { console.error('child.print failed (onload)', err2); }
-                  };
+                  return;
                 }
-              } catch (printErr) {
-                console.error('Immediate print() threw, attaching onload fallback', printErr);
-                w.onload = function () {
-                  try { w.print(); } catch (err3) { console.error('child.print failed (onload)', err3); }
-                };
-              }
+
+                // If already loaded from cache
+                if (qr.complete && qr.naturalWidth > 0) {
+                  w.print();
+                  return;
+                }
+
+                var printed = false;
+                function safePrint() {
+                  if (printed) return;
+                  printed = true;
+                  try { w.focus(); } catch (e) {}
+                  w.print();
+                }
+
+                qr.addEventListener('load', safePrint, { once: true });
+                qr.addEventListener('error', safePrint, { once: true });
+
+                // Safety timeout
+                setTimeout(safePrint, 2500);
+              };
+
+              // Optional: auto-close after printing
+              w.onafterprint = function () {
+                try { w.close(); } catch (e) {}
+              };
             } catch (writeErr) {
               console.error('Failed to write child window HTML', writeErr);
               alert('Sorry — could not open the print preview. Check console for details.');
