@@ -294,12 +294,13 @@ import "../../styles/global.css";
 
             html += '.wallet-title{font-weight:800;font-size:14px;margin-bottom:6px;}';
             html += '.wallet-line{font-size:12px;margin:4px 0}';
-            html += '.qr-label{position:absolute;right:4mm;bottom:16mm;font-size:8px;color:#333;text-align:right;font-weight:600}';
-            html += '.qr{position:absolute;right:4mm;bottom:4mm;width:12mm;height:12mm;display:block;object-fit:contain}';
+            html += '.logo{position:absolute;top:4mm;right:4mm;width:14mm;height:auto;object-fit:contain;opacity:0.9;filter:grayscale(100%)}';
+            html += '.qr-label{position:absolute;right:4mm;bottom:5mm;font-size:8px;color:#333;text-align:right;font-weight:600}';
+            html += '.qr{position:absolute;right:4mm;bottom:4.5mm;width:12mm;height:12mm;display:block;object-fit:contain}';
               
 html += '.qr-label{position:absolute;';
 html += 'right:calc(6mm + 9mm + 3mm);'; // label sits 3mm left of the QR (QR is 16mm wide)
-html += 'bottom:6mm;';                   // align to the same bottom offset as the QR
+html += 'bottom:4.5mm;';                   // align to the same bottom offset as the QR
 html += 'max-width:28mm;';               // limit width so it doesn’t run into main text
 html += 'text-align:right;';             // looks nice when next to the QR
 html += 'font-size:8.5px;line-height:1.2;font-weight:600;color:#333;}';
@@ -312,6 +313,7 @@ html += 'font-size:8.5px;line-height:1.2;font-weight:600;color:#333;}';
             // FRONT
             html += '<div class="panel-card front" aria-label="Front">';
             html += '  <div class="wallet-area">';
+            html += '    <img class="logo" src="/space-ahead-logo.png" alt="Space Ahead logo">';
             html += '    <div class="wallet-title">My Support Card</div>';
             html += '    <div class="wallet-line"><strong>Name:</strong> ' + esc(data.name) + '</div>';
             html += '    <div class="wallet-line"><strong>How I like to be told things:</strong> ' + esc(data.how) + '</div>';
@@ -320,13 +322,14 @@ html += 'font-size:8.5px;line-height:1.2;font-weight:600;color:#333;}';
             html += '    <div class="wallet-line"><strong>Emergency:</strong> ' + esc(data.contact) + '</div>';
             html += '    <div class="qr-label">Scan me to learn more!</div>';
             html += '    <img class="qr" src="' + qrSrc + '" alt="QR linking to site">';
-            html += ' <p style="font-size=7px; padding-top:15px;"> P.T.O </p>';
+            html += '    <p style="position:absolute;bottom:5.25mm;left:6mm;font-size:7px;margin:0;font-weight:600;">P.T.O</p>';
             html += '  </div>';
             html += '</div>';
 
             // BACK
             html += '<div class="panel-card back" aria-label="Back">';
             html += '  <div class="wallet-area">';
+            html += '    <img class="logo" src="/space-ahead-logo.png" alt="Space Ahead logo">';
             html += '    <div class="wallet-title">Additional Info</div>';
             html += '    <div class="wallet-line"><strong>Sensory triggers:</strong> ' + esc(data.sensory) + '</div>';
             html += '    <div class="wallet-line"><strong>Confidence tip:</strong> ' + esc(data.confident) + '</div>';
