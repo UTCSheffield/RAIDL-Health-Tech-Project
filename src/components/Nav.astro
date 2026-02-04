@@ -1,6 +1,5 @@
----
+--- 
 import siteConfig, { type Link } from "../site.config";
-import Hamburger from "./Hamburger.astro";
 import SiteIdentity from "./SiteIdentity.astro";
 import NavLinks from "./NavLinks.astro";
 import { withBase } from "../utils/helpers";
@@ -9,9 +8,9 @@ const { activePage } = Astro.props;
 
 <header
   id="site-header"
-  class="sticky top-0 z-50 transition-transform duration-300 h-16 overflow-hidden"
+  class="sticky top-0 z-50 transition-transform duration-300 h-16 overflow-visible"
 >
-<nav class="site-nav flex items-center justify-between w-full h-full px-6 bg-white/80 backdrop-blur-sm">
+  <nav class="site-nav flex items-center justify-between w-full h-full px-6 bg-white/80 backdrop-blur-sm" style="margin:0;">
     <div class="flex items-center gap-6">
       <a href={withBase("/")} aria-label="Home"><SiteIdentity /></a>
     </div>
@@ -22,71 +21,92 @@ const { activePage } = Astro.props;
     </div>
 
     <!-- Actions -->
-<div class="flex items-center gap-4">
-  <!-- desktop CTA: no mt-4 so it vertically centers with the row -->
-<a
-  href={withBase("/help/")}
-  class="inline-flex items-center h-10 px-4 rounded-lg font-bold caveat-brush-regular get-help-btn"style="font-size:19px"
->
-    Get Help
-  </a>
+    <div class="flex items-center gap-4">
+      <!-- desktop CTA: hidden on mobile -->
+      <a
+        href={withBase("/help/")}
+        class="hidden sm:inline-flex inline-flex items-center h-10 px-4 rounded-lg font-bold caveat-brush-regular get-help-btn"
+        style="font-size:19px"
+      >
+        Get Help
+      </a>
 
- <!-- Mode toggle (accessible) -->
-<button
-  id="mode-toggle"
-  class="mode-toggle hidden sm:inline-flex"
-  aria-pressed="false"
-  aria-label="Toggle colour mode: Calm or Vivid"
-  title="Calm / Vivid"
->
-  <span class="labels" aria-hidden="true">
-    <span class="label-calm">Calm</span>
-    <span class="label-vivid">Vivid</span>
-  </span>
+      <!-- Mode toggle (desktop) -->
+      <button
+        id="mode-toggle"
+        class="mode-toggle hidden sm:inline-flex"
+        aria-pressed="false"
+        aria-label="Toggle colour mode: Calm or Vivid"
+        title="Calm / Vivid"
+      >
+        <span class="labels" aria-hidden="true">
+          <span class="label-calm">Calm</span>
+          <span class="label-vivid">Vivid</span>
+        </span>
 
-  <span class="knob" aria-hidden="true"></span>
-  <span class="sr-only">Toggle colour mode</span>
-</button>
+        <span class="knob" aria-hidden="true"></span>
+        <span class="sr-only">Toggle colour mode</span>
+      </button>
 
-  <button id="hamburger-menu" aria-controls="mobile-links" aria-expanded="false" class="sm:hidden inline-block" title="Menu">🍔</button>
-</div>
+      <!-- Mobile Menu Button (3-line hamburger) -->
+      <button
+        id="mobile-menu-toggle"
+        aria-controls="mobile-menu"
+        aria-expanded="false"
+        class="sm:hidden mobile-menu-button"
+        aria-label="Open site menu"
+        title="Menu"
+      >
+        <span class="mobile-menu-label sr-only">Menu</span>
+        <!-- professional 3-line icon -->
+        <svg aria-hidden="true" width="22" height="16" viewBox="0 0 22 16" fill="none" xmlns="http://www.w3.org/2000/svg" focusable="false">
+          <rect x="0" y="0" width="22" height="2" rx="1" fill="currentColor"></rect>
+          <rect x="0" y="7" width="22" height="2" rx="1" fill="currentColor"></rect>
+          <rect x="0" y="14" width="22" height="2" rx="1" fill="currentColor"></rect>
+        </svg>
+      </button>
+    </div>
   </nav>
 
-  <!-- Mobile menu (hidden by default) -->
-  <div id="mobile-links" class="fixed inset-0 z-40 hidden bg-black/60 backdrop-blur-sm p-6">
-    <div class="bg-white dark:bg-black rounded-lg max-w-md w-full mx-auto p-6">
+  <!-- Mobile menu (overlay) - hidden initially -->
+  <div id="mobile-menu" class="mobile-menu" aria-hidden="true" role="menu">
+    <div class="mobile-menu-inner max-w-md w-full mx-auto rounded-lg p-6">
       <div class="flex items-center justify-between mb-4">
-        <SiteIdentity />
-        <button id="mobile-close" aria-label="Close menu">❌</button>
+        <a href={withBase("/")} aria-label="Home"><SiteIdentity /></a>
+        <button id="mobile-menu-close" aria-label="Close menu" class="mobile-close-btn">Close</button>
       </div>
-      <div class="mt-4 flex items-center justify-between">
-  <a href={withBase("/help/")} class="inline-flex items-center px-4 py-2 rounded-lg text-white font-bold caveat-brush-regular get-help-btn" style="background: linear-gradient(90deg, var(--brand-warm) 0%, var(--brand-secondary) 100%); color: white !important;">Get Help</a>
 
-  <button id="mobile-mode-toggle" class="mode-toggle icon-only" aria-pressed="false" aria-label="Toggle colour mode: Calm or Vivid" title="Calm / Vivid">
-    <span class="knob" aria-hidden="true"></span>
-  </button>
-</div>
-      <nav class="flex flex-col gap-2">
+      <div class="mt-2 flex items-center justify-between gap-4">
+        <!-- Mobile CTA inside menu -->
+        <a href={withBase("/help/")} class="inline-flex items-center px-4 py-2 rounded-lg text-white font-bold caveat-brush-regular get-help-btn mobile-only-cta" style="background: linear-gradient(90deg, var(--brand-warm) 0%, var(--brand-secondary) 100%); color: white !important;">Get Help</a>
+
+        <button id="mobile-mode-toggle" class="mode-toggle icon-only" aria-pressed="false" aria-label="Toggle colour mode: Calm or Vivid" title="Calm / Vivid">
+          <span class="knob" aria-hidden="true"></span>
+        </button>
+      </div>
+
+      <nav class="mt-6 flex flex-col gap-2" aria-label="Mobile primary">
         <NavLinks activePage={activePage} links={siteConfig.headerNavLinks} isMobileLink={true} />
+        <!-- fallback CTA (kept for redundancy) -->
         <a href={withBase("/help/")} class="mt-4 inline-flex items-center px-4 py-2 rounded-lg text-white font-bold caveat-brush-regular get-help-btn" style="background: linear-gradient(90deg, #fb8a56 0%, #8d3db8 100%); color: white !important;">Get Help</a>
       </nav>
     </div>
   </div>
 </header>
 
+
+
 <script is:inline>
 (function () {
   if (window.__nav_mode_initialized) return;
   window.__nav_mode_initialized = true;
 
-  // safe globals
+  /* -----------------------
+     MODE TOGGLE (same behavior)
+     ----------------------- */
   window.MODE_KEY = window.MODE_KEY || 'site:mode';
-  window.mode = typeof window.mode !== 'undefined' ? window.mode : undefined;
-
-  const MODE_KEY = window.MODE_KEY;
   const DEFAULT_MODE = 'calm';
   const VALID_MODES = ['calm', 'vivid'];
-
   const VAR_MAP = {
     '--brand-primary': ['#2AA6B7', '#F33974'],
     '--brand-secondary': ['#7A5EA8', '#8D3DB8'],
@@ -102,27 +122,23 @@ const { activePage } = Astro.props;
 
   function setMode(mode, { persist = true } = {}) {
     if (!VALID_MODES.includes(mode)) mode = DEFAULT_MODE;
-
     document.documentElement.setAttribute('data-mode', mode);
-
     const isVivid = mode === 'vivid';
     Object.entries(VAR_MAP).forEach(([key, [calm, vivid]]) => {
       document.documentElement.style.setProperty(key, isVivid ? vivid : calm);
     });
-
-    if (persist) localStorage.setItem(MODE_KEY, mode);
+    if (persist) localStorage.setItem(window.MODE_KEY, mode);
     updateToggleUI(mode);
   }
 
   function getStoredMode() {
-    const stored = localStorage.getItem(MODE_KEY);
+    const stored = localStorage.getItem(window.MODE_KEY);
     return VALID_MODES.includes(stored) ? stored : DEFAULT_MODE;
   }
 
   function toggleMode() {
     const current = document.documentElement.getAttribute('data-mode') || getStoredMode();
-    const next = current === 'calm' ? 'vivid' : 'calm';
-    setMode(next);
+    setMode(current === 'calm' ? 'vivid' : 'calm');
   }
 
   function updateToggleUI(mode) {
@@ -131,8 +147,6 @@ const { activePage } = Astro.props;
       if (!btn) return;
       btn.setAttribute('aria-pressed', String(pressed));
     });
-
-    // Update visible labels in your markup (.labels .label-calm / .label-vivid)
     document.querySelectorAll('.labels').forEach(labels => {
       const calmEl = labels.querySelector('.label-calm');
       const vividEl = labels.querySelector('.label-vivid');
@@ -141,7 +155,7 @@ const { activePage } = Astro.props;
     });
   }
 
-  function bindToggleHandlers() {
+  function bindModeHandlers() {
     document.querySelectorAll('#mode-toggle, #mobile-mode-toggle').forEach(btn => {
       if (!btn || btn.dataset.bound) return;
       btn.dataset.bound = 'true';
@@ -158,33 +172,162 @@ const { activePage } = Astro.props;
   function initMode() {
     const initial = typeof window.mode !== 'undefined' ? window.mode : getStoredMode();
     setMode(initial, { persist: false });
-    bindToggleHandlers();
+    bindModeHandlers();
   }
 
-  // initial load
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initMode);
-  } else {
-    initMode();
-  }
-
-  // re-run after Astro client-side navigation
-  document.addEventListener('astro:page-load', () => {
-    // don't redeclare anything here; just re-run init logic
+  /* -----------------------
+     Header hygiene / game disable (run early)
+     ----------------------- */
+  /* REPLACEMENT: headerHygiene — also relocates #mobile-menu to document.body */
+  function headerHygiene() {
     try {
-      bindToggleHandlers();
-      const stored = getStoredMode();
-      // ensure UI matches stored mode after navigation
-      const current = document.documentElement.getAttribute('data-mode') || stored;
+      // remove legacy hamburger elements if present
+      const old = document.getElementById('hamburger-menu') || document.querySelector('.hamburger, .Hamburger');
+      if (old) old.remove();
+
+      // remove old mobile-links overlays if present
+      const oldOverlay = document.getElementById('mobile-links') || document.getElementById('mosbile-links');
+      if (oldOverlay) oldOverlay.remove();
+
+      // compute header height and publish CSS var
+      const headerEl = document.getElementById('site-header') || document.querySelector('header');
+      if (headerEl) {
+        const h = Math.ceil(headerEl.getBoundingClientRect().height || 64);
+        document.documentElement.style.setProperty('--header-h', h + 'px');
+        // lock header from scrolling
+        headerEl.style.overflow = 'hidden';
+        headerEl.style.overscrollBehavior = 'contain';
+        headerEl.style.touchAction = 'manipulation';
+      } else {
+        document.documentElement.style.setProperty('--header-h', '64px');
+      }
+
+      // move mobile menu to document.body so it cannot be clipped / scrolled by header parents
+      const mobileMenu = document.getElementById('mobile-menu');
+      if (mobileMenu && mobileMenu.parentElement !== document.body) {
+        document.body.appendChild(mobileMenu);
+      }
+
+      // disable/hide game UI on mobile (non-invasive)
+      if (window.matchMedia && window.matchMedia('(max-width:640px)').matches) {
+        window.DISABLE_GAME = true;
+        const selectors = ['#game', '.game-root', '.sprig', '[data-game-root]'];
+        selectors.forEach(sel => {
+          document.querySelectorAll(sel).forEach(el => {
+            el.style.display = 'none';
+            el.setAttribute('aria-hidden', 'true');
+          });
+        });
+        // hide single canvas fallback
+        const canvases = Array.from(document.querySelectorAll('canvas'));
+        if (canvases.length === 1) {
+          canvases[0].style.display = 'none';
+          canvases[0].setAttribute('aria-hidden', 'true');
+        }
+      }
+    } catch (err) {
+      console.warn('headerHygiene error', err);
+    }
+  }
+
+
+  /* -----------------------
+     Mobile menu: open/close behavior
+     ----------------------- */
+  function bindMobileMenu() {
+    const mobileToggle = document.getElementById('mobile-menu-toggle');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const mobileClose = document.getElementById('mobile-menu-close');
+
+    if (!mobileToggle || !mobileMenu) return;
+
+    function openMenu() {
+      mobileToggle.setAttribute('aria-expanded', 'true');
+      mobileMenu.classList.add('open');
+      mobileMenu.setAttribute('aria-hidden', 'false');
+      document.documentElement.classList.add('mobile-menu-open');
+      document.body.classList.add('mobile-menu-open');
+      // focus first interactive element inside menu
+      const first = mobileMenu.querySelector('[role="menuitem"], a, button');
+      if (first) first.focus();
+    }
+
+    function closeMenu() {
+      mobileToggle.setAttribute('aria-expanded', 'false');
+      mobileMenu.classList.remove('open');
+      mobileMenu.setAttribute('aria-hidden', 'true');
+      document.documentElement.classList.remove('mobile-menu-open');
+      document.body.classList.remove('mobile-menu-open');
+      mobileToggle.focus({ preventScroll: true });
+    }
+
+    mobileToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const expanded = mobileToggle.getAttribute('aria-expanded') === 'true';
+      if (expanded) closeMenu(); else openMenu();
+    });
+
+    if (mobileClose) {
+      mobileClose.addEventListener('click', (e) => { e.preventDefault(); closeMenu(); });
+    }
+
+    // close when pressing Escape
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && mobileMenu.classList.contains('open')) {
+        closeMenu();
+      }
+    });
+
+    // close on click outside (backdrop)
+    mobileMenu.addEventListener('click', (e) => {
+      if (e.target === mobileMenu) closeMenu();
+    });
+
+    // close when any link inside menu is clicked (except anchors that are javascript)
+    mobileMenu.addEventListener('click', (e) => {
+      const link = e.target.closest('a[role="menuitem"], a');
+      if (link && link.getAttribute('href') && link.getAttribute('href') !== '#') {
+        // allow navigation but close menu
+        closeMenu();
+      }
+    });
+  }
+const mobileMenuCheck = document.getElementById('mobile-menu');
+if (mobileMenuCheck && mobileMenuCheck.parentElement !== document.body) {
+  document.body.appendChild(mobileMenuCheck);
+}
+  /* -----------------------
+     init sequence
+     ----------------------- */
+  function initAll() {
+    initMode();
+    headerHygiene();
+    bindMobileMenu();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAll);
+  } else {
+    initAll();
+  }
+
+  // re-run after Astro client-side navigation to keep handlers bound
+  document.addEventListener('astro:page-load', () => {
+    try {
+      bindModeHandlers();
+      headerHygiene();
+      bindMobileMenu();
+      const current = document.documentElement.getAttribute('data-mode') || getStoredMode();
       updateToggleUI(current);
     } catch (e) {
-      console.error('nav mode re-init error', e);
+      console.error('nav re-init error', e);
     }
   });
 
-  // expose if needed
+  // expose small helpers
   window.setSiteMode = function (m, opts) { setMode(m, opts); };
+  window.openMobileMenu = function () { const el = document.getElementById('mobile-menu'); el && el.classList.add('open'); };
+  window.closeMobileMenu = function () { const el = document.getElementById('mobile-menu'); el && el.classList.remove('open'); };
+
 })();
 </script>
-
-

@@ -1633,3 +1633,516 @@ html[data-mode="calm"] .highlight-cta {
     transition: none;
   }
 }
+
+/* ------------------------
+   MOBILE NAV: append at end of main stylesheet
+   ------------------------ */
+@media (max-width: 640px) {
+  .site-nav {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 10px 14px !important;
+    border-radius: 0 0 12px 12px !important;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.94), rgba(255,255,255,0.88));
+    backdrop-filter: blur(6px);
+  }
+
+  /* Hide desktop link containers on small screens */
+  .hidden.sm\\:flex, .desktop-only, .nav-links { display: none !important; }
+
+  .mobile-menu-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    height: 44px;
+    min-width: 64px;
+    border-radius: 10px;
+    background: transparent;
+    border: 1px solid rgba(11,15,20,0.06);
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .mobile-menu-button svg { opacity: 0.95; vertical-align: middle; }
+
+  .mobile-menu {
+    position: fixed;
+    inset: 0 0 0 0;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 0;
+    background: linear-gradient(180deg, rgba(0,0,0,0.32), rgba(0,0,0,0.26));
+    transform: translateY(-6%);
+    opacity: 0;
+    pointer-events: none;
+    transition: transform .26s cubic-bezier(.2,.9,.3,1), opacity .2s ease;
+    z-index: 99999;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+  }
+
+  .mobile-menu.open {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .mobile-menu-inner {
+    margin-top: 4.5rem;
+    width: calc(100% - 32px);
+    max-width: 420px;
+    background: linear-gradient(180deg, #fff, #fff);
+    border-radius: 12px;
+    box-shadow: 0 20px 50px rgba(2,6,23,0.18);
+    padding: 18px;
+  }
+
+  .mobile-close-btn {
+    background: transparent;
+    border: 1px solid rgba(11,15,20,0.06);
+    padding: 8px 10px;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .mobile-menu a[role="menuitem"], .mobile-menu a {
+    display: flex;
+    align-items: center;
+    padding: 14px 16px;
+    min-height: 56px;
+    border-radius: 8px;
+    text-decoration: none;
+    color: inherit;
+    font-size: 1.05rem;
+    font-weight: 700;
+    transition: background .14s ease;
+    gap: 12px;
+  }
+  .mobile-menu a[role="menuitem"]:hover,
+  .mobile-menu a[role="menuitem"]:focus {
+    background: color-mix(in srgb, var(--brand-primary) 6%, transparent);
+    outline: none;
+  }
+
+  .mobile-menu .get-help-btn {
+    margin-top: 8px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    padding: 14px;
+    border-radius: 12px;
+    background: linear-gradient(90deg, var(--brand-primary), var(--brand-secondary));
+    color: var(--brand-light);
+    font-weight: 800;
+    box-shadow: 0 10px 30px rgba(var(--brand-primary-rgb), .12);
+  }
+
+  .page-content { padding-left: 12px !important; padding-right: 12px !important; }
+  .get-help-btn { height: 48px; padding: 0 16px; border-radius: 12px; }
+
+  html.mobile-menu-open, body.mobile-menu-open {
+    overflow: hidden !important;
+    touch-action: none;
+  }
+}
+/* -----------------------------
+   1) TOP GAP FIX (desktop + mobile)
+   Ensure header is truly flush to top, respect safe-area insets
+   ----------------------------- */
+html, body {
+  margin: 0 !important;
+  padding: 0 !important;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+/* Ensure sticky header pins to the actual viewport edge (respect notch safe area) */
+#site-header,
+header {
+  margin-top: 0 !important;
+  padding-top: 0 !important;                 /* keep your header padding controlled */
+  position: sticky !important;
+  top: env(safe-area-inset-top, 0) !important;
+  inset-block-start: env(safe-area-inset-top, 0) !important;
+  z-index: 99999;
+}
+
+/* Make sure the nav itself doesn't introduce a top-gap */
+.site-nav {
+  margin-top: 0 !important;
+  border-radius: 0 0 15px 15px; /* keep the rounded bottom if desired */
+}
+
+/* On iOS sometimes content shifts due to safe-area / zoom rounding.
+   If you still see a thin gap after applying the above, try removing
+   any page-level `zoom` (e.g. `zoom: 105%`) as a troubleshooting step. */
+
+/* -----------------------------
+   2) DISABLE / HIDE GAME ON MOBILE
+   Appends mobile-only rules and friendly notice
+   ----------------------------- */
+@media (max-width: 640px) {
+  /* Generic hide rule for common game containers (safe default). If your game uses a different root add that selector to the list below. */
+  .game-root,
+  #game,
+  .sprig,
+  [data-game-root] {
+    display: none !important;
+    pointer-events: none !important;
+    user-select: none !important;
+    opacity: 0 !important;
+    height: 0 !important;
+    width: 0 !important;
+    overflow: hidden !important;
+  }
+
+  /* Notice shown where the game would be (keeps layout stable and communicates clearly) */
+  .mobile-game-disabled {
+    max-width: 720px;
+    margin: 1rem auto;
+    padding: 14px;
+    border-radius: 12px;
+    background: linear-gradient(90deg, rgba(255,255,255,0.96), rgba(250,250,250,0.96));
+    text-align: center;
+    font-weight: 700;
+    color: var(--brand-dark);
+    box-shadow: 0 6px 20px rgba(2,6,23,0.06);
+  }
+  .mobile-game-disabled p { margin: 0; font-size: 0.98rem; line-height: 1.3; }
+  .mobile-game-disabled .mobile-game-note-cta {
+    margin-top: 8px;
+    display:inline-block;
+    padding: 8px 12px;
+    border-radius: 10px;
+    background: linear-gradient(90deg, var(--brand-primary), var(--brand-secondary));
+    color: var(--brand-light);
+    font-weight: 800;
+    text-decoration: none;
+  }
+}
+/* ------------------------------
+  MOBILE STABILITY FIXES (append)
+  - hide legacy hamburger
+  - prevent header clipping of fixed overlays
+  - ensure mobile menu overlay sits above everything
+  - hide chat/generator on mobile to avoid breakage
+  - small layout safety tweaks
+  ------------------------------ */
+
+/* hide any old hamburger variants that might remain in markup */
+#hamburger-menu,
+.hamburger,
+.Hamburger,
+#mosbile-links,
+#mobile-links {
+  display: none !important;
+}
+
+/* keep header visible overflow on mobile so fixed overlays aren't clipped */
+@media (max-width: 640px) {
+  header, #site-header {
+    overflow: visible !important; /* prevents mobile-menu from being clipped */
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Make sure nav can wrap gracefully on very small widths */
+  .site-nav {
+    flex-wrap: nowrap;           /* prefer single row */
+    align-items: center;
+    gap: 8px;
+  }
+  /* Force logo area to shrink if needed so CTA stays visible */
+  .site-nav > .flex.items-center:first-child {
+    flex: 0 1 auto;
+    min-width: 0;
+  }
+  .site-nav > .flex.items-center:last-child {
+    flex: 0 0 auto;
+  }
+
+  /* Ensure our mobile overlay sits above header and never pushes layout */
+  .mobile-menu {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    z-index: 120000 !important; /* higher than header */
+    display: flex !important;
+    align-items: flex-start !important;
+    justify-content: center !important;
+    pointer-events: auto !important;
+    transform: translateY(0) !important;
+    opacity: 1 !important;
+    background: linear-gradient(180deg, rgba(0,0,0,0.32), rgba(0,0,0,0.26));
+  }
+
+  /* Our inner panel maintains a comfortable top gap for header-safe area */
+  .mobile-menu-inner {
+    margin-top: calc( (var(--header-h, 64px)) + env(safe-area-inset-top, 0px) );
+  }
+
+  /* If header height is dynamic, set a CSS var from JS; default falls back to 64px */
+  :root { --header-h: 64px; }
+
+  /* Hide the chat / generator UI on phones to prevent layout breakage */
+  .cw-panel,
+  .cw-fab,
+  #cw-bubble,
+  .chat-widget,
+  .chat-panel {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    opacity: 0 !important;
+  }
+
+  /* Make menu button stay visually consistent / not crushed */
+  .mobile-menu-button {
+    min-width: 62px !important;
+    padding: 8px 10px !important;
+  }
+
+  /* Defensive: ensure desktop-only nav links remain hidden */
+  .hidden.sm\\:flex, .desktop-only, .nav-links { display: none !important; }
+}
+/* ================================
+   FINAL: header/top-gap + mobile menu fixes
+   Append this at the *end* of your main CSS file
+   ================================ */
+
+/* 1) Global reset for header gap issues */
+html, body {
+  margin: 0 !important;
+  padding: 0 !important;
+  box-sizing: border-box;
+}
+
+/* Force header to pin to real viewport top (desktop & mobile). Use top:0 to avoid env() inconsistencies. */
+#site-header,
+header {
+  position: sticky !important;
+  top: 0 !important;
+  inset-block-start: 0 !important;
+  margin: 0 !important;
+  padding-top: 0 !important;
+  z-index: 120000 !important; /* keep header above page but below mobile overlay we'll add later */
+}
+
+/* Remove any hard-coded top margin from .site-nav (this is the most likely root cause) */
+.site-nav {
+  margin-top: 0 !important;
+  margin: 0 auto !important;
+  width: 100% !important;
+  max-width: 1200px; /* keep your centered appearance on wide screens */
+  box-sizing: border-box;
+}
+
+/* Tailwind helper classes sometimes expand to add spacing; ensure the immediate nav container is flush */
+header > nav, .site-nav {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+/* 2) Ensure only our new mobile menu button is shown on small screens; hide legacy hamburgers */
+#hamburger-menu,
+.hamburger,
+.Hamburger,
+#mosbile-links,
+#mobile-links {
+  display: none !important;
+}
+
+/* Make mobile menu button hidden by default for desktop (keeps layout identical),
+   but forced visible on small screens with !important to avoid class conflicts. */
+.mobile-menu-button { display: none !important; }
+
+/* Mobile-specific rules */
+@media (max-width: 640px) {
+  /* ensure our menu button is visible and has a stable size */
+  .mobile-menu-button {
+    display: inline-flex !important;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px !important;
+    height: 44px !important;
+    min-width: 56px !important;
+    border-radius: 10px !important;
+    background: transparent !important;
+    border: 1px solid rgba(11,15,20,0.06) !important;
+    font-weight: 700 !important;
+    cursor: pointer !important;
+    -webkit-tap-highlight-color: transparent !important;
+    box-sizing: border-box;
+  }
+
+  /* Hide the header Get Help CTA on phones (we show it inside the mobile menu instead) */
+  .site-nav .get-help-btn {
+    display: none !important;
+  }
+
+  /* Make sure the mobile-menu overlay cannot be clipped by header */
+  header, #site-header {
+    overflow: visible !important;
+  }
+
+  /* Make our mobile menu a full-screen fixed overlay placed above header */
+  .mobile-menu {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    z-index: 130000 !important;
+    display: flex !important;
+    align-items: flex-start !important;
+    justify-content: center !important;
+    pointer-events: auto !important;
+    background: linear-gradient(180deg, rgba(0,0,0,0.32), rgba(0,0,0,0.26)) !important;
+  }
+
+  /* ensure inner panel sits below header visually */
+  .mobile-menu-inner {
+    margin-top: calc(var(--header-h, 64px) + env(safe-area-inset-top, 0px)) !important;
+    width: calc(100% - 32px) !important;
+    max-width: 420px !important;
+  }
+
+  /* Defensive: hide chat / generator UI on phones if present */
+  .cw-panel,
+  .cw-fab,
+  #cw-bubble,
+  .chat-widget,
+  .chat-panel,
+  .good-message-generator {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    opacity: 0 !important;
+  }
+
+  /* Make mobile nav items large and tappable (already in prior CSS, but reinforce) */
+  .mobile-menu a[role="menuitem"], .mobile-menu a {
+    padding: 14px 16px !important;
+    min-height: 56px !important;
+  }
+}
+/* ===========================
+   Mobile hamburger + menu final CSS
+   Place at the END of your stylesheet
+   =========================== */
+
+/* hide legacy hamburger variants */
+#hamburger-menu,
+.hamburger,
+.Hamburger,
+#mosbile-links,
+#mobile-links {
+  display: none !important;
+}
+
+/* Default: mobile menu hidden */
+.mobile-menu {
+  display: none;
+}
+
+/* Mobile-specific behavior */
+@media (max-width: 640px) {
+  /* ensure header is flush */
+  #site-header, header { top: 0 !important; position: sticky !important; z-index: 120000 !important; }
+
+  /* make sure desktop Get Help CTA is hidden on phones */
+  .site-nav .get-help-btn { display: none !important; }
+
+  /* show our mobile menu button */
+  .mobile-menu-button { display: inline-flex !important; align-items:center; gap:8px; padding:8px 10px !important; height:44px !important; min-width:56px !important; border-radius:10px !important; background:transparent !important; border:1px solid rgba(11,15,20,0.06) !important; box-sizing:border-box; }
+
+  /* mobile menu overlay - hidden by default; shown when .open */
+  .mobile-menu {
+    position: fixed !important;
+    inset: 0 !important;
+    display: none;
+    align-items: flex-start;
+    justify-content: center;
+    background: linear-gradient(180deg, rgba(0,0,0,0.32), rgba(0,0,0,0.26));
+    z-index: 130000 !important;
+    -webkit-overflow-scrolling: touch;
+  }
+  .mobile-menu.open {
+    display: flex !important;
+  }
+
+  /* inner panel sits visually below header */
+  .mobile-menu-inner {
+    margin-top: calc(var(--header-h, 64px) + env(safe-area-inset-top, 0px));
+    width: calc(100% - 32px);
+    max-width: 420px;
+    background: linear-gradient(180deg, #fff, #fff);
+    border-radius: 12px;
+    box-shadow: 0 20px 50px rgba(2,6,23,0.18);
+    padding: 18px;
+  }
+
+  /* Close button */
+  .mobile-close-btn {
+    background: transparent;
+    border: 1px solid rgba(11,15,20,0.06);
+    padding: 8px 10px;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  /* Ensure menu links are tappable */
+  .mobile-menu a[role="menuitem"], .mobile-menu a {
+    display:flex;
+    align-items:center;
+    padding:14px 16px;
+    min-height:56px;
+    border-radius:8px;
+    text-decoration:none;
+    color:inherit;
+    font-weight:700;
+  }
+
+  /* Hide chat/generator UI on mobile to avoid conflicts */
+  .cw-panel, .cw-fab, #cw-bubble, .chat-widget, .chat-panel, .good-message-generator { display:none !important; visibility:hidden !important; pointer-events:none !important; opacity:0 !important; }
+}
+/* Prevent header from scrolling / participating in scroll chaining on mobile */
+#site-header,
+header {
+  overflow: hidden !important;                /* header won't scroll */
+  -webkit-overflow-scrolling: auto !important; /* avoid touch momentum in header */
+  overscroll-behavior: contain !important;    /* prevent scroll chaining to header */
+  touch-action: manipulation !important;      /* prevent unintended gesture handling */
+}
+
+/* Ensure mobile overlay is fixed and sits above everything */
+.mobile-menu {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  z-index: 130000 !important;
+  display: none; /* shown only when `.open` present */
+}
+
+/* When open, keep body from scrolling */
+html.mobile-menu-open, body.mobile-menu-open {
+  overflow: hidden !important;
+  touch-action: none !important;
+}
+
+/* Keep mobile menu inner spacing consistent with header height */
+.mobile-menu-inner {
+  margin-top: calc(var(--header-h, 64px) + env(safe-area-inset-top, 0px)) !important;
+}
