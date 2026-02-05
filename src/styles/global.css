@@ -2146,3 +2146,80 @@ html.mobile-menu-open, body.mobile-menu-open {
 .mobile-menu-inner {
   margin-top: calc(var(--header-h, 64px) + env(safe-area-inset-top, 0px)) !important;
 }
+/* ====== Disable hover motion on shapes, keep click animation ====== */
+
+/* 1) Prevent any :hover/:focus transform/box-shadow from applying */
+.shape:hover,
+.shape:focus,
+.shape:focus-visible,
+.shape:active {
+  transform: none !important;
+  box-shadow: none !important;
+  transition: none !important; /* stops hover-generated transitions */
+}
+
+/* 2) Keep shapes visually interactive (keyboard focus still accessible)
+   but don't show hover motion — only show when .active (selection) or .click-anim (animation) */
+.shape {
+  /* remove hover-driven transitions but keep layout properties */
+  transition: none !important;
+  will-change: transform, box-shadow;
+}
+
+/* 3) Re-enable a controlled transition when the element becomes active (toggled by JS)
+   so the .active state (if used) still animates smoothly when toggled. */
+.shape.active {
+  transition: transform .16s ease, box-shadow .16s ease !important;
+  /* visual active state (keep this or adapt to your design) */
+  transform: translateY(-4px) scale(1.03);
+  box-shadow: 0 10px 30px rgba(2,6,23,0.08);
+}
+
+/* 4) Keep your click animation rules (if not already present) */
+@keyframes clickPop {
+  0%   { transform: translateY(0) scale(1); box-shadow: 0 6px 18px rgba(2,6,23,0.04); }
+  40%  { transform: translateY(-8px) scale(1.08); box-shadow: 0 20px 42px rgba(2,6,23,0.12); }
+  100% { transform: translateY(0) scale(1); box-shadow: 0 10px 30px rgba(2,6,23,0.08); }
+}
+.shape.click-anim {
+  animation: clickPop 360ms cubic-bezier(.2,.9,.3,1) both !important;
+}
+
+/* 5) Respect reduced-motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .shape.click-anim { animation: none !important; transform: translateY(0) !important; }
+  .shape.active { transition: none !important; transform: none !important; }
+}
+
+/* Ensure mobile overlay is on top and accepts pointer events when open */
+#mobile-menu {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 60;              /* above header (header is z-50) */
+  pointer-events: none;     /* default off when closed */
+  background: rgba(0,0,0,0.35);
+}
+
+#mobile-menu.open {
+  display: flex;
+  pointer-events: auto;
+}
+
+/* make sure inner panel still receives clicks */
+#mobile-menu .mobile-menu-inner {
+  z-index: 61;
+  pointer-events: auto;
+}
+
+/* visible close button area and focus styling */
+#mobile-menu-close {
+  appearance: none;
+  background: transparent;
+  border: none;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+#mobile-menu-close:focus { outline: 2px solid Highlight; outline-offset: 2px; }

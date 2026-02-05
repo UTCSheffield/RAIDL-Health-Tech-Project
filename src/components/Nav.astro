@@ -73,15 +73,27 @@ const { activePage } = Astro.props;
     <div class="mobile-menu-inner max-w-md w-full mx-auto rounded-lg p-6">
       <div class="flex items-center justify-between mb-4">
         <a href={withBase("/")} aria-label="Home"><SiteIdentity /></a>
-        <button id="mobile-menu-close" aria-label="Close menu" class="mobile-close-btn">Close</button>
+        <button id="mobile-menu-close" aria-label="Close menu" type="button"  class="mobile-close-btn">Close</button>
       </div>
 
       <div class="mt-2 flex items-center justify-between gap-4">
         <!-- Mobile CTA inside menu -->
-        <a href={withBase("/help/")} class="inline-flex items-center px-4 py-2 rounded-lg text-white font-bold caveat-brush-regular get-help-btn mobile-only-cta" style="background: linear-gradient(90deg, var(--brand-warm) 0%, var(--brand-secondary) 100%); color: white !important;">Get Help</a>
 
-        <button id="mobile-mode-toggle" class="mode-toggle icon-only" aria-pressed="false" aria-label="Toggle colour mode: Calm or Vivid" title="Calm / Vivid">
+        <button
+          id="mobile-mode-toggle"
+          class="mode-toggle"
+          type="button"
+          aria-pressed="false"
+          aria-label="Toggle colour mode: Calm or Vivid"
+          title="Calm / Vivid"
+        >
+          <span class="labels" aria-hidden="true">
+            <span class="label-calm">Calm</span>
+            <span class="label-vivid" style="display:none">Vivid</span>
+          </span>
+
           <span class="knob" aria-hidden="true"></span>
+          <span class="sr-only">Toggle colour mode</span>
         </button>
       </div>
 
@@ -94,7 +106,36 @@ const { activePage } = Astro.props;
   </div>
 </header>
 
+<style is:inline>
+/* Hide by default and enforce hidden when aria-hidden="true" */
+#mobile-menu {
+  display: none !important;
+  pointer-events: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  transition: opacity .12s ease, visibility .12s ease;
+  position: fixed;
+  inset: 0;
+  align-items: center;
+  justify-content: center;
+  z-index: 130000; /* keep the high z-index but hidden */
+}
 
+/* Visible when explicitly opened or when aria-hidden is false.
+   Using both selectors covers both code paths. */
+#mobile-menu.open,
+#mobile-menu[aria-hidden="false"] {
+  display: flex !important;
+  pointer-events: auto !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* inner panel should receive pointer events regardless */
+#mobile-menu .mobile-menu-inner {
+  pointer-events: auto;
+}
+</style>
 
 <script is:inline>
 (function () {
@@ -146,6 +187,7 @@ const { activePage } = Astro.props;
     document.querySelectorAll('#mode-toggle, #mobile-mode-toggle').forEach(btn => {
       if (!btn) return;
       btn.setAttribute('aria-pressed', String(pressed));
+      btn.classList.toggle('is-vivid', pressed);
     });
     document.querySelectorAll('.labels').forEach(labels => {
       const calmEl = labels.querySelector('.label-calm');
@@ -226,76 +268,121 @@ const { activePage } = Astro.props;
         }
       }
     } catch (err) {
-      console.warn('headerHygiene error', err);
+      // swallow errors in hygiene step
     }
   }
 
+  function bindMobileCloseButton() {
+    const mobileClose = document.getElementById('mobile-menu-close');
+    if (!mobileClose) return;
+    if (mobileClose.dataset.boundClose) return;
+    mobileClose.dataset.boundClose = 'true';
+
+    mobileClose.addEventListener('click', (e) => {
+      try { e.preventDefault(); } catch (err) {}
+      try {
+        closeMenu();
+      } catch (err) {
+        // fallback minimal close
+        const mm = document.getElementById('mobile-menu');
+        if (mm) {
+          mm.classList.remove('open');
+          mm.setAttribute('aria-hidden', 'true');
+          document.documentElement.classList.remove('mobile-menu-open');
+          document.body.classList.remove('mobile-menu-open');
+        }
+      }
+      try { e.stopPropagation(); } catch (err) {}
+    });
+  }
 
   /* -----------------------
      Mobile menu: open/close behavior
      ----------------------- */
-  function bindMobileMenu() {
+function bindMobileMenu() {
+  if (document._mobileMenuDelegated) return;
+  document._mobileMenuDelegated = true;
+
+  function openMenu() {
     const mobileToggle = document.getElementById('mobile-menu-toggle');
     const mobileMenu = document.getElementById('mobile-menu');
-    const mobileClose = document.getElementById('mobile-menu-close');
-
-    if (!mobileToggle || !mobileMenu) return;
-
-    function openMenu() {
+    if (!mobileMenu || !mobileToggle) return;
+    try {
       mobileToggle.setAttribute('aria-expanded', 'true');
-      mobileMenu.classList.add('open');
-      mobileMenu.setAttribute('aria-hidden', 'false');
-      document.documentElement.classList.add('mobile-menu-open');
-      document.body.classList.add('mobile-menu-open');
-      // focus first interactive element inside menu
-      const first = mobileMenu.querySelector('[role="menuitem"], a, button');
-      if (first) first.focus();
+    } catch (e) {}
+    mobileMenu.classList.add('open');
+    mobileMenu.setAttribute('aria-hidden', 'false');
+    document.documentElement.classList.add('mobile-menu-open');
+    document.body.classList.add('mobile-menu-open');
+    const first = mobileMenu.querySelector('[role="menuitem"], a, button, input');
+    if (first) {
+      try { first.focus(); } catch (e) {}
     }
-
-    function closeMenu() {
-      mobileToggle.setAttribute('aria-expanded', 'false');
-      mobileMenu.classList.remove('open');
-      mobileMenu.setAttribute('aria-hidden', 'true');
-      document.documentElement.classList.remove('mobile-menu-open');
-      document.body.classList.remove('mobile-menu-open');
-      mobileToggle.focus({ preventScroll: true });
-    }
-
-    mobileToggle.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const expanded = mobileToggle.getAttribute('aria-expanded') === 'true';
-      if (expanded) closeMenu(); else openMenu();
-    });
-
-    if (mobileClose) {
-      mobileClose.addEventListener('click', (e) => { e.preventDefault(); closeMenu(); });
-    }
-
-    // close when pressing Escape
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && mobileMenu.classList.contains('open')) {
-        closeMenu();
-      }
-    });
-
-    // close on click outside (backdrop)
-    mobileMenu.addEventListener('click', (e) => {
-      if (e.target === mobileMenu) closeMenu();
-    });
-
-    // close when any link inside menu is clicked (except anchors that are javascript)
-    mobileMenu.addEventListener('click', (e) => {
-      const link = e.target.closest('a[role="menuitem"], a');
-      if (link && link.getAttribute('href') && link.getAttribute('href') !== '#') {
-        // allow navigation but close menu
-        closeMenu();
-      }
-    });
   }
-const mobileMenuCheck = document.getElementById('mobile-menu');
-if (mobileMenuCheck && mobileMenuCheck.parentElement !== document.body) {
-  document.body.appendChild(mobileMenuCheck);
+
+  function closeMenu() {
+    const mobileToggle = document.getElementById('mobile-menu-toggle');
+    const mobileMenu = document.getElementById('mobile-menu');
+    if (!mobileMenu) return;
+    mobileMenu.classList.remove('open');
+    mobileMenu.setAttribute('aria-hidden', 'true');
+    document.documentElement.classList.remove('mobile-menu-open');
+    document.body.classList.remove('mobile-menu-open');
+
+    if (mobileToggle) {
+      try {
+        mobileToggle.setAttribute('aria-expanded', 'false');
+        mobileToggle.focus && mobileToggle.focus({ preventScroll: true });
+      } catch (err) { /* ignore */ }
+    }
+  }
+
+  document.addEventListener('click', function (e) {
+    const clicked = e.target;
+
+    if (clicked.closest && clicked.closest('#mobile-menu-toggle')) {
+      e.preventDefault();
+      const mobileToggle = document.getElementById('mobile-menu-toggle');
+      const expanded = mobileToggle && mobileToggle.getAttribute('aria-expanded') === 'true';
+      if (expanded) closeMenu(); else openMenu();
+      return;
+    }
+
+    if (clicked.closest && clicked.closest('#mobile-menu-close')) {
+      try { e.preventDefault(); } catch (err) {}
+      // defer to avoid DOM mutation mid-event issues
+      setTimeout(() => {
+        try { closeMenu(); } catch (err) { /* ignore */ }
+      }, 0);
+      try { e.stopPropagation(); } catch (err) {}
+      return;
+    }
+
+    const mobileMenu = document.getElementById('mobile-menu');
+    if (mobileMenu && clicked === mobileMenu) {
+      closeMenu();
+      return;
+    }
+
+    const link = clicked.closest && clicked.closest('#mobile-menu a[role="menuitem"], #mobile-menu a');
+    if (link) {
+      const href = link.getAttribute && link.getAttribute('href');
+      if (href && href !== '#') {
+        closeMenu();
+      }
+    }
+  }, true);
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') {
+      const mobileMenu = document.getElementById('mobile-menu');
+      if (mobileMenu && mobileMenu.classList.contains('open')) {
+        closeMenu();
+      }
+    }
+  });
 }
+
   /* -----------------------
      init sequence
      ----------------------- */
@@ -303,6 +390,7 @@ if (mobileMenuCheck && mobileMenuCheck.parentElement !== document.body) {
     initMode();
     headerHygiene();
     bindMobileMenu();
+    bindMobileCloseButton();
   }
 
   if (document.readyState === 'loading') {
@@ -317,10 +405,11 @@ if (mobileMenuCheck && mobileMenuCheck.parentElement !== document.body) {
       bindModeHandlers();
       headerHygiene();
       bindMobileMenu();
+      bindMobileCloseButton();
       const current = document.documentElement.getAttribute('data-mode') || getStoredMode();
       updateToggleUI(current);
     } catch (e) {
-      console.error('nav re-init error', e);
+      // swallow re-init errors
     }
   });
 

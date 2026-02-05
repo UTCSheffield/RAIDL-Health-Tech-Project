@@ -112,7 +112,7 @@ import { withBase } from "../utils/helpers";
 <!-- Replace your existing shapes section with this updated snippet.
      The description card now has a fixed width so its size won't change layout. -->
 <section id="autism-spectrum" class="shapes-section" aria-labelledby="shapes-heading">
-  <h2 id="shapes-heading" class="shapes-title">Autism Spectrum</h2>
+  <h2 id="shapes-heading" class="shapes-title text-center">Autism Spectrum</h2>
   <p class="shapes-sub">Austism isn't a line from least to most severe; it's many things which connect together in many different ways.</p>
 
   <div class="shapes-canvas" id="shapesCanvas" role="application" aria-describedby="shapes-desc">
@@ -123,7 +123,7 @@ import { withBase } from "../utils/helpers";
      <button class="shape triangle" data-id="sensory" aria-label="Sensory experience">
   <span class="shape-text">Different<br>senses</span>
 </button>
-      <button class="shape square" data-id="routines" aria-label="Routines and change">Habits &amp; change</button>
+      <button class="shape square text-center" data-id="routines" aria-label="Routines and change">Habits &amp; change</button>
       <button class="shape blob" data-id="emotions" aria-label="Emotional regulation">Managing emotions</button>
       <button class="shape hexagon" data-id="focus" aria-label="Focus and interests">Focus &amp; interests</button>
       <button class="shape diamond" data-id="executive" aria-label="Executive functioning">Thinking skills</button>
@@ -133,8 +133,8 @@ import { withBase } from "../utils/helpers";
   <!-- Fixed-width description card (does not change layout when text changes) -->
   <div id="shapeCard" class="shape-card" role="region" aria-live="polite" aria-hidden="true">
     <div class="shape-card__inner">
-      <h3 id="cardTitle"></h3>
-      <p id="cardText"></p>
+      <h3 class="text-center" id="cardTitle"></h3>
+      <p class="text-center" id="cardText"></p>
     </div>
   </div>
 </section>
@@ -186,22 +186,15 @@ import { withBase } from "../utils/helpers";
   .circle { border-radius: 999px; background: #dbeafe; }
   .triangle {
   background: #fef9c3;
-  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
-  padding: 6px 8px;        /* reduce padding so text sits lower in triangle */
+  clip-path: polygon(50% 0%, 13% 95%, 85% 95%);
+    /* reduce padding so text sits lower in triangle */
   display: flex;
   align-items: center;
   justify-content: center;
+  
 }
 
-.triangle .shape-text {
-  display: inline-block;
-  text-align: center;
-  font-size: clamp(10px, 1.1vw, 12px); /* smaller / responsive */
-  line-height: 1.05;
-  white-space: normal;
-  word-break: break-word;
-  margin-top: 6px; /* nudge down into the wider part of the triangle */
-}
+
   .square { background: #dcfce7; border-radius: 12px; }
   .blob { background: #fee2e2; border-radius: 28% 72% 60% 40% / 40% 30% 70% 60%; }
   .hexagon { background: #ede9fe; clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%); }
@@ -229,6 +222,27 @@ import { withBase } from "../utils/helpers";
   .shape-card h3 { margin: 0 0 6px; font-size: 1rem; }
   .shape-card p { margin: 0; color: #475569; font-size: .95rem; }
 
+  .shape .diamond{
+     justify-self: center;   
+  align-self: center;
+  }
+
+  @media (min-width: 720px) {
+  /* make the grid a stable 3-column layout on larger screens */
+  .shapes-grid {
+    grid-template-columns: repeat(3, 1fr);
+    grid-auto-flow: row;
+  }
+
+  /* force the diamond into the middle column / middle row */
+  .shape.diamond {
+    grid-column: 2;   /* second (middle) column */
+    grid-row: 2;      /* second row (for a 3x2 grid this is the center) */
+    justify-self: center;
+    align-self: center;
+    width: calc(var(--size) * 1.25);
+  }
+}
   @media (max-width: 720px) {
     .shape-card { width: 92%; }
     .shape { --size: 84px; font-size: clamp(11px, 2.6vw, 13px); }
@@ -238,9 +252,35 @@ import { withBase } from "../utils/helpers";
     .shape { transition: none; }
     .shape-card { transition: none; }
   }
+
+  .shapes-canvas { position: relative; }      
+.shapes-lines { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
+.shapes-grid  { position: relative; z-index: 2; } 
+.shape         { z-index: 3; }   
+
+
+/* REPLACE your existing .shape.click-anim block with this */
+@keyframes clickPop {
+  0%   { transform: translateY(0) scale(1); box-shadow: 0 6px 18px rgba(2,6,23,0.04); }
+  40%  { transform: translateY(-8px) scale(1.08); box-shadow: 0 20px 42px rgba(2,6,23,0.12); }
+  100% { transform: translateY(0) scale(1); box-shadow: 0 10px 30px rgba(2,6,23,0.08); }
+}
+
+/* ensure the animation wins over any transitions */
+.shape.click-anim {
+  animation: clickPop 360ms cubic-bezier(.2,.9,.3,1) both !important;
+  will-change: transform, box-shadow;
+}
+
+/* Respect reduced-motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .shape.click-anim { animation: none !important; transform: translateY(0) !important; box-shadow: none !important; }
+}
+
 </style>
 
 <script is:inline>
+  
   const DATA = {
   social: {
     title: "Talking and understanding",
@@ -277,39 +317,55 @@ import { withBase } from "../utils/helpers";
   const cardText = document.getElementById('cardText');
   const selected = new Set();
 
-  function drawConnections() {
-    while (svg.firstChild) svg.removeChild(svg.firstChild);
-    const ids = Array.from(selected);
-    if (ids.length < 2) return;
+function drawConnections() {
+  // clear existing lines
+  while (svg.firstChild) svg.removeChild(svg.firstChild);
 
-    const canvasRect = shapesGrid.getBoundingClientRect();
-    svg.setAttribute('width', canvasRect.width);
-    svg.setAttribute('height', canvasRect.height);
-    svg.style.width = canvasRect.width + 'px';
-    svg.style.height = canvasRect.height + 'px';
+  const ids = Array.from(selected);
+  if (ids.length < 2) return;
 
-    for (let i = 0; i < ids.length; i++) {
-      for (let j = i + 1; j < ids.length; j++) {
-        const a = document.querySelector(`[data-id="${ids[i]}"]`).getBoundingClientRect();
-        const b = document.querySelector(`[data-id="${ids[j]}"]`).getBoundingClientRect();
+  // use the canvas element that contains the SVG and the grid
+  const canvasEl = document.getElementById('shapesCanvas');
+  const canvasRect = canvasEl.getBoundingClientRect();
 
-        const x1 = a.left + a.width / 2 - canvasRect.left;
-        const y1 = a.top + a.height / 2 - canvasRect.top;
-        const x2 = b.left + b.width / 2 - canvasRect.left;
-        const y2 = b.top + b.height / 2 - canvasRect.top;
+  // size the svg to exactly match the canvas pixel size and viewBox
+  const w = Math.max(0, Math.round(canvasRect.width));
+  const h = Math.max(0, Math.round(canvasRect.height));
+  svg.setAttribute('width', w);
+  svg.setAttribute('height', h);
+  svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+  svg.style.width = w + 'px';
+  svg.style.height = h + 'px';
 
-        const line = document.createElementNS('http://www.w3.org/2000/svg','line');
-        line.setAttribute('x1', x1);
-        line.setAttribute('y1', y1);
-        line.setAttribute('x2', x2);
-        line.setAttribute('y2', y2);
-        line.setAttribute('stroke', 'rgba(15,23,42,0.12)');
-        line.setAttribute('stroke-width', '2');
-        line.setAttribute('stroke-linecap', 'round');
-        svg.appendChild(line);
-      }
+  // draw line between centers of selected shapes (centers measured relative to canvas)
+  for (let i = 0; i < ids.length; i++) {
+    for (let j = i + 1; j < ids.length; j++) {
+      const aEl = document.querySelector(`[data-id="${ids[i]}"]`);
+      const bEl = document.querySelector(`[data-id="${ids[j]}"]`);
+      if (!aEl || !bEl) continue;
+
+      const a = aEl.getBoundingClientRect();
+      const b = bEl.getBoundingClientRect();
+
+      // center points relative to the canvas top-left
+      const x1 = (a.left + a.width / 2) - canvasRect.left;
+      const y1 = (a.top  + a.height / 2) - canvasRect.top;
+      const x2 = (b.left + b.width / 2) - canvasRect.left;
+      const y2 = (b.top  + b.height / 2) - canvasRect.top;
+
+      const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+      line.setAttribute('x1', x1);
+      line.setAttribute('y1', y1);
+      line.setAttribute('x2', x2);
+      line.setAttribute('y2', y2);
+      line.setAttribute('stroke', 'rgba(15,23,42,0.12)');
+      line.setAttribute('stroke-width', '2');
+      line.setAttribute('stroke-linecap', 'round');
+      svg.appendChild(line);
     }
   }
+}
+
 
   function showCard(id) {
     const d = DATA[id];
@@ -323,33 +379,7 @@ import { withBase } from "../utils/helpers";
     card.setAttribute('aria-hidden', 'true');
   }
 
-  shapes.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const id = btn.dataset.id;
-      if (!id) return;
 
-      if (selected.has(id)) {
-        selected.delete(id);
-        btn.classList.remove('active');
-        hideCard();
-      } else {
-        selected.add(id);
-        btn.classList.add('active');
-        showCard(id);
-      }
-
-      // keep visual active state for all selected
-      shapes.forEach(s => s.classList.toggle('active', selected.has(s.dataset.id)));
-      drawConnections();
-    });
-
-    btn.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        btn.click();
-      }
-    });
-  });
 
   // initial draw and resize handling
   function updateSvgOnResize() {
@@ -357,6 +387,65 @@ import { withBase } from "../utils/helpers";
   }
   window.addEventListener('resize', updateSvgOnResize);
   window.addEventListener('load', drawConnections);
+
+  // -- unified click animation + selection handler --
+
+// playClickAnim helper (one copy only)
+function playClickAnim(el) {
+  if (!el) return;
+  el.classList.remove('click-anim'); // restart
+  void el.offsetWidth; // reflow
+  el.classList.add('click-anim');
+
+  el.addEventListener('animationend', function handler() {
+    el.classList.remove('click-anim');
+    el.removeEventListener('animationend', handler);
+  }, { once: true });
+}
+
+shapes.forEach(btn => {
+  // immediate pointer/touch feedback
+  btn.addEventListener('pointerdown', (ev) => {
+    if (!ev.pointerType || ['mouse','touch','pen'].includes(ev.pointerType)) {
+      playClickAnim(btn);
+    }
+  });
+
+  // keyboard users: play animation then trigger click handler
+  btn.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      playClickAnim(btn);
+      // allow click handler to run after animation class applied
+      setTimeout(() => btn.click(), 0);
+    }
+  });
+
+  // main click handler: toggle selection, show/hide card, draw lines
+  btn.addEventListener('click', () => {
+    const id = btn.dataset.id;
+    if (!id) return;
+
+    if (selected.has(id)) {
+      selected.delete(id);
+      hideCard();
+    } else {
+      selected.add(id);
+      showCard(id);
+    }
+
+    // visual active state
+    shapes.forEach(s => s.classList.toggle('active', selected.has(s.dataset.id)));
+
+    // redraw lines
+    drawConnections();
+  });
+});
+
+
+
+
+  
 </script>
 
 
