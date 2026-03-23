@@ -90,7 +90,13 @@
     if (!body) return null;
     const d = document.createElement('div');
     d.className = 'msg ' + (from === 'user' ? 'user' : 'bot') + ' msg-fade-in';
-    d.textContent = text;
+    
+    if (from === 'bot') {
+      d.innerHTML = marked.parse(text);  // parse markdown for bot messages
+    } else {
+      d.textContent = text;  // keep user messages as plain text (safer)
+    }
+    
     body.appendChild(d);
     // Use requestAnimationFrame to ensure scroll happens after DOM update
     requestAnimationFrame(() => {
@@ -104,10 +110,10 @@
     return new Promise((resolve) => {
       let charIndex = 0;
       element.textContent = '';
-      
+
       const typeChar = () => {
         if (charIndex < fullText.length) {
-          element.textContent += fullText[charIndex];
+          element.textContent += fullText[charIndex];  // plain text while typing
           charIndex++;
           
           // Force layout recalculation and scroll
@@ -121,7 +127,7 @@
           }
           setTimeout(typeChar, delayMs);
         } else {
-          // Final scroll to ensure message is fully visible
+          element.innerHTML = marked.parse(fullText);  // render markdown when done
           const { body } = nodes();
           if (body) {
             requestAnimationFrame(() => {
@@ -131,7 +137,7 @@
           resolve();
         }
       };
-      
+
       typeChar();
     });
   }

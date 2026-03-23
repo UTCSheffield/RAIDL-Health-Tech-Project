@@ -282,6 +282,17 @@ html[data-mode="calm"] .get-help-btn:hover {
   white-space: normal;
   margin: 6px 0;
 }
+
+.msg p {
+  font-size: inherit;
+  line-height: inherit;
+  margin: 0 0 4px 0;
+}
+
+.msg p:last-child {
+  margin-bottom: 0;
+}
+
 .msg.user {
   align-self: flex-end;
   background: #0d9488;
@@ -1220,6 +1231,72 @@ html[data-mode="calm"] .blinking {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* Markdown styling for bot messages */
+.msg.bot p {
+  margin: 0 0 6px 0;
+}
+
+.msg.bot p:last-child {
+  margin-bottom: 0;
+}
+
+.msg.bot strong {
+  font-weight: 700;
+}
+
+.msg.bot em {
+  font-style: italic;
+}
+
+.msg.bot ul,
+.msg.bot ol {
+  padding-left: 16px;
+  margin: 4px 0;
+}
+
+.msg.bot li {
+  margin-bottom: 2px;
+}
+
+.msg.bot code {
+  background: rgba(0,0,0,0.1);
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-family: monospace;
+  font-size: 0.9em;
+}
+
+.msg.bot blockquote {
+  border-left: 3px solid rgba(0,0,0,0.2);
+  padding-left: 12px;
+  margin: 6px 0;
+  font-style: italic;
+}
+
+.msg.bot h1,
+.msg.bot h2,
+.msg.bot h3 {
+  font-weight: 700;
+  margin: 8px 0 4px 0;
+}
+
+.msg.bot h1 {
+  font-size: 1.3em;
+}
+
+.msg.bot h2 {
+  font-size: 1.1em;
+}
+
+.msg.bot h3 {
+  font-size: 1em;
+}
+
+.msg.bot a {
+  color: #0d9488;
+  text-decoration: underline;
 }
 
 /* Input area */
