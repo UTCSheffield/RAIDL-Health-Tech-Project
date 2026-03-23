@@ -2,20 +2,21 @@
   "name": "space-ahead",
   "type": "module",
   "version": "0.11.4",
-"scripts": {
-  "dev": "astro dev",
-  "build": "astro build",
-  "start": "npm run build && node server.js",
-  "preview": "astro preview",
-  "astro": "astro"
-},
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "start": "npm run build && node server.js",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
   "dependencies": {
-    "@astrojs/preact": "^4.1.2",
-    "@astrojs/rss": "4.0.12",
-    "@astrojs/sitemap": "^3.6.0",
+    "@astrojs/preact": "^5.0.2",
+    "@astrojs/rss": "^4.0.17",
+    "@astrojs/sitemap": "^3.7.1",
+    "@astrojs/vercel": "^10.0.2",
     "@swup/astro": "^1.7.0",
     "@tailwindcss/vite": "^4.1.16",
-    "astro": "^5.15.2",
+    "astro": "^6.0.8",
     "express": "^5.2.1",
     "groq-sdk": "^0.37.0",
     "preact": "^10.27.2",

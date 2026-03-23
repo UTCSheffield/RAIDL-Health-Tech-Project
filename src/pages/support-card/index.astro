@@ -167,12 +167,12 @@ import "../../styles/global.css";
     <div class="preview" aria-live="polite">
       <div class="card-screen" id="card-screen">
         <div class="card-title">My Support Card</div>
-        <div class="card-line"><span class="card-label">Name:</span><span id="p-name">—</span></div>
-        <div class="card-line"><span class="card-label">How I like to be told things:</span><span id="p-how">—</span></div>
-        <div class="card-line"><span class="card-label">Sensory triggers:</span><span id="p-sensory">—</span></div>
-        <div class="card-line"><span class="card-label">What helps me:</span><span id="p-helps">—</span></div>
-        <div class="card-line"><span class="card-label">Health note:</span><span id="p-health">—</span></div>
-        <div class="card-line"><span class="card-label">Emergency contact:</span><span id="p-contact">—</span></div>
+        <div class="card-line"><span class="card-label">Name:</span><span id="p-name">-</span></div>
+        <div class="card-line"><span class="card-label">How I like to be told things:</span><span id="p-how">-</span></div>
+        <div class="card-line"><span class="card-label">Sensory triggers:</span><span id="p-sensory">-</span></div>
+        <div class="card-line"><span class="card-label">What helps me:</span><span id="p-helps">-</span></div>
+        <div class="card-line"><span class="card-label">Health note:</span><span id="p-health">-</span></div>
+        <div class="card-line"><span class="card-label">Emergency contact:</span><span id="p-contact">-</span></div>
         <div class="card-line small"><strong>How to use:</strong> Show this card to a adult to help them understand what you need.</div>
       </div>
     </div>
@@ -204,7 +204,7 @@ import "../../styles/global.css";
           var f = fields[i];
           var v = ($(f) && $(f).value ? $(f).value.toString().trim() : '');
           var el = $('p-' + f);
-          if (el) { el.textContent = v || '—'; }
+          if (el) { el.textContent = v || '-'; }
         }
         try {
           var obj = {};
@@ -259,12 +259,12 @@ import "../../styles/global.css";
           try {
             updatePreview();
 
-            // Collect form data safely, with '—' fallback for empty
+            // Collect form data safely, with '-' fallback for empty
             var data = {};
             for (var i = 0; i < fields.length; i++) {
               data[fields[i]] = ($(fields[i]) && $(fields[i]).value)
                 ? $(fields[i]).value.toString().trim()
-                : '—';
+                : '-';
             }
 
             // Hard-coded site URL for QR (as requested)
@@ -400,11 +400,11 @@ html += 'font-size:8.5px;line-height:1.2;font-weight:600;color:#333;}';
               };
             } catch (writeErr) {
               console.error('Failed to write child window HTML', writeErr);
-              alert('Sorry — could not open the print preview. Check console for details.');
+              alert('Sorry - could not open the print preview. Check console for details.');
             }
           } catch (err) {
             console.error('Print handler error', err);
-            alert('Sorry — an error occurred while preparing the print page. Check the console for details.');
+            alert('Sorry - an error occurred while preparing the print page. Check the console for details.');
           }
         });
       }
@@ -417,7 +417,7 @@ html += 'font-size:8.5px;line-height:1.2;font-weight:600;color:#333;}';
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else {
-    // already ready — run immediately
+    // already ready - run immediately
     init();
   }
 })();
