@@ -36,6 +36,7 @@ const {
       title={siteConfig.title + " - RSS Feed"}
       href={new URL(withBase("/rss.xml"), Astro.site)}
     />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
     <title>{siteConfig.title}</title>
   </head>
   <body>

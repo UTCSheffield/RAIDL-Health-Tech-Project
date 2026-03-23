@@ -263,40 +263,47 @@ html[data-mode="calm"] .get-help-btn:hover {
 
 
 
-#site-header {
-  background: transparent !important;
-  /* keep existing sticky behaviour; padding removed so nav controls spacing */
-  padding: 0;
+/* Messages */
+.msg {
+  padding: 8px 12px;
+  border-radius: 8px;
+  max-width: 55%;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  opacity: 1;
+  transform: translateY(0);
+  height: auto;
+  line-height: 1.4;
+  font-size: inherit;
+  font-family: inherit;
+  display: block;
+  box-sizing: border-box;
+  white-space: normal;
+  margin: 6px 0;
 }
 
-/* Primary nav container — centered content with soft rounded bottom corners */
-.site-nav {
-  /* Limit width and center so the rounded corners are visible and consistent */
-  width: min(1200px, calc(100% - 32px));
-  margin: 8px auto 0;               /* small top gap for breathing room */
-  padding: 12px 20px;               /* comfortable hit area */
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  /* Visuals: soft frosted surface that adapts to your colours */
-  background: linear-gradient(180deg, rgba(255,255,255,0.86), rgba(255,255,255,0.72));
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-
-  /* rounded bottom only — keeps sharp top edge aligned to viewport top */
-  border-radius: 0 0 15px 15px;
-
-  /* soft shadow for separation but low contrast to avoid harsh edges */
-border-bottom: 1px solid rgba(0,0,0,0.05);
-  -webkit-font-smoothing:antialiased;
+.msg p {
+  font-size: inherit;
+  line-height: inherit;
+  margin: 0 0 4px 0;
 }
 
-/* Dark mode variant: preserve shape but use themed dark surface */
-html.dark .site-nav {
-  background: linear-gradient(180deg, rgba(43,47,58,0.9), rgba(34,36,42,0.85));
-  color: var(--brand-light);
+.msg p:last-child {
+  margin-bottom: 0;
 }
+
+.msg.user {
+  align-self: flex-end;
+  background: #0d9488;
+  color: white;
+}
+.msg.bot {
+  align-self: flex-start;
+  background: #F4A261;
+  color: #111;
+}
+
 
 /* Mobile: reduce side margins so nav fits comfortably on small screens */
 @media (max-width: 640px) {
@@ -1110,14 +1117,18 @@ html[data-mode="calm"] .blinking {
   bottom: 80px;
   right: 0;
   width: 340px;
-  max-width: calc(100vw - 40px);
+  max-width: calc(100vw - 32px);
   height: 420px;
+  max-height: calc(100vh - 160px);
   background: white;
   border-radius: 12px;
   box-shadow: 0 18px 50px rgba(2,6,23,0.18);
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  box-sizing: border-box;
+  font-family: inherit;
+  font-size: inherit;
 
   opacity: 0;
   transform: translateY(20px);
@@ -1149,31 +1160,143 @@ html[data-mode="calm"] .blinking {
   cursor: pointer;
 }
 
+.cw-disclaimer {
+  color: var(--text-secondary);
+  font-size: 12px;
+  margin: 0;
+  line-height: 1.2;
+}
+
 /* Body */
 .cw-body {
   flex: 1;
   padding: 14px;
   overflow-y: auto;
+  overflow-x: hidden;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
+  min-height: 0;
+  box-sizing: border-box;
 }
 
 /* Messages */
 .msg {
-  padding: 8px 10px;
+  padding: 8px 12px;
   border-radius: 8px;
-  max-width: 85%;
+  max-width: 65%;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  opacity: 1;
+  transform: translateY(0);
+  height: auto;
+  line-height: 1.4;
+  font-size: 14px;
+  font-family: Roboto Slab;
+    max-width: 75%;     
+  width: fit-content; 
+  display: inline-block;
+  box-sizing: border-box;
+  white-space: normal;
+  min-width: fit-content;
 }
 .msg.user {
   align-self: flex-end;
-  background: #0d9488;
+  background: linear-gradient(259deg,rgba(72, 224, 212, 1) 0%, rgba(13, 148, 136, 1) 12%, rgba(13, 148, 136, 1) 100%);;
   color: white;
+  margin-right: 0;
+  margin-left: auto;
 }
 .msg.bot {
   align-self: flex-start;
-  background: #f1f5f9;
+  background: linear-gradient(259deg,rgb(247, 178, 143) 0%, rgb(251, 138, 86) 33%, rgb(251, 138, 86) 100%);
   color: #111;
+  margin-left: 0;
+  margin-right: auto;
+}
+
+/* Fade-in animation class for messages */
+.msg.msg-fade-in {
+  animation: fadeInMsg 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Fade-in animation for messages */
+@keyframes fadeInMsg {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Markdown styling for bot messages */
+.msg.bot p {
+  margin: 0 0 6px 0;
+}
+
+.msg.bot p:last-child {
+  margin-bottom: 0;
+}
+
+.msg.bot strong {
+  font-weight: 700;
+}
+
+.msg.bot em {
+  font-style: italic;
+}
+
+.msg.bot ul,
+.msg.bot ol {
+  padding-left: 16px;
+  margin: 4px 0;
+}
+
+.msg.bot li {
+  margin-bottom: 2px;
+}
+
+.msg.bot code {
+  background: rgba(0,0,0,0.1);
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-family: monospace;
+  font-size: 0.9em;
+}
+
+.msg.bot blockquote {
+  border-left: 3px solid rgba(0,0,0,0.2);
+  padding-left: 12px;
+  margin: 6px 0;
+  font-style: italic;
+}
+
+.msg.bot h1,
+.msg.bot h2,
+.msg.bot h3 {
+  font-weight: 700;
+  margin: 8px 0 4px 0;
+}
+
+.msg.bot h1 {
+  font-size: 1.3em;
+}
+
+.msg.bot h2 {
+  font-size: 1.1em;
+}
+
+.msg.bot h3 {
+  font-size: 1em;
+}
+
+.msg.bot a {
+  color: #0d9488;
+  text-decoration: underline;
 }
 
 /* Input area */
@@ -1183,6 +1306,8 @@ html[data-mode="calm"] .blinking {
   padding: 12px;
   border-top: 1px solid #e2e8f0;
   background: white;
+  flex-shrink: 0;
+  box-sizing: border-box;
 }
 
 .cw-input-el {
@@ -1190,6 +1315,15 @@ html[data-mode="calm"] .blinking {
   padding: 10px 12px;
   border-radius: 999px;
   border: 1px solid #cbd5e1;
+  font-family: inherit;
+  font-size: 13px;
+  box-sizing: border-box;
+  outline: none;
+}
+
+.cw-input-el:focus {
+  border-color: #0d9488;
+  box-shadow: 0 0 0 2px rgba(13, 148, 136, 0.1);
 }
 
 .cw-send {
@@ -1200,6 +1334,12 @@ html[data-mode="calm"] .blinking {
   color: white;
   cursor: pointer;
   font-weight: 700;
+  flex-shrink: 0;
+  transition: background 0.2s;
+}
+
+.cw-send:hover {
+  background: #0f766e;
 }
 
 
@@ -1211,19 +1351,23 @@ html[data-mode="calm"] .blinking {
   position: absolute;
   right: 76px;               /* move it left of the FAB; tweak as needed */
   bottom: 18px;
-  min-width: 160px;         /* ensures it isn't too small */
-  max-width: 320px;         /* prevents it from growing too wide on large screens */
-  padding: 10px 14px;       /* more breathing room for text */
-  border-radius: 999px;
-  background: linear-gradient(90deg, #fb8a56 0%, #8d3db8 100%);
+  min-width: 180px;         /* ensures it isn't too small */
+  max-width: 300px;         /* prevents it from growing too wide on large screens */
+  padding: 12px 16px;       /* more breathing room for text */
+  border-radius: 16px;
+  background: linear-gradient(135deg, #0d9488 0%, #059669 100%);
   color: #fff;
-  font-weight: 600;
-  font-size: 13px;
-  line-height: 1.2;
+  font-weight: 500;
+  font-size: inherit;
+  font-family: inherit;
+  line-height: 1.4;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
+  text-align: center;
   gap: 8px;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.18);
+  box-shadow: 0 10px 28px rgba(13, 148, 136, 0.22), 0 2px 8px rgba(0,0,0,0.12);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   z-index: 100001;
   cursor: pointer;
   pointer-events: auto;
@@ -1231,46 +1375,86 @@ html[data-mode="calm"] .blinking {
   white-space: normal;      /* allow wrapping */
   word-break: break-word;   /* break long words if needed */
   overflow: visible;
+  transition: all 0.3s cubic-bezier(0.2, 0.9, 0.3, 1);
 }
 
-/* caret (small triangle) */
+#cw-bubble:hover {
+  transform: translateX(-4px);
+  box-shadow: 0 12px 32px rgba(13, 148, 136, 0.28), 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* speech bubble tail (smooth triangle) */
 #cw-bubble::after {
   content: "";
   position: absolute;
-  right: -6px;              /* small offset so caret sits near FAB */
+  right: -14px;              
+  bottom: 12px;
+  width: 0;
+  height: 0;
+  border-left: 14px solid #0d9488;
+  border-top: 11px solid transparent;
+  border-bottom: 11px solid transparent;
+  filter: drop-shadow(-2px 1px 2px rgba(0,0,0,0.1));
+}
+
+/* orange border accent on tail */
+#cw-bubble::before {
+  content: "";
+  position: absolute;
+  right: -17px;              
   bottom: 10px;
   width: 0;
   height: 0;
-  border-left: 6px solid transparent;
-  border-right: 6px solid transparent;
-  border-top: 6px solid rgba(0,0,0,0.06);
-  transform: translateX(0);
+  border-left: 17px solid #f97316;
+  border-top: 13px solid transparent;
+  border-bottom: 13px solid transparent;
+  opacity: 0.35;
+  pointer-events: none;
 }
 
-/* optional: make text truncate on very small screens */
+/* optional: make text adapt on very small screens */
 @media (max-width: 420px) {
   #cw-bubble {
-    min-width: 120px;
-    max-width: 200px;
+    min-width: 140px;
+    max-width: 220px;
     font-size: 12px;
+    padding: 10px 14px;
   }
 }
 
 
-/* pop animation */
+/* pop animation with smooth entrance */
 @keyframes cw-pop {
-  0% { transform: scale(0.85); opacity: 0; }
-  60% { transform: scale(1.05); opacity: 1; }
-  100% { transform: scale(1); opacity: 1; }
+  0% { 
+    transform: scale(0.75) translateX(20px); 
+    opacity: 0; 
+  }
+  60% { 
+    transform: scale(1.08) translateX(-2px); 
+    opacity: 1; 
+  }
+  100% { 
+    transform: scale(1) translateX(0); 
+    opacity: 1; 
+  }
 }
 
 #cw-bubble.show {
-  animation: cw-pop 360ms cubic-bezier(.2,.9,.3,1);
+  animation: cw-pop 420ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* subtle pulse to draw attention (optional) */
+/* gentle pulse to draw attention */
+@keyframes cw-pulse-glow {
+  0%, 100% { 
+    box-shadow: 0 10px 28px rgba(13, 148, 136, 0.22), 0 2px 8px rgba(0,0,0,0.12);
+  }
+  50% { 
+    box-shadow: 0 12px 32px rgba(13, 148, 136, 0.35), 0 4px 12px rgba(0,0,0,0.15), 0 0 0 4px rgba(13, 148, 136, 0.12);
+  }
+}
+
 #cw-bubble.pulse {
-  box-shadow: 0 6px 18px rgba(0,0,0,0.18), 0 0 0 6px rgba(139, 58, 173, 0.08);
+  animation: cw-pulse-glow 2.2s ease-in-out 0.3s infinite;
 }
 
 /* Help page cards and emphasis */

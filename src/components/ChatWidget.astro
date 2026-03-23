@@ -23,11 +23,14 @@
     aria-label="Chat panel"
   >
     <header class="cw-header">
-      <strong>Care Bot</strong>
+      <div style="display:flex;flex-direction:column;">
+        <strong style="padding: 6px 10px 2px 10px;">Care Bot</strong>
+        <p class="cw-disclaimer" style="margin:0;font-size:12px;color:#6b7280;padding:0 10px 6px 10px;">Care Bot is not a clinician. In an emergency call 999.</p>
+      </div>
       <button id="cw-close" class="cw-close" aria-label="Close">✕</button>
     </header>
 
-    <div id="cw-body" class="cw-body">Hello! Type a message to start.</div>
+    <div id="cw-body" class="cw-body"></div>
 
     <div class="cw-input">
       <input id="cw-input" class="cw-input-el" placeholder="Type a message..." />
@@ -40,6 +43,9 @@
 (function () {
   if (window.__cw_delegation_installed) return;
   window.__cw_delegation_installed = true;
+
+  // Conversation history kept in-memory for the session
+  const conversationHistory = [];
 
   // Helper to read current nodes (always uses the live DOM)
   function nodes() {
@@ -59,6 +65,17 @@
     panel.setAttribute('aria-hidden', 'false');
     if (btnLaunch) btnLaunch.setAttribute('aria-expanded', 'true');
     if (input) input.focus();
+    // Ensure the initial bot greeting is present when panel opens
+    try {
+      const { body } = nodes();
+      if (body && body.children.length === 0) {
+        addMessage("Hey, I'm Care Bot. I'm here if you want to talk, ask something, or just think out loud.", 'bot');
+        // also seed the initial assistant message into conversation history
+        conversationHistory.push({ role: 'assistant', content: "Hey, I'm Care Bot. I'm here if you want to talk, ask something, or just think out loud." });
+      }
+    } catch (e) {
+      console.error('init greeting failed', e);
+    }
   }
 
   function closePanel() {
@@ -72,11 +89,57 @@
     const { body } = nodes();
     if (!body) return null;
     const d = document.createElement('div');
-    d.className = 'msg ' + (from === 'user' ? 'user' : 'bot');
-    d.textContent = text;
+    d.className = 'msg ' + (from === 'user' ? 'user' : 'bot') + ' msg-fade-in';
+    
+    if (from === 'bot') {
+      d.innerHTML = marked.parse(text);  // parse markdown for bot messages
+    } else {
+      d.textContent = text;  // keep user messages as plain text (safer)
+    }
+    
     body.appendChild(d);
-    body.scrollTop = body.scrollHeight;
+    // Use requestAnimationFrame to ensure scroll happens after DOM update
+    requestAnimationFrame(() => {
+      body.scrollTop = body.scrollHeight;
+    });
     return d;
+  }
+
+  // Gradually type out text character by character with fade effect
+  async function typeOutMessage(element, fullText, delayMs = 30) {
+    return new Promise((resolve) => {
+      let charIndex = 0;
+      element.textContent = '';
+
+      const typeChar = () => {
+        if (charIndex < fullText.length) {
+          element.textContent += fullText[charIndex];  // plain text while typing
+          charIndex++;
+          
+          // Force layout recalculation and scroll
+          const { body } = nodes();
+          if (body) {
+            // Trigger reflow to ensure text height is calculated
+            void element.offsetHeight;
+            requestAnimationFrame(() => {
+              body.scrollTop = body.scrollHeight;
+            });
+          }
+          setTimeout(typeChar, delayMs);
+        } else {
+          element.innerHTML = marked.parse(fullText);  // render markdown when done
+          const { body } = nodes();
+          if (body) {
+            requestAnimationFrame(() => {
+              body.scrollTop = body.scrollHeight;
+            });
+          }
+          resolve();
+        }
+      };
+
+      typeChar();
+    });
   }
 
   async function sendMessageToServer(message) {
@@ -84,7 +147,7 @@
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message })
+        body: JSON.stringify({ messages: message })
       });
 
       const contentType = res.headers.get('content-type') || '';
@@ -104,7 +167,10 @@
       }
 
       const data = await res.json();
-      return data.reply || data.error || null;
+      // Ensure reply is clean string
+      const reply = (data.reply || data.error || '').toString().trim();
+      if (!reply) throw new Error('Empty response from server');
+      return reply;
     } catch (err) {
       console.error('sendMessageToServer error:', err);
       throw err;
@@ -132,17 +198,67 @@
     }
 
     if (send) {
-      const { input } = nodes();
+      const { input, body } = nodes();
       if (!input) return;
       const v = input.value.trim();
       if (!v) return;
+      
+      // Add user message and clear input
       addMessage(v, 'user');
+      // push to conversation history
+      conversationHistory.push({ role: 'user', content: v });
       input.value = '';
-      const thinkingEl = addMessage('Thinking...', 'bot');
-      sendMessageToServer(v).then(reply => {
-        if (thinkingEl) thinkingEl.textContent = reply ?? 'No reply';
+      input.blur();
+      
+      // Disable input while waiting
+      const { btnSend } = nodes();
+      input.disabled = true;
+      if (btnSend) btnSend.disabled = true;
+
+      // Show thinking indicator with animation
+      const thinkingEl = addMessage('', 'bot');
+      let dots = 0;
+      const thinkingInterval = setInterval(() => {
+        dots = (dots + 1) % 4;
+        thinkingEl.textContent = 'Thinking' + '.'.repeat(dots);
+      }, 400);
+      
+      // Send the full conversation history to the API
+      const recentHistory = conversationHistory.slice(-20);
+      sendMessageToServer(recentHistory).then(reply => {
+        clearInterval(thinkingInterval);
+
+        // Validate reply
+        const replyText = reply && typeof reply === 'string' ? reply.trim() : null;
+        const finalText = replyText || "Sorry, something went wrong on my end. Try again in a moment.";
+
+        // push assistant reply into history
+        conversationHistory.push({ role: 'assistant', content: finalText });
+
+        // Add realistic delay before animating response (400ms)
+        setTimeout(async () => {
+          if (thinkingEl) {
+            // Type out the response gradually
+            await typeOutMessage(thinkingEl, finalText, 15);
+            thinkingEl.style.color = '';
+          }
+          // re-enable input after response
+          input.disabled = false;
+          if (btnSend) btnSend.disabled = false;
+          input.focus();
+        }, 400);
       }).catch(err => {
-        if (thinkingEl) thinkingEl.textContent = 'Error: ' + (err.message || 'Request failed');
+        clearInterval(thinkingInterval);
+        // Friendly error message for users
+        const friendly = "Sorry, something went wrong on my end. Try again in a moment.";
+        if (thinkingEl) {
+          thinkingEl.textContent = friendly;
+          thinkingEl.style.color = '#dc2626';
+        }
+        // re-enable input
+        input.disabled = false;
+        if (btnSend) btnSend.disabled = false;
+        input.focus();
       });
       e.preventDefault();
       return;
@@ -195,7 +311,7 @@
     b.type = 'button';
     b.setAttribute('aria-label', 'Open chat');
     b.className = '';
-    b.innerHTML = `<span class="cw-bubble-text">What's up? Do you want to chat?</span><span aria-hidden="true"></span>`;
+    b.innerHTML = `<span class="cw-bubble-text">Care Bot is here if you want to chat</span><span aria-hidden="true"></span>`;
     // ensure it doesn't steal focus on creation
     b.tabIndex = -1;
     root.appendChild(b);
@@ -203,6 +319,13 @@
   }
 
   function showBubble(opts = {}) {
+    // Only show once per session unless overridden
+    try {
+      if (sessionStorage.getItem('cw_bubble_shown')) return;
+    } catch (e) {
+      // ignore storage errors
+    }
+
     const b = createBubble();
     if (!b) return;
     b.classList.add('show', 'pulse');
@@ -213,6 +336,11 @@
     setTimeout(() => b.classList.remove('pulse'), 2200);
     if (opts.autoHideMs) {
       setTimeout(() => hideBubble(), opts.autoHideMs);
+    }
+    try {
+      sessionStorage.setItem('cw_bubble_shown', '1');
+    } catch (e) {
+      // ignore
     }
   }
 

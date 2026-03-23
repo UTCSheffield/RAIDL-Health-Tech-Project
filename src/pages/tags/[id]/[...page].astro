@@ -12,6 +12,8 @@ import MainLayout from "../../../layouts/MainLayout.astro";
 import Pagination from "../../../components/Pagination.astro";
 import PostListPreview from "../../../components/PostListPreview.astro";
 
+export const prerender = true;
+
 export async function getStaticPaths({ paginate }: GetStaticPathsOptions) {
   const posts = (await getCollection("articles")).sort(sortItemsByDateDesc);
   const tags = getAllTags(posts);
