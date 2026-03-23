@@ -9,6 +9,7 @@ import tailwindcss from "@tailwindcss/vite";
 export default defineConfig({
   site: "https://utcsheffield.github.io",
   base: "/",
+  output: "server",
   server: {
     open: '/RAIDL-Health-Tech-Project',
     
