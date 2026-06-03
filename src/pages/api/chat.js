@@ -1,33 +1,20 @@
 // src/pages/api/chat.js
 import { Groq } from "groq-sdk";
 
-console.log("DEBUG: GROQ env present:", typeof process.env.GROQ_API_KEY !== "undefined");
-console.log("DEBUG: GROQ env length:", process.env.GROQ_API_KEY ? process.env.GROQ_API_KEY.length : 0);
-
-let groq;
-try {
-  groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
-} catch (e) {
-  console.error("DEBUG: Groq client init error:", e);
-}
-
 export async function POST({ request }) {
   try {
     const { message } = await request.json();
 
-    if (!process.env.GROQ_API_KEY) {
+    const apiKey = process.env.GROQ_API_KEY || import.meta.env.GROQ_API_KEY;
+
+    if (!apiKey) {
       return new Response(JSON.stringify({ error: "Server missing GROQ_API_KEY" }), {
         status: 500,
         headers: { "Content-Type": "application/json" }
       });
     }
 
-    if (!groq) {
-      return new Response(JSON.stringify({ error: "Groq client not initialized" }), {
-        status: 500,
-        headers: { "Content-Type": "application/json" }
-      });
-    }
+    const groq = new Groq({ apiKey });
 
     const completion = await groq.chat.completions.create({
       model: "llama-3.3-70b-versatile",
