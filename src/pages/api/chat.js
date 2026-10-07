@@ -1,5 +1,6 @@
 // src/pages/api/chat.js
 import { Groq } from "groq-sdk";
+import { SYSTEM_PROMPT } from "../../utils/chatPrompt.js";
 
 export async function POST({ request }) {
   try {
@@ -17,10 +18,10 @@ export async function POST({ request }) {
     const groq = new Groq({ apiKey });
 
     const completion = await groq.chat.completions.create({
-      model: "llama-3.3-70b-versatile",
+      model: process.env.GROQ_MODEL || "openai/gpt-oss-20b",
       stream: false,
       messages: [
-        { role: "system", content: "You are a helpful assistant." },
+        { role: "system", content: SYSTEM_PROMPT },
         { role: "user", content: message }
       ]
     });
