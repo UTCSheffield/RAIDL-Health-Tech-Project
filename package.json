@@ -21,7 +21,8 @@
     "groq-sdk": "^0.37.0",
     "preact": "^10.27.2",
     "sharp": "^0.34.4",
-    "tailwindcss": "^4.1.16"
+    "tailwindcss": "^4.1.16",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "prettier": "^3.6.2",
