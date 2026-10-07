@@ -2,15 +2,14 @@ import { defineConfig } from "astro/config";
 import preact from "@astrojs/preact";
 import sitemap from "@astrojs/sitemap";
 import swup from "@swup/astro";
-import vercel from '@astrojs/vercel';
 import tailwindcss from "@tailwindcss/vite";
+
+const siteUrl = process.env.PUBLIC_SITE_URL || process.env.SITE_URL || "https://health-tech-project.up.railway.app";
 
 // https://astro.build/config
 export default defineConfig({
-  site: "https://utcsheffield.github.io",
+  site: siteUrl,
   base: "/",
-  output: "server",
-  adapter: vercel(),
   server: {
     open: '/RAIDL-Health-Tech-Project',
     
