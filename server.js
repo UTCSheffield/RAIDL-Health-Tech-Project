@@ -42,6 +42,7 @@ app.post("/api/chat", async (req, res) => {
     if (!GROQ_KEY) {
       return res.status(500).json({ error: "Server missing GROQ_API_KEY" });
     }
+    const GROQ_MODEL = process.env.GROQ_MODEL || "openai/gpt-oss-20b";
 
     // Add user message to history
     chatHistory.push({ role: "user", content: message.trim() });
@@ -61,7 +62,7 @@ app.post("/api/chat", async (req, res) => {
         "Authorization": `Bearer ${GROQ_KEY}`
       },
       body: JSON.stringify({
-        model: "llama-3.3-70b-versatile",
+        model: GROQ_MODEL,
         messages,
         stream: false,
         max_completion_tokens: 512
