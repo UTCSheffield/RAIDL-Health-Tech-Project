@@ -34,7 +34,7 @@ Below are some common profiles you might hear about:
 - **Sensitive senses**  
   Everyday sights, sounds, textures, or smells can feel overwhelming. Bright lights, crowded spaces, or certain fabrics may cause stress. Having a quiet spaces, headphones, or predictable sensory breaks can help.
 
-- **Havits**  
+- **Habits**  
   Knowing whats happening next reduces anxiety. Sudden changes or unclear plans can be worrying. So advance notices, step‑by‑step instructions, and consistent routines are important.
 
 - **Focused interests**  
