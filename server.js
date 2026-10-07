@@ -61,16 +61,25 @@ app.post("/api/chat", async (req, res) => {
         "Authorization": `Bearer ${GROQ_KEY}`
       },
       body: JSON.stringify({
-        model: "llama-3.1-8b-instant",
+        model: "llama-3.3-70b-versatile",
         messages,
         stream: false,
         max_completion_tokens: 512
       })
     });
 
-    const data = await resp.json().catch(() => null);
+    const responseText = await resp.text();
+    let data;
+    try {
+      data = JSON.parse(responseText);
+    } catch {
+      data = { error: { message: responseText || resp.statusText } };
+    }
+
     if (!resp.ok) {
-      return res.status(500).json({ error: "Groq API error", details: data || await resp.text() });
+      const details = data?.error?.message || data?.message || "Groq returned an unexpected error";
+      console.error(`Groq API error (${resp.status}):`, details);
+      return res.status(502).json({ error: "Groq API error", details, upstreamStatus: resp.status });
     }
 
     const reply = data?.choices?.[0]?.message?.content ?? null;
