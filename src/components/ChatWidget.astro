@@ -91,7 +91,11 @@
       if (!res.ok) {
         if (contentType.includes('application/json')) {
           const errJson = await res.json();
-          throw new Error(errJson.error || JSON.stringify(errJson));
+          const details = errJson.details;
+          const message = typeof details === 'string'
+            ? details
+            : details?.message || details?.error?.message;
+          throw new Error(message || errJson.error || JSON.stringify(errJson));
         } else {
           const text = await res.text();
           throw new Error(text || res.statusText);
